@@ -13,6 +13,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "My Application"
+rootProject.name = "3city Commuter"
 include(":app")
 include(":data")
+include(":network")
