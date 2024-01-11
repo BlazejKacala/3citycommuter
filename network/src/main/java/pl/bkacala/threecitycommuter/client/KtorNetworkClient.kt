@@ -25,6 +25,4 @@ class KtorNetworkClient(
         val dataToDeserialize = jsonData.jsonObject.entries.first().value
         return json.decodeFromJsonElement(StopsNetworkData.serializer(), dataToDeserialize)
     }
-
-
 }
