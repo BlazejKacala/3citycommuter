@@ -35,20 +35,17 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation(libs.kotlinx.serialization.json)
 
-    implementation("io.ktor:ktor-client-core:2.3.7")
-    implementation("io.ktor:ktor-client-serialization:2.3.7")
-    implementation("io.ktor:ktor-client-android:2.3.7")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("io.ktor:ktor-client-mock:2.3.7")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    testImplementation(libs.junit)
+    testImplementation(libs.ktor.client.mock)
 }
