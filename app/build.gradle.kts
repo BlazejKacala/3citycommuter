@@ -1,8 +1,11 @@
+apply("${project.rootDir}/spotless.gradle")
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.hilt)
     alias(libs.plugins.secrets)
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+    id("com.diffplug.spotless") version "6.24.0"
     kotlin("kapt")
 }
 

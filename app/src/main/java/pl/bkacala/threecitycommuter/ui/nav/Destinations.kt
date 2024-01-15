@@ -10,23 +10,23 @@ import pl.bkacala.threecitycommuter.R
 enum class TopLvlDestinations(
     val route: String,
     @StringRes val label: Int,
-    val icon: ImageVector
+    val icon: ImageVector,
 ) {
     Map(
         route = "Map",
         label = R.string.nav_toplvl_map,
-        icon = Icons.Rounded.Home
+        icon = Icons.Rounded.Home,
     ),
     Schedule(
         route = "Schedule",
         label = R.string.nav_toplvl_schedule,
-        icon = Icons.Rounded.AccountBox
+        icon = Icons.Rounded.AccountBox,
     ),
 }
 
 enum class Destinations(
-    val route: String
+    val route: String,
 ) {
     Maps(route = "Maps"),
-    Lines(route = "Lines")
+    Lines(route = "Lines"),
 }
