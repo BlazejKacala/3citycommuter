@@ -1,14 +1,14 @@
 package pl.bkacala.threecitycommuter.repository.stops
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
+import pl.bkacala.threecitycommuter.client.NetworkClient
 import pl.bkacala.threecitycommuter.model.stops.StopData
+import pl.bkacala.threecitycommuter.model.stops.toStopData
+import javax.inject.Inject
 
-class RealStopsRepository(
-    private val ioDispatcher: CoroutineDispatcher,
-
+class RealStopsRepository @Inject constructor(
+    private val networkClient: NetworkClient
 ) : StopsRepository {
-    override fun searchContents(searchQuery: String): Flow<List<StopData>> {
-        TODO("Not yet implemented")
+    override suspend fun getBusStops(): List<StopData> {
+        return networkClient.getStops().stops.map { it.toStopData() }
     }
 }

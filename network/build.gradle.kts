@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin)
     kotlin("plugin.serialization") version "1.9.22"
+    kotlin("kapt")
 }
 
 android {
@@ -35,6 +37,9 @@ android {
 }
 
 dependencies {
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.hilt.android)
+
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.ktor.client.core)
