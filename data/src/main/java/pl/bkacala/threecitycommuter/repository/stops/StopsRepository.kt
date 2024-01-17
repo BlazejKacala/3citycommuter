@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 import pl.bkacala.threecitycommuter.model.stops.StopData
 
 interface StopsRepository {
-    suspend fun getBusStops(): List<StopData>
+    fun getBusStops(): Flow<List<StopData>>
 }

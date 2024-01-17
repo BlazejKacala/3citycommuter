@@ -25,6 +25,7 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidxComposeBom" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-test-manifest= { module = "androidx.compose.ui:ui-test-manifest" }
