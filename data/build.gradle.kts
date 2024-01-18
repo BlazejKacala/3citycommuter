@@ -44,4 +44,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
 
     implementation(project(":network"))
+    implementation(project(":database"))
+
 }
