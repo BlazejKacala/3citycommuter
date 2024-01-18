@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin)
     kotlin("plugin.serialization") version "1.9.22"
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     implementation(libs.hilt.android)
 
     implementation(libs.kotlinx.serialization.json)

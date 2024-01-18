@@ -6,7 +6,8 @@ plugins {
     alias(libs.plugins.secrets)
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     id("com.diffplug.spotless") version "6.24.0"
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
+
 }
 
 secrets {
@@ -55,7 +56,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packaging {
         resources {
@@ -65,7 +66,7 @@ android {
 }
 
 dependencies {
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     implementation(libs.hilt.android)
 
     implementation(platform(libs.androidx.compose.bom))
@@ -93,9 +94,6 @@ dependencies {
 
     implementation(project(":data"))
 
-}
-kapt {
-    correctErrorTypes = true
 }
 
 
