@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    implementation(libs.kotlinx.datetime)
 
     implementation(project(":network"))
     implementation(project(":database"))

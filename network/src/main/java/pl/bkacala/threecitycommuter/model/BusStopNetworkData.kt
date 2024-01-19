@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class StopsNetworkData(
+data class BusStopsNetworkData(
     @SerialName("lastUpdate") val lastUpdate: String,
-    @SerialName("stops") val stops: List<StopNetworkData>
+    @SerialName("stops") val stops: List<BusStopNetworkData>
 ) {
     @Serializable
-    data class StopNetworkData(
+    data class BusStopNetworkData(
         @SerialName("stopId") val stopId: Int,
         @SerialName("stopCode") val stopCode: String? = null,
         @SerialName("stopName") val stopName: String? = null,

@@ -1,6 +1,6 @@
 package pl.bkacala.threecitycommuter.model.stops
 
-data class StopData(
+data class BusStopData(
     val stopId: Int,
     val stopCode: String?,
     val stopName: String?,

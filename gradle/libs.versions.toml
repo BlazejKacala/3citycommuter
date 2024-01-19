@@ -12,6 +12,7 @@ hiltNavigationCompose = "1.1.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 kotlin = "1.9.10"
+kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.6.0"
 ktor= "2.3.7"
 lifecycleRuntimeKtx = "2.7.0"
@@ -46,6 +47,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }

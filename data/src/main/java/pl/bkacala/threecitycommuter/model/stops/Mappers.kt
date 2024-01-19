@@ -1,10 +1,10 @@
 package pl.bkacala.threecitycommuter.model.stops
 
-import pl.bkacala.threecitycommuter.model.StopsNetworkData
+import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
 
 
-fun BusStopEntity.toStopData(): StopData {
-    return StopData(
+fun BusStopEntity.toStopData(): BusStopData {
+    return BusStopData(
         stopId = this.stopId,
         stopCode = this.stopCode,
         stopName = this.stopName,
@@ -30,7 +30,7 @@ fun BusStopEntity.toStopData(): StopData {
     )
 }
 
-fun StopsNetworkData.StopNetworkData.toEntity(): BusStopEntity {
+fun BusStopsNetworkData.BusStopNetworkData.toEntity(): BusStopEntity {
     return BusStopEntity(
         stopId = this.stopId,
         stopCode = this.stopCode,
