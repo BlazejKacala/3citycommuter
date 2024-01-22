@@ -31,7 +31,10 @@ class RealBusStopsRepository @Inject constructor(
                 busStopsDao.upsertBusStations(networkClient.getStops().stops.map { it.toEntity() })
                 lastUpdateRepository.storeLastUpdateCurrentTimeStamp(BUS_STOPS_KEY)
             }
-            emit(busStopsDao.getBusStations().map { it.toStopData() })
+            emit(busStopsDao.getBusStations()
+                .filter { it.virtual != 0 }
+                .filter { it.virtual != 0 }
+                .map { it.toStopData() })
         }.flowOn(Dispatchers.IO)
     }
 }
