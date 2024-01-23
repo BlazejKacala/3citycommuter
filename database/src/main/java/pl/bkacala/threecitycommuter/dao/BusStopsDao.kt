@@ -3,7 +3,6 @@ package pl.bkacala.threecitycommuter.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import kotlinx.coroutines.flow.Flow
 import pl.bkacala.threecitycommuter.model.stops.BusStopEntity
 
 @Dao

@@ -9,12 +9,9 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.ByteReadChannel
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.Test
-import org.junit.internal.Classes.getClass
-
 import pl.bkacala.threecitycommuter.client.KtorNetworkClient
 
 

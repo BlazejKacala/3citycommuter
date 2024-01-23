@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import pl.bkacala.threecitycommuter.ui.nav.AppNavHost
-import pl.bkacala.threecitycommuter.ui.nav.AppNavigationBar
 import pl.bkacala.threecitycommuter.ui.theme.AppTheme
 
 @AndroidEntryPoint
@@ -40,7 +39,6 @@ fun App() {
         topBar = {
             TopAppBar(title = { Text(text = "Mapa komunikacji miejskiej") })
         },
-        bottomBar = { AppNavigationBar(navController = navController) },
         content = { paddingValues ->
             Box(
                 modifier = Modifier

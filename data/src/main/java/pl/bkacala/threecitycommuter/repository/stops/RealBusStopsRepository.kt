@@ -1,6 +1,5 @@
 package pl.bkacala.threecitycommuter.repository.stops
 
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -32,8 +31,7 @@ class RealBusStopsRepository @Inject constructor(
                 lastUpdateRepository.storeLastUpdateCurrentTimeStamp(BUS_STOPS_KEY)
             }
             emit(busStopsDao.getBusStations()
-                .filter { it.virtual != 0 }
-                .filter { it.virtual != 0 }
+                .filter { it.virtual == 0 }
                 .map { it.toStopData() })
         }.flowOn(Dispatchers.IO)
     }

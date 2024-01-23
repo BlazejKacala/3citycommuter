@@ -5,9 +5,9 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
 
 class KtorNetworkClient(

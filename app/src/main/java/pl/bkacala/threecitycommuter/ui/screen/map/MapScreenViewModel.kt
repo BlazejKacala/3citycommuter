@@ -2,8 +2,6 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.ui.common.UiState
