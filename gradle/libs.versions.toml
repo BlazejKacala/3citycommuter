@@ -4,6 +4,7 @@ androidxComposeBom = "2023.10.01"
 appcompat = "1.6.1"
 androidGradlePlugin = "8.2.1"
 coreKtx = "1.12.0"
+coreSplashscreen = "1.0.1"
 espressoCore = "3.4.0"
 hiltAndroid = "2.50"
 hiltAndroidCompiler = "2.50"
@@ -18,10 +19,12 @@ ktor= "2.3.7"
 lifecycleRuntimeKtx = "2.7.0"
 mapsCompose = "4.3.0"
 navigationCompose = "2.7.6"
-playServicesMaps = "18.2.0"
+permissionFlow = "1.2.0"
+playServices = "18.2.0"
 room = "2.6.1"
 secrets = "2.0.1"
 material = "1.11.0"
+playServicesLocation = "21.1.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -37,6 +40,7 @@ androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling
 androidx-compose-material-iconsExtended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
@@ -59,8 +63,12 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsCompose" }
 maps-compose-widgets = { module = "com.google.maps.android:maps-compose-widgets", version.ref = "mapsCompose" }
-play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+permission-flow-android = { module = "dev.shreyaspatil.permission-flow:permission-flow-android", version.ref = "permissionFlow" }
+permission-flow-compose = { module = "dev.shreyaspatil.permission-flow:permission-flow-compose", version.ref = "permissionFlow" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServices" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServices" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+gms-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

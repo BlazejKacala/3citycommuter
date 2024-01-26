@@ -73,7 +73,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
 
     implementation(libs.play.services.maps)
-    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
     implementation(libs.maps.compose.widgets)
@@ -88,6 +88,10 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation (libs.permission.flow.android)
+    implementation (libs.permission.flow.compose)
+    implementation(libs.androidx.core.splashscreen)
+
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)

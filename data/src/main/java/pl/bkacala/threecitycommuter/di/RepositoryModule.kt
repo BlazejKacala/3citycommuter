@@ -4,6 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import pl.bkacala.threecitycommuter.repository.location.LocationRepository
+import pl.bkacala.threecitycommuter.repository.location.RealLocationRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.repository.stops.RealBusStopsRepository
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
@@ -26,5 +28,10 @@ abstract class RepositoryModule {
         realRepositoryImpl: RealLastUpdateRepository
     ): LastUpdateRepository
 
+    @Binds
+    @Singleton
+    abstract fun bindLocationRepository(
+        realRepositoryImpl: RealLocationRepository
+    ): LocationRepository
 
 }
