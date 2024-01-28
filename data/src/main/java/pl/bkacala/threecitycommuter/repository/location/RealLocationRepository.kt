@@ -1,53 +1,53 @@
 package pl.bkacala.threecitycommuter.repository.location
-import android.Manifest
 import android.annotation.SuppressLint
-import android.os.Looper
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import dev.shreyaspatil.permissionFlow.PermissionFlow
+import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.OnTokenCanceledListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import javax.inject.Inject
 
 class RealLocationRepository @Inject constructor(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
-    private val permissionFlow: PermissionFlow
 
 ) : LocationRepository {
 
     @SuppressLint("MissingPermission")
     override fun getLocation(): Flow<UserLocation> = callbackFlow {
 
-        val callback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                super.onLocationResult(locationResult)
-                locationResult.lastLocation?.let {
-                    trySend(
-                        UserLocation
-                            (
-                            latitude = it.latitude,
-                            longitude = it.longitude,
-                            isFixed = false
-                        )
-                    )
-                }
+        var isCancellationRequested = false
+
+        val callback = object : CancellationToken() {
+            override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
+                return this
+            }
+
+            override fun isCancellationRequested(): Boolean {
+                return isCancellationRequested
             }
         }
 
-        if(permissionFlow.getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION).value.isGranted) {
-            val locationRequest = LocationRequest.Builder(60 * 1000).build()
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest, callback, Looper.getMainLooper())
-        } else {
-            trySend(
-                UserLocation.default()
-            )
+        fusedLocationProviderClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, callback).addOnSuccessListener {
+            it?.let {
+                trySend(
+                    UserLocation(
+                        latitude = it.latitude,
+                        longitude = it.longitude,
+                        isFixed = false
+                    )
+                )
+            }
         }
+
         awaitClose {
-            fusedLocationProviderClient.removeLocationUpdates(callback)
+            isCancellationRequested = true
         }
-    }
+
+    }.flowOn(Dispatchers.IO)
+
 }

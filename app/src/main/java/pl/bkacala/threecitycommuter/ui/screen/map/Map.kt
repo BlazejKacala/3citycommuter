@@ -22,7 +22,6 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.clustering.rememberClusterManager
-import kotlinx.coroutines.flow.collectLatest
 import pl.bkacala.threecitycommuter.R
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.component.map.BusStopClusterItem
@@ -39,10 +38,9 @@ fun Map(
     val iconBitmap = remember { ContextCompat.getDrawable(context, R.drawable.bus_station)?.toBitmap()?.changeColor(color) }
 
     LaunchedEffect(viewModel) {
-        viewModel.location.collectLatest {
-            cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(
-                LatLng(it.latitude, it.longitude), 16.0f
-            )
+        viewModel.location.collect {
+            cameraPositionState.move(
+                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16.0f)
             )
         }
     }
