@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
+import pl.bkacala.threecitycommuter.model.DepartureList
 
 class KtorNetworkClient(
     private val httpClient: HttpClient,
@@ -29,4 +30,12 @@ class KtorNetworkClient(
         }
         return stops
     }
+
+    override suspend fun getDepartures(stopId: Int): DepartureList {
+        val departures = withContext(Dispatchers.IO) {
+            httpClient.get("$BASE_URL/departures?stopId=$stopId").body<DepartureList>()
+        }
+        return departures
+    }
+
 }

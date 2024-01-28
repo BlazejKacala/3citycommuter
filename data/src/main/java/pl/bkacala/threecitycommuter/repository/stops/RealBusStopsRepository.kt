@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import pl.bkacala.threecitycommuter.client.NetworkClient
 import pl.bkacala.threecitycommuter.dao.BusStopsDao
+import pl.bkacala.threecitycommuter.model.departures.Departure
+import pl.bkacala.threecitycommuter.model.departures.toDepartureData
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.stops.toEntity
 import pl.bkacala.threecitycommuter.model.stops.toStopData
@@ -34,5 +36,11 @@ class RealBusStopsRepository @Inject constructor(
                 .filter { it.virtual == 0 }
                 .map { it.toStopData() })
         }.flowOn(Dispatchers.IO)
+    }
+
+    override fun getDepartures(stopId: Int): Flow<List<Departure>> {
+        return flow {
+            emit(networkClient.getDepartures(stopId).departures.map { it.toDepartureData() })
+        }
     }
 }

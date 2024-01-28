@@ -58,4 +58,11 @@ class BusStationsClusterRenderer(
     override fun onClusterItemRendered(clusterItem: BusStopClusterItem, marker: Marker) {
         marker.setIcon(itemBitmap)
     }
+
+    override fun onBeforeClusterItemRendered(
+        item: BusStopClusterItem,
+        markerOptions: MarkerOptions
+    ) {
+        super.onBeforeClusterItemRendered(item, markerOptions)
+    }
 }
