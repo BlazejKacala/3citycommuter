@@ -3,6 +3,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,6 +56,7 @@ fun Map(
             )
         )
     ) {
+
         val busIcon = remember {
             BitmapDescriptorFactory.fromBitmap(iconBitmap!!)
         }
@@ -64,6 +66,11 @@ fun Map(
             clusterManager = clusterManager,
             itemBitmap = busIcon
         )
+        clusterManager?.setOnClusterItemClickListener {
+
+            false
+        }
+
         if (clusterManager != null && clusterRenderer!= null) {
             clusterManager.renderer = clusterRenderer
 
@@ -74,6 +81,8 @@ fun Map(
                 UiState.Loading -> {
                 }
                 is UiState.Success -> {
+
+
                     Clustering(
                         items = busStops.data,
                         clusterManager = clusterManager

@@ -7,9 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.shreyaspatil.permissionFlow.PermissionFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
@@ -49,8 +47,4 @@ class MapScreenViewModel @Inject constructor(
         this,
         initialValue = UiState.Loading
     )
-
-
-
-
 }
