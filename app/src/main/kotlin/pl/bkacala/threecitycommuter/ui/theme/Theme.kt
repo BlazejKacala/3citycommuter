@@ -10,9 +10,11 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
@@ -27,6 +29,13 @@ private val LightColorScheme = lightColorScheme(
     secondary = DarkPrimaryColor,
     tertiary = Accent,
 )
+
+object Padding {
+    val small = 5.dp
+    val normal = 10.dp
+    val large = 20.dp
+}
+
 
 @Composable
 fun AppTheme(
