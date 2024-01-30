@@ -1,4 +1,4 @@
-package pl.bkacala.threecitycommuter.ui.view
+package pl.bkacala.threecitycommuter.ui.screen.map.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -108,7 +108,7 @@ private fun BikesAllowedIcon() {
 private fun DisabledFriendlyIcon() {
     Icon(
         imageVector = Icons.Rounded.WheelchairPickup,
-        contentDescription = "Dosotosowany dla niepełnosprawnych",
+        contentDescription = "Dostosowany dla niepełnosprawnych",
         modifier = Modifier.size(12.dp)
     )
 }

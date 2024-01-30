@@ -16,14 +16,14 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.google.maps.android.compose.GoogleMapComposable
 import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapsComposeExperimentalApi
-import pl.bkacala.threecitycommuter.ui.component.map.BusStopClusterItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 
 
 @Composable
 @GoogleMapComposable
 @MapsComposeExperimentalApi
 fun rememberBusStopsClusterRenderer(
-    clusterManager: ClusterManager<BusStopClusterItem>?,
+    clusterManager: ClusterManager<BusStopMapItem>?,
     itemBitmap: BitmapDescriptor
 ): BusStationsClusterRenderer? {
     val context = LocalContext.current
@@ -41,26 +41,26 @@ fun rememberBusStopsClusterRenderer(
 class BusStationsClusterRenderer(
     context: Context,
     map: GoogleMap,
-    clusterManager: ClusterManager<BusStopClusterItem>,
+    clusterManager: ClusterManager<BusStopMapItem>,
     private val itemBitmap: BitmapDescriptor
-    ): DefaultClusterRenderer<BusStopClusterItem>(
+    ): DefaultClusterRenderer<BusStopMapItem>(
     context, map, clusterManager
 ) {
 
-    override fun onBeforeClusterRendered(cluster: Cluster<BusStopClusterItem?>, markerOptions: MarkerOptions) {
+    override fun onBeforeClusterRendered(cluster: Cluster<BusStopMapItem?>, markerOptions: MarkerOptions) {
         markerOptions.icon(getDescriptorForCluster(cluster))
     }
 
-    override fun onClusterUpdated(cluster: Cluster<BusStopClusterItem?>, marker: Marker) {
+    override fun onClusterUpdated(cluster: Cluster<BusStopMapItem?>, marker: Marker) {
         marker.setIcon(getDescriptorForCluster(cluster))
     }
 
-    override fun onClusterItemRendered(clusterItem: BusStopClusterItem, marker: Marker) {
+    override fun onClusterItemRendered(clusterItem: BusStopMapItem, marker: Marker) {
         marker.setIcon(itemBitmap)
     }
 
     override fun onBeforeClusterItemRendered(
-        item: BusStopClusterItem,
+        item: BusStopMapItem,
         markerOptions: MarkerOptions
     ) {
         super.onBeforeClusterItemRendered(item, markerOptions)

@@ -24,7 +24,7 @@ import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.clustering.rememberClusterManager
 import pl.bkacala.threecitycommuter.R
 import pl.bkacala.threecitycommuter.ui.common.UiState
-import pl.bkacala.threecitycommuter.ui.component.map.BusStopClusterItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.utils.changeColor
 
 @OptIn(MapsComposeExperimentalApi::class)
@@ -55,18 +55,16 @@ fun Map(
             )
         )
     ) {
-
         val busIcon = remember {
             BitmapDescriptorFactory.fromBitmap(iconBitmap!!)
         }
 
-        val clusterManager = rememberClusterManager<BusStopClusterItem>()
+        val clusterManager = rememberClusterManager<BusStopMapItem>()
         val clusterRenderer = rememberBusStopsClusterRenderer(
             clusterManager = clusterManager,
             itemBitmap = busIcon
         )
         clusterManager?.setOnClusterItemClickListener {
-
             false
         }
 
@@ -80,8 +78,6 @@ fun Map(
                 UiState.Loading -> {
                 }
                 is UiState.Success -> {
-
-
                     Clustering(
                         items = busStops.data,
                         clusterManager = clusterManager

@@ -14,18 +14,22 @@ import pl.bkacala.threecitycommuter.repository.location.LocationRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.common.asUiState
-import pl.bkacala.threecitycommuter.ui.component.map.BusStopClusterItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
+import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper.mapToUiRow
 import pl.bkacala.threecitycommuter.utils.stateInViewModelScope
 import javax.inject.Inject
 
 @HiltViewModel
 class MapScreenViewModel @Inject constructor(
-    stopsRepository: BusStopsRepository,
+    private val stopsRepository: BusStopsRepository,
     locationRepository: LocationRepository,
     permissionFlow: PermissionFlow
 ) : ViewModel() {
 
     val location = MutableStateFlow(UserLocation.default())
+    val departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
+    val busStops = busStopsStateFlow(stopsRepository)
 
     init {
         viewModelScope.launch {
@@ -39,12 +43,26 @@ class MapScreenViewModel @Inject constructor(
         }
     }
 
-    val busStops = stopsRepository.getBusStops().map {
-        it.map { busStopData -> BusStopClusterItem(busStopData) }
+    private fun busStopsStateFlow(stopsRepository: BusStopsRepository) =
+        stopsRepository.getBusStops().map {
+            it.map { busStopData -> BusStopMapItem(busStopData) }
+        }
+            .asUiState()
+            .stateInViewModelScope(
+                this,
+                initialValue = UiState.Loading
+            )
+
+    fun onBusStopSelected(selected: BusStopMapItem) {
+
+        viewModelScope.launch {
+            stopsRepository.getDepartures(selected.id).collect { departures ->
+                this@MapScreenViewModel.departures.value = departures.map { it.mapToUiRow() }
+            }
+        }
+
     }
-        .asUiState()
-        .stateInViewModelScope(
-        this,
-        initialValue = UiState.Loading
-    )
+
+
+
 }
