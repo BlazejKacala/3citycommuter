@@ -7,7 +7,7 @@ import pl.bkacala.threecitycommuter.model.stops.BusStopData
 
 @Stable
 class BusStopMapItem(
-    private val busStopItem: BusStopData
+    busStopItem: BusStopData
 ) : ClusterItem {
 
     private val latLng = LatLng(busStopItem.stopLat, busStopItem.stopLon)
@@ -17,11 +17,11 @@ class BusStopMapItem(
     }
 
     override fun getTitle(): String? {
-        return busStopItem.stopName
+        return null
     }
 
     override fun getSnippet(): String? {
-        return busStopItem.stopShortName
+        return null
 
     }
 
