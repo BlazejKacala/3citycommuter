@@ -9,6 +9,6 @@ import pl.bkacala.threecitycommuter.model.stops.BusStopEntity
     entities = [BusStopEntity::class],
     version = 1
 )
-abstract class CommuterDatabase: RoomDatabase() {
-   abstract val busStopsDao: BusStopsDao
+abstract class CommuterDatabase : RoomDatabase() {
+    abstract val busStopsDao: BusStopsDao
 }

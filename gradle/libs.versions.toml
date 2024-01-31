@@ -15,7 +15,7 @@ junitVersion = "1.1.5"
 kotlin = "1.9.10"
 kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.6.0"
-ktor= "2.3.7"
+ktor = "2.3.7"
 lifecycleRuntimeKtx = "2.7.0"
 mapsCompose = "4.3.0"
 navigationCompose = "2.7.6"
@@ -34,7 +34,7 @@ androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
-androidx-compose-ui-test-manifest= { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-compose-material-iconsExtended = { module = "androidx.compose.material:material-icons-extended" }

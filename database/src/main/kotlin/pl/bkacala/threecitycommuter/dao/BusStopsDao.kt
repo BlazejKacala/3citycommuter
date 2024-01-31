@@ -12,5 +12,5 @@ interface BusStopsDao {
     fun upsertBusStations(stops: List<BusStopEntity>)
 
     @Query("SELECT * FROM bus_stops")
-    suspend fun getBusStations() : List<BusStopEntity>
+    suspend fun getBusStations(): List<BusStopEntity>
 }

@@ -8,7 +8,7 @@ object DeparturesMapper {
 
     fun Departure.mapToUiRow() = DepartureRowModel(
         isNear = true,
-        vehicleType = if(this.routeId < 100) VehicleType.Tram else VehicleType.Bus,
+        vehicleType = if (this.routeId < 100) VehicleType.Tram else VehicleType.Bus,
         departureTime = this.estimatedTime.toString(),
         lineNumber = this.routeId.toString(),
         direction = this.headsign,

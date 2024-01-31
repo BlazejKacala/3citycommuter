@@ -85,7 +85,7 @@ private fun DepartureTime(isNear: Boolean, departureTime: String) {
     }
 
     Box(modifier = Modifier.width(45.dp)) {
-        if(isVisible.value) {
+        if (isVisible.value) {
             Text(
                 text = departureTime, style = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.primary

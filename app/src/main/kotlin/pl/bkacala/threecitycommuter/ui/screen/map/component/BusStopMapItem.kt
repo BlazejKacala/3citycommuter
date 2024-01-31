@@ -7,7 +7,7 @@ import pl.bkacala.threecitycommuter.model.stops.BusStopData
 
 @Stable
 class BusStopMapItem(
-    private val busStopItem : BusStopData
+    private val busStopItem: BusStopData
 ) : ClusterItem {
 
     private val latLng = LatLng(busStopItem.stopLat, busStopItem.stopLon)
@@ -26,7 +26,7 @@ class BusStopMapItem(
     }
 
     override fun getZIndex(): Float {
-       return  1f
+        return 1f
     }
 
     val id = busStopItem.stopId

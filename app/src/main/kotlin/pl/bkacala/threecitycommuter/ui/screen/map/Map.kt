@@ -32,10 +32,13 @@ import pl.bkacala.threecitycommuter.utils.changeColor
 fun Map(
     cameraPositionState: CameraPositionState,
     viewModel: MapScreenViewModel,
+    onBusStationSelected: (busStation: BusStopMapItem) -> Unit,
 ) {
     val context = LocalContext.current
     val color = MaterialTheme.colorScheme.primary.toArgb()
-    val iconBitmap = remember { ContextCompat.getDrawable(context, R.drawable.bus_station)?.toBitmap()?.changeColor(color) }
+    val iconBitmap = remember {
+        ContextCompat.getDrawable(context, R.drawable.bus_station)?.toBitmap()?.changeColor(color)
+    }
 
     LaunchedEffect(viewModel) {
         viewModel.location.collect {
@@ -65,18 +68,21 @@ fun Map(
             itemBitmap = busIcon
         )
         clusterManager?.setOnClusterItemClickListener {
+            onBusStationSelected(it)
             false
         }
 
-        if (clusterManager != null && clusterRenderer!= null) {
+        if (clusterManager != null && clusterRenderer != null) {
             clusterManager.renderer = clusterRenderer
 
             when (val busStops = viewModel.busStops.collectAsState().value) {
                 is UiState.Error -> {
 
                 }
+
                 UiState.Loading -> {
                 }
+
                 is UiState.Success -> {
                     Clustering(
                         items = busStops.data,

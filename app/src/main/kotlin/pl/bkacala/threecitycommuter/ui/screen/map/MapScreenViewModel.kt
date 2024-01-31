@@ -3,10 +3,14 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 import android.Manifest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.shreyaspatil.permissionFlow.PermissionFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.location.UserLocation
@@ -27,6 +31,8 @@ class MapScreenViewModel @Inject constructor(
     permissionFlow: PermissionFlow
 ) : ViewModel() {
 
+    private val mapBounds = MutableSharedFlow<LatLngBounds>()
+
     val location = MutableStateFlow(UserLocation.default())
     val departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
     val busStops = busStopsStateFlow(stopsRepository)
@@ -34,7 +40,7 @@ class MapScreenViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             permissionFlow.getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION).collect {
-                if(it.isGranted) {
+                if (it.isGranted) {
                     locationRepository.getLocation().collectLatest { userLocation ->
                         location.value = userLocation
                     }
@@ -44,25 +50,32 @@ class MapScreenViewModel @Inject constructor(
     }
 
     private fun busStopsStateFlow(stopsRepository: BusStopsRepository) =
-        stopsRepository.getBusStops().map {
-            it.map { busStopData -> BusStopMapItem(busStopData) }
-        }
+        stopsRepository.getBusStops().combine(mapBounds, ::Pair).map {
+            val (busStops, bounds) = it
+            busStops.filter { busStop ->
+                bounds.contains(LatLng(busStop.stopLat, busStop.stopLon))
+            }
+        }.map { it.map { busStopData -> BusStopMapItem(busStopData) } }
             .asUiState()
             .stateInViewModelScope(
                 this,
                 initialValue = UiState.Loading
             )
 
-    fun onBusStopSelected(selected: BusStopMapItem) {
 
+    fun onBusStopSelected(selected: BusStopMapItem) {
         viewModelScope.launch {
             stopsRepository.getDepartures(selected.id).collect { departures ->
                 this@MapScreenViewModel.departures.value = departures.map { it.mapToUiRow() }
             }
         }
-
     }
 
+    fun onMapMoved(bounds: LatLngBounds) {
+        viewModelScope.launch {
+            mapBounds.emit(bounds)
+        }
+    }
 
 
 }

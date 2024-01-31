@@ -20,13 +20,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideNetworkClient(httpClient: HttpClient, json: Json) : NetworkClient {
+    fun provideNetworkClient(httpClient: HttpClient, json: Json): NetworkClient {
         return KtorNetworkClient(httpClient, json)
     }
 
     @Provides
     @Singleton
-    fun provideJson() : Json {
+    fun provideJson(): Json {
         return Json {
             prettyPrint = true
             isLenient = true
@@ -36,7 +36,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(json: Json) : HttpClient {
+    fun provideHttpClient(json: Json): HttpClient {
 
         val httpClient = HttpClient(
             engine = AndroidClientEngine(config = AndroidEngineConfig())

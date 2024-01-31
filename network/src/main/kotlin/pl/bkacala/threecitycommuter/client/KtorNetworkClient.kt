@@ -17,7 +17,9 @@ class KtorNetworkClient(
 ) : NetworkClient {
 
     companion object {
-        private const val BASE_URL = "https://ckan.multimediagdansk.pl/"
+        private const val BASE_URL = "https://ckan.multimediagdansk.pl"
+        private const val BASE_URLV2 = "https://ckan2.multimediagdansk.pl"
+
     }
 
     override suspend fun getStops(): BusStopsNetworkData {
@@ -33,7 +35,7 @@ class KtorNetworkClient(
 
     override suspend fun getDepartures(stopId: Int): DepartureList {
         val departures = withContext(Dispatchers.IO) {
-            httpClient.get("$BASE_URL/departures?stopId=$stopId").body<DepartureList>()
+            httpClient.get("$BASE_URLV2/departures?stopId=$stopId").body<DepartureList>()
         }
         return departures
     }

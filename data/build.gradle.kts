@@ -44,7 +44,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     implementation(libs.kotlinx.datetime)
-    implementation (libs.permission.flow.android)
+    implementation(libs.permission.flow.android)
 
 
     implementation(project(":network"))

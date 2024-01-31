@@ -14,7 +14,7 @@ import pl.bkacala.threecitycommuter.database.CommuterDatabase
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
     @Provides
-    fun provideDatabase(@ApplicationContext context: Context) : CommuterDatabase {
+    fun provideDatabase(@ApplicationContext context: Context): CommuterDatabase {
         return Room.databaseBuilder(
             context,
             CommuterDatabase::class.java,
@@ -23,7 +23,7 @@ object DatabaseModule {
     }
 
     @Provides
-    fun providesBusStopsDao(commuterDatabase: CommuterDatabase) : BusStopsDao {
+    fun providesBusStopsDao(commuterDatabase: CommuterDatabase): BusStopsDao {
         return commuterDatabase.busStopsDao
     }
 }

@@ -27,7 +27,8 @@ fun rememberBusStopsClusterRenderer(
     itemBitmap: BitmapDescriptor
 ): BusStationsClusterRenderer? {
     val context = LocalContext.current
-    val clusterRendererState: MutableState<BusStationsClusterRenderer?> = remember { mutableStateOf(null) }
+    val clusterRendererState: MutableState<BusStationsClusterRenderer?> =
+        remember { mutableStateOf(null) }
 
     clusterManager ?: return null
     MapEffect(context) { map ->
@@ -43,20 +44,31 @@ class BusStationsClusterRenderer(
     map: GoogleMap,
     clusterManager: ClusterManager<BusStopMapItem>,
     private val itemBitmap: BitmapDescriptor
-    ): DefaultClusterRenderer<BusStopMapItem>(
+) : DefaultClusterRenderer<BusStopMapItem>(
     context, map, clusterManager
 ) {
 
-    override fun onBeforeClusterRendered(cluster: Cluster<BusStopMapItem?>, markerOptions: MarkerOptions) {
+    override fun onBeforeClusterRendered(
+        cluster: Cluster<BusStopMapItem?>,
+        markerOptions: MarkerOptions
+    ) {
         markerOptions.icon(getDescriptorForCluster(cluster))
     }
 
     override fun onClusterUpdated(cluster: Cluster<BusStopMapItem?>, marker: Marker) {
-        marker.setIcon(getDescriptorForCluster(cluster))
+        try {
+            marker.setIcon(getDescriptorForCluster(cluster))
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
     }
 
     override fun onClusterItemRendered(clusterItem: BusStopMapItem, marker: Marker) {
-        marker.setIcon(itemBitmap)
+        try {
+            marker.setIcon(itemBitmap)
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        }
     }
 
     override fun onBeforeClusterItemRendered(

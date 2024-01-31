@@ -17,11 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-        primary = PrimaryColor,
-        secondary = DarkPrimaryColor,
-        tertiary = Accent,
+    primary = PrimaryColor,
+    secondary = DarkPrimaryColor,
+    tertiary = Accent,
 
-)
+    )
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
@@ -38,9 +38,9 @@ object Padding {
 
 @Composable
 fun AppTheme(
-        darkTheme: Boolean = isSystemInDarkTheme(),
-        dynamicColor: Boolean = true,
-        content: @Composable () -> Unit
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = true,
+    content: @Composable () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -61,8 +61,8 @@ fun AppTheme(
     }
 
     MaterialTheme(
-            colorScheme = colorScheme,
-            typography = Typography,
-            content = content
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
     )
 }

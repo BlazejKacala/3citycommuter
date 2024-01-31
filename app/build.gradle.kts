@@ -43,7 +43,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
@@ -88,9 +91,10 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation (libs.permission.flow.android)
-    implementation (libs.permission.flow.compose)
+    implementation(libs.permission.flow.android)
+    implementation(libs.permission.flow.compose)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.kotlinx.datetime)
 
     testImplementation(libs.junit)
 

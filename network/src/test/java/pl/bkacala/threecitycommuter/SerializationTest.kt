@@ -18,7 +18,6 @@ import pl.bkacala.threecitycommuter.client.KtorNetworkClient
 class SerializationTest {
 
 
-
     @Test
     fun testSerialization() {
 
@@ -47,12 +46,11 @@ class SerializationTest {
             val response = apiClient.getStops()
 
 
-
         }
     }
 }
 
-val body : String = "{\n" +
+val body: String = "{\n" +
         "    \"2024-01-09\": {\n" +
         "        \"lastUpdate\": \"2024-01-09 02:21:29\",\n" +
         "        \"stops\": [\n" +

@@ -18,19 +18,19 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun providesSharedPreferences(@ApplicationContext context: Context) : SharedPreferences {
+    fun providesSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
         return context.getSharedPreferences("shared_prefs", Context.MODE_PRIVATE)
     }
 
     @Provides
     @Singleton
-    fun providesPermissionFlow() : PermissionFlow {
+    fun providesPermissionFlow(): PermissionFlow {
         return PermissionFlow.getInstance()
     }
 
     @Provides
     @Singleton
-    fun locationClient(@ApplicationContext context: Context) : FusedLocationProviderClient {
+    fun locationClient(@ApplicationContext context: Context): FusedLocationProviderClient {
         return LocationServices.getFusedLocationProviderClient(context)
     }
 }

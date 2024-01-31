@@ -1,4 +1,5 @@
 package pl.bkacala.threecitycommuter.repository.location
+
 import android.annotation.SuppressLint
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
@@ -15,7 +16,7 @@ import javax.inject.Inject
 class RealLocationRepository @Inject constructor(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
 
-) : LocationRepository {
+    ) : LocationRepository {
 
     @SuppressLint("MissingPermission")
     override fun getLocation(): Flow<UserLocation> = callbackFlow {
@@ -32,17 +33,18 @@ class RealLocationRepository @Inject constructor(
             }
         }
 
-        fusedLocationProviderClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, callback).addOnSuccessListener {
-            it?.let {
-                trySend(
-                    UserLocation(
-                        latitude = it.latitude,
-                        longitude = it.longitude,
-                        isFixed = false
+        fusedLocationProviderClient.getCurrentLocation(PRIORITY_HIGH_ACCURACY, callback)
+            .addOnSuccessListener {
+                it?.let {
+                    trySend(
+                        UserLocation(
+                            latitude = it.latitude,
+                            longitude = it.longitude,
+                            isFixed = false
+                        )
                     )
-                )
+                }
             }
-        }
 
         awaitClose {
             isCancellationRequested = true

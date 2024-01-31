@@ -2,7 +2,7 @@ package pl.bkacala.threecitycommuter.model.departures
 
 import pl.bkacala.threecitycommuter.model.DepartureNetworkData
 
-fun DepartureNetworkData.toDepartureData() : Departure {
+fun DepartureNetworkData.toDepartureData(): Departure {
     return Departure(
         id = this.id,
         delayInSeconds = this.delayInSeconds,
