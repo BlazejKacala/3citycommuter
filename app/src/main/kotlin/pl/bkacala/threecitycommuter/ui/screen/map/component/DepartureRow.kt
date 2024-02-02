@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -45,7 +46,9 @@ fun DepartureRowModel.Widget() {
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(
+        modifier = Modifier
+            .height(52.dp)
+            .padding(
             vertical = Padding.small,
             horizontal = Padding.normal
         )
@@ -66,7 +69,6 @@ fun DepartureRowModel.Widget() {
         }
         Spacer(modifier = Modifier.width(Padding.normal))
         DepartureTime(isNear, departureTime)
-
     }
 }
 
@@ -84,7 +86,7 @@ private fun DepartureTime(isNear: Boolean, departureTime: String) {
         }
     }
 
-    Box(modifier = Modifier.width(45.dp)) {
+    Box(modifier = Modifier.width(65.dp)) {
         if (isVisible.value) {
             Text(
                 text = departureTime, style = MaterialTheme.typography.bodyLarge.copy(
