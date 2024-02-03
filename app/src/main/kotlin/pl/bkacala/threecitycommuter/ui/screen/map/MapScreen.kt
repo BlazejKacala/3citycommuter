@@ -1,7 +1,6 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -9,6 +8,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,6 +25,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import pl.bkacala.threecitycommuter.LocalSnackbarHostState
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
@@ -36,6 +37,7 @@ fun MapScreen() {
 
         val viewModel = hiltViewModel<MapScreenViewModel>()
         val cameraPositionState = rememberCameraPositionState()
+        val snackbarHostState = LocalSnackbarHostState.current
 
         LaunchedEffect(cameraPositionState) {
             snapshotFlow { cameraPositionState.position.target }
@@ -60,7 +62,20 @@ fun MapScreen() {
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
         when (busStops) {
             is UiState.Error -> {
-                //TODO
+                LaunchedEffect(busStops) {
+                    val result = snackbarHostState.showSnackbar(
+                        message = "Nie udało się wczytać przystanków",
+                        actionLabel = "Spróbuj ponownie"
+
+                    )
+                    when (result) {
+                        SnackbarResult.Dismissed -> {}
+                        SnackbarResult.ActionPerformed -> {
+                            viewModel.onMapReloadRequest()
+                        }
+                    }
+
+                }
             }
 
             UiState.Loading -> {

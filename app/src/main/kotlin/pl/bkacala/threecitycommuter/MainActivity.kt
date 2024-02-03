@@ -8,11 +8,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,6 +22,10 @@ import dev.shreyaspatil.permissionFlow.utils.launch
 import dev.shreyaspatil.permissionFlow.utils.registerForPermissionFlowRequestsResult
 import pl.bkacala.threecitycommuter.ui.nav.AppNavHost
 import pl.bkacala.threecitycommuter.ui.theme.AppTheme
+
+val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> {
+    throw IllegalStateException("SnackbarHostState is not provided")
+}
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -43,24 +49,26 @@ private fun ComponentActivity.requestLocationPermission() {
     permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
+    CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    AppNavHost(navController = navController)
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(title = { Text(text = "Mapa komunikacji miejskiej") })
-        },
-        content = { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                AppNavHost(navController = navController)
+                }
+            },
+            snackbarHost = {
+                SnackbarHost(LocalSnackbarHostState.current)
             }
-        }
-    )
+        )
+    }
 }
