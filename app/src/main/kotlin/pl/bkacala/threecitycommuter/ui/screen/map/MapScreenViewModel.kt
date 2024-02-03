@@ -71,6 +71,10 @@ class MapScreenViewModel @Inject constructor(
         }
     }
 
+    fun onMapClicked() {
+        departures.value = emptyList()
+    }
+
     fun onMapMoved(bounds: LatLngBounds) {
         viewModelScope.launch {
             mapBounds.emit(bounds)

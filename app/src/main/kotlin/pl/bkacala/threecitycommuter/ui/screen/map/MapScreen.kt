@@ -29,7 +29,7 @@ import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 
-@OptIn(FlowPreview::class, ExperimentalAnimationApi::class)
+@OptIn(FlowPreview::class)
 @Composable
 fun MapScreen() {
     BoxWithConstraints {
@@ -50,7 +50,7 @@ fun MapScreen() {
 
         LaunchedEffect(viewModel) {
             viewModel.location.collect {
-                cameraPositionState.move(
+                cameraPositionState.animate(
                     CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16.0f)
                 )
             }
@@ -75,7 +75,8 @@ fun MapScreen() {
         Map(
             cameraPositionState = cameraPositionState,
             busStops = busStopsState.value,
-            onBusStationSelected = { viewModel.onBusStopSelected(it) }
+            onBusStationSelected = { viewModel.onBusStopSelected(it) },
+            onMapClicked = { viewModel.onMapClicked() }
         )
 
         val departures = viewModel.departures.collectAsState().value
