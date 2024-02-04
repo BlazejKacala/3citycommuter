@@ -1,25 +1,30 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
+import android.Manifest
+import app.cash.turbine.test
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import dev.shreyaspatil.permissionFlow.MultiplePermissionState
 import dev.shreyaspatil.permissionFlow.PermissionFlow
 import dev.shreyaspatil.permissionFlow.PermissionState
+import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
+import org.junit.Rule
+import org.junit.Test
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
-import android.Manifest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.runTest
-import org.junit.Rule
-import org.junit.Test
 import pl.bkacala.threecitycommuter.tools.MainDispatcherRule
 import pl.bkacala.threecitycommuter.tools.makeRandomInstance
+import pl.bkacala.threecitycommuter.ui.common.UiState
+import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 
 class MapScreenViewModelTest {
 
@@ -27,6 +32,7 @@ class MapScreenViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val mockBusStopsRepository = object: BusStopsRepository {
+
         override fun getBusStops(): Flow<List<BusStopData>> {
             return flowOf(listOf(makeRandomInstance<BusStopData>()))
         }
@@ -60,16 +66,41 @@ class MapScreenViewModelTest {
 
     }
 
+    private fun mapScreenViewModel() = MapScreenViewModel(
+        stopsRepository = mockBusStopsRepository,
+        locationRepository = mockLocationRepository,
+        permissionFlow = mockPermissionFlow
+    )
+
     @Test
     fun `should load bus stops correctly`() {
-        val viewModel = MapScreenViewModel(
-            stopsRepository = mockBusStopsRepository,
-            locationRepository = mockLocationRepository,
-            permissionFlow = mockPermissionFlow
-        )
+
+        val viewModel = mapScreenViewModel()
+
         runTest {
-            val a = viewModel.busStops.take(1).toList()
-            //TODO make test
+            val job = launch {
+                viewModel.busStops.test {
+                    val initialItem = awaitItem()
+                    initialItem.shouldBeInstanceOf<UiState.Loading>()
+
+                    val loadedBusStations = awaitItem()
+                    loadedBusStations.shouldBeInstanceOf<UiState.Success<List<BusStopMapItem>>>()
+
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+            launch {
+                viewModel.onMapMoved(
+                    LatLngBounds(
+                        LatLng(54.3543727, 18.5870928),
+                        LatLng(54.3780752, 18.639192)
+                    )
+                )
+            }
+
+            job.join()
+            job.cancel()
         }
 
     }

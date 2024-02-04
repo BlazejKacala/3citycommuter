@@ -9,10 +9,10 @@ coreTesting = "2.2.0"
 espressoCore = "3.4.0"
 hiltAndroid = "2.50"
 hiltAndroidCompiler = "2.50"
-
 hiltNavigationCompose = "1.1.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
+kotestAssertionsCore = "5.8.0"
 kotlin = "1.9.10"
 kotlinxCoroutinesTest = "1.8.0-RC2"
 kotlinxDatetime = "0.5.0"
@@ -27,6 +27,7 @@ room = "2.6.1"
 secrets = "2.0.1"
 material = "1.11.0"
 playServicesLocation = "21.1.0"
+turbine = "1.0.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -56,6 +57,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotestAssertionsCore" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
@@ -74,6 +76,7 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServices" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 gms-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

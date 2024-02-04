@@ -7,12 +7,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.shreyaspatil.permissionFlow.PermissionFlow
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.location.UserLocation
@@ -53,22 +52,24 @@ class MapScreenViewModel @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun busStopsStateFlow(stopsRepository: BusStopsRepository) =
-        loadBusStateFlowRequest.flatMapLatest {
-            stopsRepository.getBusStops().combine(mapBounds, ::Pair)
+    private fun busStopsStateFlow(stopsRepository: BusStopsRepository): StateFlow<UiState<List<BusStopMapItem>>> {
+
+        val requestFlow = mapBounds.combine(loadBusStateFlowRequest, ::Pair).map {
+            it.first
         }
-            .map {
-                val (busStops, bounds) = it
-                busStops.filter { busStop ->
-                    bounds.contains(LatLng(busStop.stopLat, busStop.stopLon))
-                }
-            }.map { it.map { busStopData -> BusStopMapItem(busStopData) } }
+
+        return stopsRepository.getBusStops().combine(requestFlow, ::Pair).map {
+            val (busStops, bounds) = it
+            busStops.filter { busStop ->
+                bounds.contains(LatLng(busStop.stopLat, busStop.stopLon))
+            }
+        }.map { it.map { busStopData -> BusStopMapItem(busStopData) } }
             .asUiState()
             .stateInViewModelScope(
                 this,
                 initialValue = UiState.Loading
             )
+    }
 
 
     fun onBusStopSelected(selected: BusStopMapItem) {
@@ -94,6 +95,4 @@ class MapScreenViewModel @Inject constructor(
             loadBusStateFlowRequest.emit(EmitRequest())
         }
     }
-
-
 }

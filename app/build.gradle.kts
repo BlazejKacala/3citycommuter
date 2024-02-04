@@ -102,8 +102,10 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     testImplementation(libs.junit)
-    testImplementation (libs.androidx.core.testing)
-    testImplementation (libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.turbine)
 
 
     androidTestImplementation(libs.androidx.junit)
