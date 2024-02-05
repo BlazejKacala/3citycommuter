@@ -24,7 +24,6 @@ class MapScreenViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-
     @Test
     fun `should load bus stops correctly`() {
 
