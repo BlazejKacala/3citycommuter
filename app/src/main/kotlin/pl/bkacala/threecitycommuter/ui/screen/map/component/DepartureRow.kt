@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DirectionsBike
+import androidx.compose.material.icons.rounded.GpsFixed
+import androidx.compose.material.icons.rounded.GpsOff
 import androidx.compose.material.icons.rounded.WheelchairPickup
 import androidx.compose.material.icons.sharp.DirectionsBusFilled
 import androidx.compose.material.icons.sharp.Tram
@@ -36,7 +38,8 @@ data class DepartureRowModel(
     val direction: String,
     val departureTime: String,
     val disabledFriendly: Boolean,
-    val bikesAllowed: Boolean
+    val bikesAllowed: Boolean,
+    val gpsPosition: Boolean
 ) {
     enum class VehicleType { Bus, Tram }
 }
@@ -49,24 +52,26 @@ fun DepartureRowModel.Widget() {
         modifier = Modifier
             .height(52.dp)
             .padding(
-            vertical = Padding.small,
-            horizontal = Padding.normal
-        )
+                vertical = Padding.small,
+                horizontal = Padding.normal
+            )
     ) {
 
         VehicleImage(vehicleType)
-        Spacer(modifier = Modifier.width(Padding.small))
+        Spacer(modifier = Modifier.width(Padding.normal))
         LineNumber(lineNumber)
         Spacer(modifier = Modifier.width(Padding.normal))
         Direction(direction)
         if (disabledFriendly) {
-            Spacer(modifier = Modifier.width(Padding.small))
+            Spacer(modifier = Modifier.width(Padding.normal))
             DisabledFriendlyIcon()
         }
         if (bikesAllowed) {
-            Spacer(modifier = Modifier.width(Padding.small))
+            Spacer(modifier = Modifier.width(Padding.normal))
             BikesAllowedIcon()
         }
+        Spacer(modifier = Modifier.width(Padding.large))
+        GPSIcon(gpsPosition = gpsPosition)
         Spacer(modifier = Modifier.width(Padding.normal))
         DepartureTime(isNear, departureTime)
     }
@@ -89,12 +94,19 @@ private fun DepartureTime(isNear: Boolean, departureTime: String) {
     Box(modifier = Modifier.width(65.dp)) {
         if (isVisible.value) {
             Text(
-                text = departureTime, style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.primary
-                )
+                text = departureTime, style = MaterialTheme.typography.bodyLarge
             )
         }
     }
+}
+
+@Composable
+private fun GPSIcon(gpsPosition: Boolean) {
+    Icon(
+        imageVector = if (gpsPosition) Icons.Rounded.GpsFixed else Icons.Rounded.GpsOff,
+        contentDescription = "Czy pozycja pojazdu jest dostępna",
+        modifier = Modifier.size(12.dp)
+    )
 }
 
 @Composable
@@ -118,9 +130,7 @@ private fun DisabledFriendlyIcon() {
 @Composable
 private fun RowScope.Direction(direction: String) {
     Text(
-        text = direction, style = MaterialTheme.typography.bodyMedium.copy(
-            color = MaterialTheme.colorScheme.primary
-        ),
+        text = direction, style = MaterialTheme.typography.bodyMedium,
         maxLines = 2,
         modifier = Modifier.weight(1f)
     )
@@ -129,9 +139,7 @@ private fun RowScope.Direction(direction: String) {
 @Composable
 private fun LineNumber(lineNumber: String) {
     Text(
-        text = lineNumber, style = MaterialTheme.typography.bodyLarge.copy(
-            color = MaterialTheme.colorScheme.primary
-        )
+        text = lineNumber, style = MaterialTheme.typography.headlineSmall
     )
 }
 
@@ -145,7 +153,7 @@ private fun VehicleImage(vehicleType: DepartureRowModel.VehicleType) {
     Icon(
         imageVector = image,
         contentDescription = "typ pojazdu",
-        modifier = Modifier.size(18.dp)
+        modifier = Modifier.size(24.dp)
     )
 }
 
@@ -159,7 +167,8 @@ private fun DepartureRowPreview() {
         bikesAllowed = true,
         disabledFriendly = true,
         departureTime = "Teraz",
-        direction = "Orunia Górna"
+        direction = "Orunia Górna",
+        gpsPosition = true
     ).Widget()
 
 }

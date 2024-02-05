@@ -20,11 +20,12 @@ object DeparturesMapper {
         return DepartureRowModel(
             isNear = minutesToArrival == 0,
             vehicleType = if (this.routeId < 100) VehicleType.Tram else VehicleType.Bus,
-            departureTime = if(minutesToArrival == 0) "teraz" else "$minutesToArrival min",
+            departureTime = if (minutesToArrival == 0) "teraz" else "$minutesToArrival min",
             lineNumber = this.routeId.toString(),
             direction = this.headsign,
             disabledFriendly = true,
-            bikesAllowed = false
+            bikesAllowed = false,
+            gpsPosition = this.delayInSeconds != null
         )
     }
 }
