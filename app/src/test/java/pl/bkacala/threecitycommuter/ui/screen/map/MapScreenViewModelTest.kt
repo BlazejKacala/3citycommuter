@@ -4,8 +4,10 @@ import app.cash.turbine.test
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -81,6 +83,7 @@ class MapScreenViewModelTest {
                 }
             }
 
+
             job.join()
             job.cancel()
         }
@@ -107,6 +110,38 @@ class MapScreenViewModelTest {
 
                     cancelAndIgnoreRemainingEvents()
                 }
+            }
+
+            job.join()
+            job.cancel()
+        }
+    }
+
+    @Test
+    fun `should pick closest bus stop when data is loaded`() {
+
+        val viewModel = MapScreenViewModel(
+            stopsRepository = mockBusStopsRepository,
+            locationRepository = mockLocationRepository,
+            permissionFlow = mockGrantedPermissionFlow
+        )
+
+        runTest {
+            val job = launch {
+                viewModel.departures.filter { it.isNotEmpty() }.test {
+                    val item = awaitItem()
+                    item.size shouldNotBe 0
+
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+            launch {
+                viewModel.onMapMoved(
+                    LatLngBounds(
+                        LatLng(54.3543727, 18.5870928),
+                        LatLng(54.3780752, 18.679192)
+                    )
+                )
             }
 
             job.join()

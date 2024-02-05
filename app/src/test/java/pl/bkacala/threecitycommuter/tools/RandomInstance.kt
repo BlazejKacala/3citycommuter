@@ -1,5 +1,6 @@
 package pl.bkacala.threecitycommuter.tools
 
+import kotlinx.datetime.Instant
 import kotlin.random.Random
 import kotlin.reflect.KClass
 
@@ -42,6 +43,7 @@ private fun makePrimitiveOrNull(clazz: KClass<*>) = when (clazz) {
     Float::class -> random.nextFloat()
     Char::class -> makeRandomChar()
     String::class -> makeRandomString()
+    Instant::class -> Instant.fromEpochMilliseconds(2137)
     else -> null
 }
 

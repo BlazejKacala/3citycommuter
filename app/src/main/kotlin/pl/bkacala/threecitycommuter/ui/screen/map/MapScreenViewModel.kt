@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.ktx.utils.sphericalDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.shreyaspatil.permissionFlow.PermissionFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,7 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
@@ -47,17 +50,38 @@ class MapScreenViewModel @Inject constructor(
     init {
         traceUserLocation()
         loadBusStops()
+        showClosestStationBoard()
     }
+
+    private fun showClosestStationBoard() {
+        viewModelScope.launch {
+            busStops.filter { it is UiState.Success }
+                .combine(location.filter { !it.isFixed }, ::Pair)
+                .take(1)
+                .collect { pair ->
+                    val (busStops, userLocation) = pair
+                    require(busStops is UiState.Success)
+                    val userLocationLatLng = LatLng(userLocation.latitude, userLocation.longitude)
+                    val closestBusStop =
+                        busStops.data.minByOrNull { it.position.sphericalDistance(userLocationLatLng) }
+                    closestBusStop?.let {
+                        onBusStopSelected(it)
+                    }
+                }
+        }
+    }
+
 
     private fun traceUserLocation() {
         viewModelScope.launch {
-            permissionFlow.getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION).collect {
-                if (it.isGranted) {
-                    locationRepository.getLocation().collectLatest { userLocation ->
-                        _location.value = userLocation
+            permissionFlow.getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
+                .collect {
+                    if (it.isGranted) {
+                        locationRepository.getLocation().collectLatest { userLocation ->
+                            _location.value = userLocation
+                        }
                     }
                 }
-            }
         }
     }
 

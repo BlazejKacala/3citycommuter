@@ -93,9 +93,7 @@ private fun UserLocationMarker(userLocation: UserLocation?) {
                 state = rememberMarkerState(
                     key = userLocation.toString(),
                     position = LatLng(userLocation.latitude, userLocation.longitude)
-
                 )
-
             ) {
                 Icon(
                     imageVector = Icons.Filled.Man,
