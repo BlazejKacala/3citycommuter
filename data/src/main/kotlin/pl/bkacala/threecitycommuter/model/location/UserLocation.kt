@@ -12,7 +12,7 @@ data class UserLocation(
         fun default(): UserLocation = UserLocation(
             latitude = 54.3552444,
             longitude = 18.6465378,
-            isFixed = false
+            isFixed = true
         )
     }
 }
