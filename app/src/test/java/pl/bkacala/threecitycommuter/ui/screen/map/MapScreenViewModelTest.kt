@@ -5,7 +5,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -60,6 +62,7 @@ class MapScreenViewModelTest {
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should receive default location when permission is not granted`() {
 
@@ -73,9 +76,37 @@ class MapScreenViewModelTest {
             val job = launch {
                 viewModel.location.test {
                     val location = awaitItem()
-
+                    advanceTimeBy(200)
                     location.isFixed shouldBe true
                     ensureAllEventsConsumed()
+                }
+            }
+
+            job.join()
+            job.cancel()
+        }
+    }
+
+    @Test
+    fun `should receive real location when permission is granted`() {
+
+        val viewModel = MapScreenViewModel(
+            stopsRepository = mockBusStopsRepository,
+            locationRepository = mockLocationRepository,
+            permissionFlow = mockGrantedPermissionFlow
+        )
+
+        runTest {
+            val job = launch {
+                viewModel.location.test {
+
+                    val initialLocation = awaitItem()
+                    initialLocation.isFixed shouldBe true
+
+                    val fusedLocation = awaitItem()
+                    fusedLocation.isFixed shouldBe false
+
+                    cancelAndIgnoreRemainingEvents()
                 }
             }
 

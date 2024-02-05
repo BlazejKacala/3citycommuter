@@ -14,8 +14,10 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +30,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import pl.bkacala.threecitycommuter.LocalSnackbarHostState
+import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
@@ -41,6 +44,7 @@ fun MapScreen() {
         val viewModel = hiltViewModel<MapScreenViewModel>()
         val cameraPositionState = rememberCameraPositionState()
         val snackbarHostState = LocalSnackbarHostState.current
+        var userLocation by remember { mutableStateOf<UserLocation?>(null) }
 
         LaunchedEffect(cameraPositionState) {
             snapshotFlow { cameraPositionState.position.target }
@@ -55,6 +59,7 @@ fun MapScreen() {
 
         LaunchedEffect(viewModel) {
             viewModel.location.collect {
+                userLocation = it
                 cameraPositionState.animate(
                     CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16.0f)
                 )
@@ -90,6 +95,7 @@ fun MapScreen() {
         Map(
             cameraPositionState = cameraPositionState,
             busStops = busStopsState.value,
+            userLocation = userLocation,
             onBusStationSelected = { viewModel.onBusStopSelected(it) },
             onMapClicked = { viewModel.onMapClicked() },
         )
@@ -101,7 +107,6 @@ fun MapScreen() {
             )
         }
         DeparturesSheet(viewModel.departures.collectAsState().value)
-
     }
 
 }
