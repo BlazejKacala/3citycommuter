@@ -1,14 +1,15 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import pl.bkacala.threecitycommuter.LocalSnackbarHostState
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 
 @OptIn(FlowPreview::class)
@@ -63,7 +65,6 @@ fun MapScreen() {
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
         when (busStops) {
             is UiState.Error -> {
-                Log.d("2137", "busStops Error")
                 LaunchedEffect(busStops) {
                     val result = snackbarHostState.showSnackbar(
                         message = "Nie udało się wczytać przystanków",
@@ -80,13 +81,8 @@ fun MapScreen() {
                 }
             }
 
-            UiState.Loading -> {
-                Log.d("2137", "busStops Loading")
-                //TODO
-            }
-
+            UiState.Loading -> {}
             is UiState.Success -> {
-                Log.d("2137", "busStops Success")
                 busStopsState.value = busStops.data
             }
         }
@@ -97,32 +93,42 @@ fun MapScreen() {
             onBusStationSelected = { viewModel.onBusStopSelected(it) },
             onMapClicked = { viewModel.onMapClicked() },
         )
-
-        val departures = viewModel.departures.collectAsState().value
-        AnimatedContent(
-            targetState = departures,
-            label = "Tablica odjazdów",
-            transitionSpec = {
-                (slideInVertically(
-                    animationSpec = tween(400),
-                    initialOffsetY = { fullHeight -> fullHeight/2 })
-                ).togetherWith(
-                    slideOutVertically (
-                        animationSpec = tween(400),
-                        targetOffsetY = { fullHeight -> fullHeight/2 }
-                    )
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 0.dp, max = maxHeight / 2)
-                .align(Alignment.BottomCenter)
-        ) {
-            DeparturesBottomSheet(
-                departures = it,
+        if (busStops is UiState.Loading) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
             )
         }
+        DeparturesSheet(viewModel.departures.collectAsState().value)
 
     }
 
+}
+
+@Composable
+private fun BoxWithConstraintsScope.DeparturesSheet(departures: List<DepartureRowModel>) {
+    AnimatedContent(
+        targetState = departures,
+        label = "Tablica odjazdów",
+        transitionSpec = {
+            (slideInVertically(
+                animationSpec = tween(400),
+                initialOffsetY = { fullHeight -> fullHeight / 2 })
+                    ).togetherWith(
+                    slideOutVertically(
+                        animationSpec = tween(400),
+                        targetOffsetY = { fullHeight -> fullHeight / 2 }
+                    )
+                )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 0.dp, max = maxHeight / 2)
+            .align(Alignment.BottomCenter)
+    ) {
+        DeparturesBottomSheet(
+            departures = it,
+        )
+    }
 }

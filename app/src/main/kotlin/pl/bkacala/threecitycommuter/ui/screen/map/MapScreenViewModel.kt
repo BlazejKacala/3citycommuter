@@ -22,66 +22,73 @@ import pl.bkacala.threecitycommuter.ui.common.asUiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper.mapToUiRow
-import pl.bkacala.threecitycommuter.utils.EmitRequest
-import pl.bkacala.threecitycommuter.utils.stateInViewModelScope
 import javax.inject.Inject
 
 @HiltViewModel
 class MapScreenViewModel @Inject constructor(
     private val stopsRepository: BusStopsRepository,
-    locationRepository: LocationRepository,
-    permissionFlow: PermissionFlow
+    private val locationRepository: LocationRepository,
+    private val permissionFlow: PermissionFlow
 ) : ViewModel() {
 
-    private val mapBounds = MutableSharedFlow<LatLngBounds>()
-    private val loadBusStateFlowRequest = MutableStateFlow(EmitRequest())
+    private val mapBounds = MutableSharedFlow<LatLngBounds>(
+        replay = 1,
+        extraBufferCapacity = 1
+    )
 
-    val location = MutableStateFlow(UserLocation.default())
-    val departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
-    val busStops = busStopsStateFlow(stopsRepository)
+    private val _location = MutableStateFlow(UserLocation.default())
+    private val _departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
+    private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
+
+    val location: StateFlow<UserLocation> = _location
+    val departures: StateFlow<List<DepartureRowModel>> = _departures
+    val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
 
     init {
+        traceUserLocation()
+        loadBusStops()
+    }
+
+    private fun traceUserLocation() {
         viewModelScope.launch {
             permissionFlow.getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION).collect {
                 if (it.isGranted) {
                     locationRepository.getLocation().collectLatest { userLocation ->
-                        location.value = userLocation
+                        _location.value = userLocation
                     }
                 }
             }
         }
     }
 
-    private fun busStopsStateFlow(stopsRepository: BusStopsRepository): StateFlow<UiState<List<BusStopMapItem>>> {
-
-        val requestFlow = mapBounds.combine(loadBusStateFlowRequest, ::Pair).map {
-            it.first
+    private fun loadBusStops() {
+        viewModelScope.launch {
+            stopsRepository.getBusStops().combine(mapBounds, ::Pair)
+                .map {
+                    val (busStops, bounds) = it
+                    busStops.filter { busStop ->
+                        bounds.contains(LatLng(busStop.stopLat, busStop.stopLon))
+                    }
+                }.map {
+                    it.map { busStopData -> BusStopMapItem(busStopData) }
+                }.asUiState()
+                .collect {
+                    _busStops.value = it
+                }
         }
-
-        return stopsRepository.getBusStops().combine(requestFlow, ::Pair).map {
-            val (busStops, bounds) = it
-            busStops.filter { busStop ->
-                bounds.contains(LatLng(busStop.stopLat, busStop.stopLon))
-            }
-        }.map { it.map { busStopData -> BusStopMapItem(busStopData) } }
-            .asUiState()
-            .stateInViewModelScope(
-                this,
-                initialValue = UiState.Loading
-            )
     }
 
 
     fun onBusStopSelected(selected: BusStopMapItem) {
         viewModelScope.launch {
             stopsRepository.getDepartures(selected.id).collect { departures ->
-                this@MapScreenViewModel.departures.value = departures.map { it.mapToUiRow() }
+                this@MapScreenViewModel._departures.value = departures.map { it.mapToUiRow() }
             }
         }
     }
 
     fun onMapClicked() {
-        departures.value = emptyList()
+        _departures.value = emptyList()
     }
 
     fun onMapMoved(bounds: LatLngBounds) {
@@ -92,7 +99,7 @@ class MapScreenViewModel @Inject constructor(
 
     fun onMapReloadRequest() {
         viewModelScope.launch {
-            loadBusStateFlowRequest.emit(EmitRequest())
+            loadBusStops()
         }
     }
 }
