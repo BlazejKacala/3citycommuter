@@ -1,41 +1,30 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Man
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.MarkerComposable
-import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.R
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 
-@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 fun Map(
     cameraPositionState: CameraPositionState,
@@ -62,25 +51,17 @@ fun Map(
         }
     ) {
         UserLocationMarker(userLocation)
-        Clustering(
-            items = busStops,
-            clusterItemContent = {
-                key(selectedBusStop) {
-                    BusStationIcon(isSelected = it.id == selectedBusStop?.id)
-                }
-            },
-            onClusterItemClick = { selectedBusStop ->
-                onBusStationSelected(selectedBusStop)
+        BusStops(
+            busStops = busStops,
+            selectedBusStop = selectedBusStop,
+            onClusterItemClick = { clickedBusStop ->
+                onBusStationSelected(clickedBusStop)
                 coroutineScope.launch {
                     cameraPositionState.animate(
-                        CameraUpdateFactory.newLatLng(selectedBusStop.position),
+                        CameraUpdateFactory.newLatLng(clickedBusStop.position),
                         durationMs = 300
                     )
                 }
-                true
-            },
-            clusterContent = {
-                Cluster(it)
             },
             onClusterClick = {
                 coroutineScope.launch {
@@ -88,8 +69,7 @@ fun Map(
                         CameraUpdateFactory.zoomIn()
                     )
                 }
-                true
-            },
+            }
         )
     }
 }
@@ -114,30 +94,6 @@ private fun UserLocationMarker(userLocation: UserLocation?) {
             }
         }
     }
-}
-
-@Composable
-private fun Cluster(it: Cluster<BusStopMapItem>) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "( ${it.size} )",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold
-        )
-        BusStationIcon(isSelected = false)
-    }
-}
-
-@Composable
-private fun BusStationIcon(isSelected: Boolean) {
-    Icon(
-        imageVector = ImageVector.vectorResource(id = R.drawable.bus_station),
-        contentDescription = "Przystanek",
-        tint = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
-    )
 }
 
 
