@@ -22,67 +22,66 @@ import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 
 class MapScreenViewModelTest {
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
     fun `should load bus stops correctly`() {
-
-        val viewModel = MapScreenViewModel(
-            stopsRepository = mockBusStopsRepository,
-            locationRepository = mockLocationRepository,
-            permissionFlow = mockGrantedPermissionFlow
-        )
+        val viewModel =
+            MapScreenViewModel(
+                stopsRepository = mockBusStopsRepository,
+                locationRepository = mockLocationRepository,
+                permissionFlow = mockGrantedPermissionFlow,
+            )
 
         runTest {
-            val job = launch {
-                viewModel.busStops.test {
-                    val initialItem = awaitItem()
-                    initialItem.shouldBeInstanceOf<UiState.Loading>()
+            val job =
+                launch {
+                    viewModel.busStops.test {
+                        val initialItem = awaitItem()
+                        initialItem.shouldBeInstanceOf<UiState.Loading>()
 
-                    val loadedBusStations = awaitItem()
-                    loadedBusStations.shouldBeInstanceOf<UiState.Success<List<BusStopMapItem>>>()
+                        val loadedBusStations = awaitItem()
+                        loadedBusStations.shouldBeInstanceOf<UiState.Success<List<BusStopMapItem>>>()
 
-                    cancelAndIgnoreRemainingEvents()
+                        cancelAndIgnoreRemainingEvents()
+                    }
                 }
-            }
 
             launch {
                 viewModel.onMapMoved(
                     LatLngBounds(
                         LatLng(54.3543727, 18.5870928),
-                        LatLng(54.3780752, 18.639192)
-                    )
+                        LatLng(54.3780752, 18.639192),
+                    ),
                 )
             }
 
             job.join()
             job.cancel()
         }
-
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should receive default location when permission is not granted`() {
-
-        val viewModel = MapScreenViewModel(
-            stopsRepository = mockBusStopsRepository,
-            locationRepository = mockLocationRepository,
-            permissionFlow = mockDeniedPermissionFlow
-        )
+        val viewModel =
+            MapScreenViewModel(
+                stopsRepository = mockBusStopsRepository,
+                locationRepository = mockLocationRepository,
+                permissionFlow = mockDeniedPermissionFlow,
+            )
 
         runTest {
-            val job = launch {
-                viewModel.location.test {
-                    val location = awaitItem()
-                    advanceTimeBy(200)
-                    location.isFixed shouldBe true
-                    ensureAllEventsConsumed()
+            val job =
+                launch {
+                    viewModel.location.test {
+                        val location = awaitItem()
+                        advanceTimeBy(200)
+                        location.isFixed shouldBe true
+                        ensureAllEventsConsumed()
+                    }
                 }
-            }
-
 
             job.join()
             job.cancel()
@@ -91,26 +90,26 @@ class MapScreenViewModelTest {
 
     @Test
     fun `should receive real location when permission is granted`() {
-
-        val viewModel = MapScreenViewModel(
-            stopsRepository = mockBusStopsRepository,
-            locationRepository = mockLocationRepository,
-            permissionFlow = mockGrantedPermissionFlow
-        )
+        val viewModel =
+            MapScreenViewModel(
+                stopsRepository = mockBusStopsRepository,
+                locationRepository = mockLocationRepository,
+                permissionFlow = mockGrantedPermissionFlow,
+            )
 
         runTest {
-            val job = launch {
-                viewModel.location.test {
+            val job =
+                launch {
+                    viewModel.location.test {
+                        val initialLocation = awaitItem()
+                        initialLocation.isFixed shouldBe true
 
-                    val initialLocation = awaitItem()
-                    initialLocation.isFixed shouldBe true
+                        val fusedLocation = awaitItem()
+                        fusedLocation.isFixed shouldBe false
 
-                    val fusedLocation = awaitItem()
-                    fusedLocation.isFixed shouldBe false
-
-                    cancelAndIgnoreRemainingEvents()
+                        cancelAndIgnoreRemainingEvents()
+                    }
                 }
-            }
 
             job.join()
             job.cancel()
@@ -119,28 +118,29 @@ class MapScreenViewModelTest {
 
     @Test
     fun `should pick closest bus stop when data is loaded`() {
-
-        val viewModel = MapScreenViewModel(
-            stopsRepository = mockBusStopsRepository,
-            locationRepository = mockLocationRepository,
-            permissionFlow = mockGrantedPermissionFlow
-        )
+        val viewModel =
+            MapScreenViewModel(
+                stopsRepository = mockBusStopsRepository,
+                locationRepository = mockLocationRepository,
+                permissionFlow = mockGrantedPermissionFlow,
+            )
 
         runTest {
-            val job = launch {
-                viewModel.departures.filter { it.isNotEmpty() }.test {
-                    val item = awaitItem()
-                    item.size shouldNotBe 0
+            val job =
+                launch {
+                    viewModel.departures.filter { it.isNotEmpty() }.test {
+                        val item = awaitItem()
+                        item.size shouldNotBe 0
 
-                    cancelAndIgnoreRemainingEvents()
+                        cancelAndIgnoreRemainingEvents()
+                    }
                 }
-            }
             launch {
                 viewModel.onMapMoved(
                     LatLngBounds(
                         LatLng(54.3543727, 18.5870928),
-                        LatLng(54.3780752, 18.679192)
-                    )
+                        LatLng(54.3780752, 18.679192),
+                    ),
                 )
             }
 
