@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 apply("${project.rootDir}/spotless.gradle")
 plugins {
     alias(libs.plugins.android.application)
@@ -11,14 +14,10 @@ plugins {
 }
 
 secrets {
-    // Optionally specify a different file name containing your secrets.
-    // The plugin defaults to "local.properties"
     propertiesFileName = "secrets.properties"
 
-    // Configure which keys should be ignored by the plugin by providing regular expressions.
-    // "sdk.dir" is ignored by default.
-    ignoreList.add("keyToIgnore") // Ignore the key "keyToIgnore"
-    ignoreList.add("sdk.*")       // Ignore all keys matching the regexp "sdk.*"
+    ignoreList.add("keyToIgnore")
+    ignoreList.add("sdk.*")
 }
 
 
@@ -38,6 +37,20 @@ android {
             useSupportLibrary = true
         }
     }
+    val secretPropertiesFile = rootProject.file("secrets.properties")
+    if (secretPropertiesFile.exists()) {
+        val secretProperties = Properties()
+        secretProperties.load(FileInputStream(secretPropertiesFile))
+
+        signingConfigs {
+            create("release") {
+                storeFile = rootProject.file("signing/key.jks")
+                storePassword = secretProperties.getProperty("PASS") ?: ""
+                keyAlias = secretProperties.getProperty("ALIAS") ?: ""
+                keyPassword = secretProperties.getProperty("ALIAS_PASS") ?: ""
+            }
+        }
+    }
 
 
     buildTypes {
@@ -47,6 +60,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
+
         }
     }
     compileOptions {

@@ -11,9 +11,12 @@ object DeparturesMapper {
     private fun minutesToArrival(estimatedTime: Instant, now: Long): Int {
 
         val secondsToArrival = estimatedTime.epochSeconds - now
-        return secondsToArrival.toInt()/60
+        return secondsToArrival.toInt() / 60
     }
-    fun Departure.mapToUiRow() : DepartureRowModel {
+
+//    fun List<Departure>.mapToUi() : List
+
+    fun Departure.mapToUiRow(): DepartureRowModel {
 
         val now = Clock.System.now().epochSeconds
         val minutesToArrival = minutesToArrival(this.estimatedTime, now)

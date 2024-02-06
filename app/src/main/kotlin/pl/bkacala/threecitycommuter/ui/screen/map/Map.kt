@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 fun Map(
     cameraPositionState: CameraPositionState,
     busStops: List<BusStopMapItem>,
+    selectedBusStop: BusStopMapItem?,
     onBusStationSelected: (busStation: BusStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
     userLocation: UserLocation?
@@ -63,10 +65,18 @@ fun Map(
         Clustering(
             items = busStops,
             clusterItemContent = {
-                BusStationIcon()
+                key(selectedBusStop) {
+                    BusStationIcon(isSelected = it.id == selectedBusStop?.id)
+                }
             },
-            onClusterItemClick = {
-                onBusStationSelected(it)
+            onClusterItemClick = { selectedBusStop ->
+                onBusStationSelected(selectedBusStop)
+                coroutineScope.launch {
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newLatLng(selectedBusStop.position),
+                        durationMs = 300
+                    )
+                }
                 true
             },
             clusterContent = {
@@ -117,16 +127,16 @@ private fun Cluster(it: Cluster<BusStopMapItem>) {
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
-        BusStationIcon()
+        BusStationIcon(isSelected = false)
     }
 }
 
 @Composable
-private fun BusStationIcon() {
+private fun BusStationIcon(isSelected: Boolean) {
     Icon(
         imageVector = ImageVector.vectorResource(id = R.drawable.bus_station),
         contentDescription = "Przystanek",
-        tint = MaterialTheme.colorScheme.primary
+        tint = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
     )
 }
 

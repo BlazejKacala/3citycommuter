@@ -95,6 +95,7 @@ fun MapScreen() {
         Map(
             cameraPositionState = cameraPositionState,
             busStops = busStopsState.value,
+            selectedBusStop = viewModel.selectedBusStop.collectAsState().value,
             userLocation = userLocation,
             onBusStationSelected = { viewModel.onBusStopSelected(it) },
             onMapClicked = { viewModel.onMapClicked() },

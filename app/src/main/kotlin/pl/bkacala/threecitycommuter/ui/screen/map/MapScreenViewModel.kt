@@ -42,10 +42,12 @@ class MapScreenViewModel @Inject constructor(
     private val _location = MutableStateFlow(UserLocation.default())
     private val _departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
     private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
+    private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
 
     val location: StateFlow<UserLocation> = _location
     val departures: StateFlow<List<DepartureRowModel>> = _departures
     val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
+    val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
 
     init {
         traceUserLocation()
@@ -104,6 +106,7 @@ class MapScreenViewModel @Inject constructor(
 
 
     fun onBusStopSelected(selected: BusStopMapItem) {
+        _selectedBusStop.value = selected
         viewModelScope.launch {
             stopsRepository.getDepartures(selected.id).collect { departures ->
                 this@MapScreenViewModel._departures.value = departures.map { it.mapToUiRow() }
@@ -112,6 +115,7 @@ class MapScreenViewModel @Inject constructor(
     }
 
     fun onMapClicked() {
+        _selectedBusStop.value = null
         _departures.value = emptyList()
     }
 
