@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Man
+import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -53,7 +55,6 @@ fun Map(
         UserLocationMarker(userLocation)
         BusStops(
             busStops = busStops,
-            selectedBusStop = selectedBusStop,
             onClusterItemClick = { clickedBusStop ->
                 onBusStationSelected(clickedBusStop)
                 coroutineScope.launch {
@@ -71,6 +72,29 @@ fun Map(
                 }
             }
         )
+        selectedBusStop?.let {
+            SelectedBusStop(it)
+        }
+
+    }
+}
+
+@Composable
+private fun SelectedBusStop(busStopMapItem: BusStopMapItem) {
+    val icon = remember { Icons.Outlined.DirectionsBus }
+    MarkerComposable(
+        busStopMapItem,
+        state = rememberMarkerState(
+            key = busStopMapItem.id.toString(),
+            position = busStopMapItem.position
+        ),
+        zIndex = 10f
+    ) {
+        Icon(
+            imageVector = icon,
+            tint = MaterialTheme.colorScheme.tertiary,
+            contentDescription = "Zaznaczony przystanek"
+        )
     }
 }
 
@@ -87,7 +111,7 @@ private fun UserLocationMarker(userLocation: UserLocation?) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.Man,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.tertiary,
                     contentDescription = "Pozycja użytkownika"
                 )

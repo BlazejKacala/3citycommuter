@@ -1,8 +1,6 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
 import app.cash.turbine.test
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -47,15 +45,6 @@ class MapScreenViewModelTest {
                         cancelAndIgnoreRemainingEvents()
                     }
                 }
-
-            launch {
-                viewModel.onMapMoved(
-                    LatLngBounds(
-                        LatLng(54.3543727, 18.5870928),
-                        LatLng(54.3780752, 18.639192),
-                    ),
-                )
-            }
 
             job.join()
             job.cancel()
@@ -135,14 +124,6 @@ class MapScreenViewModelTest {
                         cancelAndIgnoreRemainingEvents()
                     }
                 }
-            launch {
-                viewModel.onMapMoved(
-                    LatLngBounds(
-                        LatLng(54.3543727, 18.5870928),
-                        LatLng(54.3780752, 18.679192),
-                    ),
-                )
-            }
 
             job.join()
             job.cancel()

@@ -18,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,8 +26,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import pl.bkacala.threecitycommuter.LocalSnackbarHostState
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.common.UiState
@@ -45,17 +42,6 @@ fun MapScreen() {
         val cameraPositionState = rememberCameraPositionState()
         val snackbarHostState = LocalSnackbarHostState.current
         var userLocation by remember { mutableStateOf<UserLocation?>(null) }
-
-        LaunchedEffect(cameraPositionState) {
-            snapshotFlow { cameraPositionState.position.target }
-                .debounce(200)
-                .distinctUntilChanged()
-                .collect {
-                    cameraPositionState.projection?.visibleRegion?.let {
-                        viewModel.onMapMoved(it.latLngBounds)
-                    }
-                }
-        }
 
         LaunchedEffect(viewModel) {
             viewModel.location.collect {
