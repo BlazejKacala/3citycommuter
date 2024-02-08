@@ -23,6 +23,7 @@ private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
     secondary = DarkPrimaryColor,
     tertiary = Accent,
+    surface = Background
 )
 
 object Padding {

@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
 import pl.bkacala.threecitycommuter.model.DepartureList
+import pl.bkacala.threecitycommuter.model.VehiclesNetworkData
 
 class KtorNetworkClient(
     private val httpClient: HttpClient,
@@ -38,6 +39,14 @@ class KtorNetworkClient(
             httpClient.get("$BASE_URLV2/departures?stopId=$stopId").body<DepartureList>()
         }
         return departures
+    }
+
+    override suspend fun getVehicles(): VehiclesNetworkData {
+        val vehicles = withContext(Dispatchers.IO) {
+            httpClient.get("https://files.cloudgdansk.pl/d/otwarte-dane/ztm/baza-pojazdow.json?v=2")
+                .body<VehiclesNetworkData>()
+        }
+        return vehicles
     }
 
 }

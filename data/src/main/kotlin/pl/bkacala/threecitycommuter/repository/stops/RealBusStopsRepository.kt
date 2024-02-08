@@ -25,10 +25,9 @@ class RealBusStopsRepository @Inject constructor(
 
     override fun getBusStops(): Flow<List<BusStopData>> {
         return flow {
-            val busStationsFromDb = busStopsDao.getBusStations()
             val lastUpdateTimestamp = lastUpdateRepository.getLastUpdateTimeStamp(BUS_STOPS_KEY)
 
-            if (busStationsFromDb.isEmpty() || lastUpdateTimestamp.isOlderThenOneDay()) {
+            if (lastUpdateTimestamp.isOlderThenOneDay()) {
                 busStopsDao.upsertBusStations(networkClient.getStops().stops.map { it.toEntity() })
                 lastUpdateRepository.storeLastUpdateCurrentTimeStamp(BUS_STOPS_KEY)
             }

@@ -1,0 +1,32 @@
+package pl.bkacala.threecitycommuter.model.vehicles
+
+data class Vehicle(
+    val id: Long = 0,
+    val photo: String,
+    val vehicleCode: String,
+    val carrirer: String,
+    val transportationType: String,
+    val vehicleCharacteristics: String,
+    val bidirectional: Boolean,
+    val historicVehicle: Boolean,
+    val length: Double,
+    val brand: String,
+    val model: String,
+    val productionYear: Int,
+    val seats: Int,
+    val standingPlaces: Int,
+    val airConditioning: Boolean,
+    val monitoring: Boolean,
+    val internalMonitor: Boolean,
+    val floorHeight: String,
+    val kneelingMechanism: Boolean,
+    val wheelchairsRamp: Boolean,
+    val usb: Boolean,
+    val voiceAnnouncements: Boolean,
+    val aed: Boolean,
+    val bikeHolders: Int,
+    val ticketMachine: Boolean,
+    val patron: String,
+    val url: String,
+    val passengersDoors: Int
+)

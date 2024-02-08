@@ -1,5 +1,6 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -56,6 +57,7 @@ fun MapScreen() {
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
         when (busStops) {
             is UiState.Error -> {
+                Log.e("2137", busStops.exception.toString())
                 LaunchedEffect(busStops) {
                     val result = snackbarHostState.showSnackbar(
                         message = "Nie udało się wczytać przystanków",
