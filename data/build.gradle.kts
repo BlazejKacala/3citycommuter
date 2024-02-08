@@ -41,11 +41,16 @@ dependencies {
     implementation(libs.gms.play.services.location)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
     implementation(libs.kotlinx.datetime)
     implementation(libs.permission.flow.android)
 
+    testImplementation(libs.junit)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.turbine)
+
+    androidTestImplementation(libs.androidx.junit)
 
     implementation(project(":network"))
     implementation(project(":database"))

@@ -26,7 +26,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
-import kotlinx.coroutines.FlowPreview
 import pl.bkacala.threecitycommuter.LocalSnackbarHostState
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.common.UiState
@@ -34,7 +33,6 @@ import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 
-@OptIn(FlowPreview::class)
 @Composable
 fun MapScreen() {
     BoxWithConstraints {
