@@ -12,7 +12,6 @@ class GetDeparturesUseCase @Inject constructor(
     private val busStopsRepository: BusStopsRepository,
     private val vehiclesRepository: VehiclesRepository
 ) {
-
     fun getDepartures(stopId: Int) : Flow<List<Pair<Departure, Vehicle?>>> {
         return busStopsRepository
             .getDepartures(stopId)

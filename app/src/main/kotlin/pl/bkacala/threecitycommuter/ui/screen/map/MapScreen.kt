@@ -1,11 +1,8 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
 import android.util.Log
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,7 +27,6 @@ import pl.bkacala.threecitycommuter.LocalSnackbarHostState
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
-import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 
 @Composable
@@ -93,34 +89,29 @@ fun MapScreen() {
                     .align(Alignment.BottomCenter)
             )
         }
-        DeparturesSheet(viewModel.departures.collectAsState().value)
+        DeparturesSheet(model = viewModel)
     }
 
 }
 
 @Composable
-private fun BoxWithConstraintsScope.DeparturesSheet(departures: List<DepartureRowModel>) {
-    AnimatedContent(
-        targetState = departures,
-        label = "Tablica odjazdów",
-        transitionSpec = {
-            (slideInVertically(
-                animationSpec = tween(400),
-                initialOffsetY = { fullHeight -> fullHeight / 2 })
-                    ).togetherWith(
-                    slideOutVertically(
-                        animationSpec = tween(400),
-                        targetOffsetY = { fullHeight -> fullHeight / 2 }
-                    )
-                )
+private fun BoxWithConstraintsScope.DeparturesSheet(model: MapScreenViewModel) {
+
+    val departuresModel = model.departures.collectAsState().value
+    AnimatedVisibility(
+        visible = departuresModel != null,
+        enter = slideInVertically { fullHeight ->
+            fullHeight
         },
         modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 0.dp, max = maxHeight / 2)
             .align(Alignment.BottomCenter)
+            .heightIn(min = 0.dp, max = maxHeight * 2 / 5)
     ) {
-        DeparturesBottomSheet(
-            departures = it,
-        )
+        departuresModel?.let {
+            DeparturesBottomSheet(
+                model = departuresModel,
+            )
+        }
     }
+
 }

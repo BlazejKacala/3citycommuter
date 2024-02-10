@@ -24,10 +24,19 @@ class MapScreenViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private fun mapScreenViewModel() = MapScreenViewModel(
+        stopsRepository = mockBusStopsRepository,
+        locationRepository = mockLocationRepository,
+        permissionFlow = mockGrantedPermissionFlow,
+        getDeparturesUseCase = GetDeparturesUseCase(
+            busStopsRepository = mockBusStopsRepository,
+            vehiclesRepository = mockVehiclesRepository
+        )
+    )
+
     @Test
     fun `should load bus stops correctly`() {
         val viewModel = mapScreenViewModel()
-
         runTest {
             val job =
                 launch {
@@ -47,22 +56,10 @@ class MapScreenViewModelTest {
         }
     }
 
-    private fun mapScreenViewModel() = MapScreenViewModel(
-        stopsRepository = mockBusStopsRepository,
-        locationRepository = mockLocationRepository,
-        permissionFlow = mockGrantedPermissionFlow,
-        getDeparturesUseCase = GetDeparturesUseCase(
-            busStopsRepository = mockBusStopsRepository,
-            vehiclesRepository = mockVehiclesRepository
-        )
-    )
-
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should receive default location when permission is not granted`() {
         val viewModel = mapScreenViewModel()
-
-
         runTest {
             val job =
                 launch {
@@ -82,8 +79,6 @@ class MapScreenViewModelTest {
     @Test
     fun `should receive real location when permission is granted`() {
         val viewModel = mapScreenViewModel()
-
-
         runTest {
             val job =
                 launch {
@@ -106,14 +101,12 @@ class MapScreenViewModelTest {
     @Test
     fun `should pick closest bus stop when data is loaded`() {
         val viewModel = mapScreenViewModel()
-
-
         runTest {
             val job =
                 launch {
-                    viewModel.departures.filter { it.isNotEmpty() }.test {
+                    viewModel.departures.filter { it?.departures?.isNotEmpty() ?: false }.test {
                         val item = awaitItem()
-                        item.size shouldNotBe 0
+                        item?.departures?.size shouldNotBe 0
 
                         cancelAndIgnoreRemainingEvents()
                     }

@@ -16,7 +16,7 @@ private val DarkColorScheme = darkColorScheme(
     primary = PrimaryColor,
     secondary = DarkPrimaryColor,
     tertiary = Accent,
-
+    surface = BackgroundDark
     )
 
 private val LightColorScheme = lightColorScheme(

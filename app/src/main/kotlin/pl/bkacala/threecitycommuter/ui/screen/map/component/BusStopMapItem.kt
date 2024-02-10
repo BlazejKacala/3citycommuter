@@ -30,4 +30,6 @@ class BusStopMapItem(
     }
 
     val id = busStopItem.stopId
+
+    val data = busStopItem
 }

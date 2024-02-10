@@ -1,12 +1,14 @@
 package pl.bkacala.threecitycommuter.ui.screen.map.mapper
 
-import android.util.Log
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.model.departures.Departure
+import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel.VehicleType
+import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
+import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesHeaderModel
 
 object DeparturesMapper {
     private fun minutesToArrival(
@@ -17,10 +19,23 @@ object DeparturesMapper {
         return secondsToArrival.toInt() / 60
     }
 
+    fun mapToBottomSheetModel(
+        busStopData: BusStopData,
+        departures: List<Pair<Departure, Vehicle?>>
+    ): DeparturesBottomSheetModel {
+        return DeparturesBottomSheetModel(
+            header = DeparturesHeaderModel(
+                busStopName = busStopData.name,
+                isForDemand = busStopData.onDemand
+            ),
+            departures = departures.map {
+                val (departure, vehicle) = it
+                departure.mapToUiRow(vehicle)
+            }
+        )
+    }
+
     fun Departure.mapToUiRow(vehicle: Vehicle?): DepartureRowModel {
-        if (vehicle != null) {
-            Log.d("2137", vehicle.model)
-        }
 
         val now = Clock.System.now().epochSeconds
         val minutesToArrival = minutesToArrival(this.estimatedTime, now)

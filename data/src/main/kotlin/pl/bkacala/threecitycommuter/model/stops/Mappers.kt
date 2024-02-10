@@ -18,7 +18,7 @@ fun BusStopEntity.toStopData(): BusStopData {
         nonpassenger = this.nonpassenger,
         depot = this.depot,
         ticketZoneBorder = this.ticketZoneBorder,
-        onDemand = this.onDemand,
+        onDemand = this.onDemand == 1,
         activationDate = this.activationDate,
         stopLat = this.stopLat,
         stopLon = this.stopLon,

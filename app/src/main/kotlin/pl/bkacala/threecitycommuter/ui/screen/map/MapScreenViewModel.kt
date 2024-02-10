@@ -26,8 +26,8 @@ import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.common.asUiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
-import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
-import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper.mapToUiRow
+import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
+import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper
 import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
 import javax.inject.Inject
 
@@ -43,12 +43,12 @@ class MapScreenViewModel
     private var updateDeparturesJob: Job? = null
 
     private val _location = MutableStateFlow(UserLocation.default())
-    private val _departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
+    private val _departures = MutableStateFlow<DeparturesBottomSheetModel?>(null)
     private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
     private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
 
     val location: StateFlow<UserLocation> = _location
-    val departures: StateFlow<List<DepartureRowModel>> = _departures
+    val departures: StateFlow<DeparturesBottomSheetModel?> = _departures
     val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
     val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
 
@@ -102,6 +102,7 @@ class MapScreenViewModel
         }
 
         fun onBusStopSelected(selected: BusStopMapItem) {
+            updateDeparturesJob?.cancel()
             _selectedBusStop.value = selected
             updateDeparturesJob = viewModelScope.launch {
                 while (isActive) {
@@ -109,23 +110,25 @@ class MapScreenViewModel
                         .take(1)
                         .collect { departures ->
                             _departures.value =
-                                departures.map {
-                                    val (departure, vehicle) = it
-                                    departure.mapToUiRow(vehicle)
-                                }
+                                DeparturesMapper.mapToBottomSheetModel(
+                                    busStopData = selected.data,
+                                    departures = departures
+                                )
                         }
                     delay(1000*30)
                 }
             }
+
         }
 
         fun onMapClicked() {
             _selectedBusStop.value = null
-            _departures.value = emptyList()
+            _departures.value = null
             updateDeparturesJob?.cancel()
         }
 
         fun onMapReloadRequest() {
+            updateDeparturesJob?.cancel()
             viewModelScope.launch {
                 loadBusStops()
             }

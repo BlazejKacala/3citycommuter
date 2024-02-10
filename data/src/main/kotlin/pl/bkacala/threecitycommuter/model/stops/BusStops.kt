@@ -14,7 +14,7 @@ data class BusStopData(
     val nonpassenger: Int,
     val depot: Int,
     val ticketZoneBorder: Int,
-    val onDemand: Int,
+    val onDemand: Boolean,
     val activationDate: String?,
     val stopLat: Double,
     val stopLon: Double,
@@ -23,4 +23,6 @@ data class BusStopData(
     val parentStation: String?,
     val stopTimezone: String?,
     val wheelchairBoarding: String?,
+    @Transient
+    val name: String = stopName ?: stopShortName ?: stopDesc ?: ""
 )

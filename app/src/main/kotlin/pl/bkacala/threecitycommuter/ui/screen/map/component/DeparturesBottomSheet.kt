@@ -5,25 +5,40 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 
+
+@Stable
+data class DeparturesBottomSheetModel(
+    val header: DeparturesHeaderModel,
+    val departures: List<DepartureRowModel>,
+)
+
 @Composable
 fun DeparturesBottomSheet(
-    departures: List<DepartureRowModel>,
+    model: DeparturesBottomSheetModel,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+        shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
-            departures.fastForEach {
+            model.header.Widget()
+            model.departures.fastForEach {
                 it.Widget()
+            }
+            if (model.departures.isEmpty()) {
+                DeparturesEmptyRow()
             }
         }
     }
