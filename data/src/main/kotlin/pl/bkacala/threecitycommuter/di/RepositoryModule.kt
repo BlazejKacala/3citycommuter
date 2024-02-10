@@ -10,6 +10,8 @@ import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.repository.stops.RealBusStopsRepository
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
 import pl.bkacala.threecitycommuter.repository.update.RealLastUpdateRepository
+import pl.bkacala.threecitycommuter.repository.vehicles.RealVehiclesRepository
+import pl.bkacala.threecitycommuter.repository.vehicles.VehiclesRepository
 import javax.inject.Singleton
 
 @Module
@@ -33,5 +35,12 @@ abstract class RepositoryModule {
     abstract fun bindLocationRepository(
         realRepositoryImpl: RealLocationRepository
     ): LocationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVehiclesRepository(
+        realRepositoryImpl: RealVehiclesRepository
+    ): VehiclesRepository
+
 
 }

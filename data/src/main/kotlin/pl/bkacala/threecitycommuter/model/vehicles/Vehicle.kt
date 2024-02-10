@@ -1,7 +1,6 @@
 package pl.bkacala.threecitycommuter.model.vehicles
 
 data class Vehicle(
-    val id: Long = 0,
     val photo: String,
     val vehicleCode: String,
     val carrirer: String,

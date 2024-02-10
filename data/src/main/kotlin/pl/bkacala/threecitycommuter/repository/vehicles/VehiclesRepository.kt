@@ -7,5 +7,7 @@ interface VehiclesRepository {
 
     suspend fun updateVehiclesBase()
 
-    fun getVehicle(id: Int) : Flow<Vehicle>
+    fun getVehicle(id: Int): Flow<Vehicle>
+
+    fun vehicles(): Flow<List<Vehicle>>
 }

@@ -11,6 +11,9 @@ interface VehiclesDao {
     @Upsert
     fun upsertVehicles(vehicles: List<VehicleEntity>)
 
-    @Query("SELECT * from vehicles WHERE id == :id")
-    fun getVehicle(id: Int) : VehicleEntity
+    @Query("SELECT * from vehicles WHERE vehicleCode == :vehicleCode")
+    fun getVehicle(vehicleCode: Int): VehicleEntity
+
+    @Query("SELECT * from vehicles")
+    fun getVehicles(): List<VehicleEntity>
 }

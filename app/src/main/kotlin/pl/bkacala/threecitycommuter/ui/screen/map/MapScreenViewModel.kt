@@ -25,6 +25,7 @@ import pl.bkacala.threecitycommuter.ui.common.asUiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper.mapToUiRow
+import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,8 +35,8 @@ class MapScreenViewModel
         private val stopsRepository: BusStopsRepository,
         private val locationRepository: LocationRepository,
         private val permissionFlow: PermissionFlow,
+        private val getDeparturesUseCase: GetDeparturesUseCase,
     ) : ViewModel() {
-
         private val _location = MutableStateFlow(UserLocation.default())
         private val _departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
         private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
@@ -98,8 +99,12 @@ class MapScreenViewModel
         fun onBusStopSelected(selected: BusStopMapItem) {
             _selectedBusStop.value = selected
             viewModelScope.launch {
-                stopsRepository.getDepartures(selected.id).collect { departures ->
-                    this@MapScreenViewModel._departures.value = departures.map { it.mapToUiRow() }
+                getDeparturesUseCase.getDepartures(selected.id).collect { departures ->
+                    _departures.value =
+                        departures.map {
+                            val (departure, vehicle) = it
+                            departure.mapToUiRow(vehicle)
+                        }
                 }
             }
         }

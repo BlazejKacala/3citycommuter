@@ -15,7 +15,6 @@ import javax.inject.Inject
 
 private const val VEHICLES = "vehicles_key"
 
-
 class RealVehiclesRepository @Inject constructor(
     private val vehiclesDao: VehiclesDao,
     private val networkClient: NetworkClient,
@@ -29,14 +28,24 @@ class RealVehiclesRepository @Inject constructor(
 
     override fun getVehicle(id: Int): Flow<Vehicle> {
         return flow {
-            val lastUpdateTimestamp = lastUpdateRepository.getLastUpdateTimeStamp(VEHICLES)
-
-            if (lastUpdateTimestamp.isOlderThenOneDay()) {
-                vehiclesDao.upsertVehicles(networkClient.getVehicles().results.map { it.toVehicleEntity() })
-                lastUpdateRepository.storeLastUpdateCurrentTimeStamp(VEHICLES)
-            }
+            ensureUpToDate()
             emit(vehiclesDao.getVehicle(id).toVehicle())
         }.flowOn(Dispatchers.IO)
     }
 
+    override fun vehicles(): Flow<List<Vehicle>> {
+        return flow {
+            ensureUpToDate()
+            emit(vehiclesDao.getVehicles().map { it.toVehicle() })
+        }.flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun ensureUpToDate() {
+        val lastUpdateTimestamp = lastUpdateRepository.getLastUpdateTimeStamp(VEHICLES)
+
+        if (lastUpdateTimestamp.isOlderThenOneDay()) {
+            vehiclesDao.upsertVehicles(networkClient.getVehicles().results.map { it.toVehicleEntity() })
+            lastUpdateRepository.storeLastUpdateCurrentTimeStamp(VEHICLES)
+        }
+    }
 }
