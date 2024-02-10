@@ -7,8 +7,17 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +38,7 @@ import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen() {
     BoxWithConstraints {
@@ -51,7 +61,7 @@ fun MapScreen() {
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
         when (busStops) {
             is UiState.Error -> {
-                Log.e("2137", busStops.exception.toString())
+                Log.e("MapScreen", busStops.exception.toString())
                 LaunchedEffect(busStops) {
                     val result = snackbarHostState.showSnackbar(
                         message = "Nie udało się wczytać przystanków",
@@ -82,6 +92,35 @@ fun MapScreen() {
             onBusStationSelected = { viewModel.onBusStopSelected(it) },
             onMapClicked = { viewModel.onMapClicked() },
         )
+
+
+        var active by remember { mutableStateOf(false) }
+        var query by remember { mutableStateOf("") }
+        SearchBar(
+            query = query,
+            onQueryChange = { query = it },
+            onSearch = {},
+            active = active,
+            onActiveChange = { active = !active },
+            modifier = Modifier.align(Alignment.TopCenter),
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Mic,
+                    contentDescription = "szukajka"
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Search,
+                    contentDescription = "szukajka"
+                )
+            },
+            placeholder = { Text(text = "Szukaj przystanku") },
+            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background)
+        ) {
+
+        }
+
         if (busStops is UiState.Loading) {
             LinearProgressIndicator(
                 modifier = Modifier
@@ -98,6 +137,7 @@ fun MapScreen() {
 private fun BoxWithConstraintsScope.DeparturesSheet(model: MapScreenViewModel) {
 
     val departuresModel = model.departures.collectAsState().value
+
     AnimatedVisibility(
         visible = departuresModel != null,
         enter = slideInVertically { fullHeight ->

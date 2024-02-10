@@ -83,7 +83,7 @@ fun Map(
 private fun SelectedBusStop(busStopMapItem: BusStopMapItem) {
     val icon = remember { Icons.Outlined.DirectionsBus }
     MarkerComposable(
-        busStopMapItem,
+        busStopMapItem.id,
         state = rememberMarkerState(
             key = busStopMapItem.id.toString(),
             position = busStopMapItem.position

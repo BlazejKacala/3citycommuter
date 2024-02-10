@@ -6,7 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -16,6 +18,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import dev.shreyaspatil.permissionFlow.utils.launch
@@ -31,7 +34,7 @@ val LocalSnackbarHostState = compositionLocalOf<SnackbarHostState> {
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         requestLocationPermission()
 
         super.onCreate(savedInstanceState)
@@ -53,6 +56,7 @@ private fun ComponentActivity.requestLocationPermission() {
 fun App() {
     val navController = rememberNavController()
     val snackbarHostState = remember { SnackbarHostState() }
+
     CompositionLocalProvider(LocalSnackbarHostState provides snackbarHostState) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -68,7 +72,8 @@ fun App() {
             },
             snackbarHost = {
                 SnackbarHost(LocalSnackbarHostState.current)
-            }
+            },
+            contentWindowInsets = WindowInsets.navigationBars
         )
     }
 }

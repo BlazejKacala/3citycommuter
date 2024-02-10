@@ -12,9 +12,12 @@ import pl.bkacala.threecitycommuter.ui.theme.Padding
 @Preview(showBackground = true)
 @Composable
 fun DeparturesEmptyRow() {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = Padding.large, vertical = Padding.small)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Padding.large)
+            .padding(bottom = Padding.large)
+    ) {
         Text(text = "Brak odjazdów z tego przystanku w najbliższej przyszłości")
     }
 }
