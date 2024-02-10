@@ -37,6 +37,7 @@ fun makeRandomInstance(clazz: KClass<*>): Any? {
 
 private val random = Random
 private fun makePrimitiveOrNull(clazz: KClass<*>) = when (clazz) {
+    Boolean::class -> random.nextBoolean()
     Int::class -> random.nextInt()
     Long::class -> random.nextLong()
     Double::class -> random.nextDouble()

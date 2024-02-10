@@ -8,6 +8,8 @@ import com.google.maps.android.ktx.utils.sphericalDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.shreyaspatil.permissionFlow.PermissionFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
@@ -37,15 +40,17 @@ class MapScreenViewModel
         private val permissionFlow: PermissionFlow,
         private val getDeparturesUseCase: GetDeparturesUseCase,
     ) : ViewModel() {
-        private val _location = MutableStateFlow(UserLocation.default())
-        private val _departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
-        private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
-        private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
+    private var updateDeparturesJob: Job? = null
 
-        val location: StateFlow<UserLocation> = _location
-        val departures: StateFlow<List<DepartureRowModel>> = _departures
-        val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
-        val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
+    private val _location = MutableStateFlow(UserLocation.default())
+    private val _departures = MutableStateFlow<List<DepartureRowModel>>(emptyList())
+    private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
+    private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
+
+    val location: StateFlow<UserLocation> = _location
+    val departures: StateFlow<List<DepartureRowModel>> = _departures
+    val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
+    val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
 
         init {
             traceUserLocation()
@@ -98,13 +103,18 @@ class MapScreenViewModel
 
         fun onBusStopSelected(selected: BusStopMapItem) {
             _selectedBusStop.value = selected
-            viewModelScope.launch {
-                getDeparturesUseCase.getDepartures(selected.id).collect { departures ->
-                    _departures.value =
-                        departures.map {
-                            val (departure, vehicle) = it
-                            departure.mapToUiRow(vehicle)
+            updateDeparturesJob = viewModelScope.launch {
+                while (isActive) {
+                    getDeparturesUseCase.getDepartures(selected.id)
+                        .take(1)
+                        .collect { departures ->
+                            _departures.value =
+                                departures.map {
+                                    val (departure, vehicle) = it
+                                    departure.mapToUiRow(vehicle)
+                                }
                         }
+                    delay(1000*30)
                 }
             }
         }
@@ -112,6 +122,7 @@ class MapScreenViewModel
         fun onMapClicked() {
             _selectedBusStop.value = null
             _departures.value = emptyList()
+            updateDeparturesJob?.cancel()
         }
 
         fun onMapReloadRequest() {

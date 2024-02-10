@@ -13,24 +13,25 @@ import org.junit.Rule
 import org.junit.Test
 import pl.bkacala.threecitycommuter.mocks.MockBusStopsRepository.mockBusStopsRepository
 import pl.bkacala.threecitycommuter.mocks.MockLocationRepository.mockLocationRepository
-import pl.bkacala.threecitycommuter.mocks.MockPermissionFlows.mockDeniedPermissionFlow
 import pl.bkacala.threecitycommuter.mocks.MockPermissionFlows.mockGrantedPermissionFlow
+import pl.bkacala.threecitycommuter.mocks.MockVehiclesRepository.mockVehiclesRepository
 import pl.bkacala.threecitycommuter.tools.MainDispatcherRule
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
 
 class MapScreenViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
+    fun `jeba pis`() {
+
+    }
+
+    @Test
     fun `should load bus stops correctly`() {
-        val viewModel =
-            MapScreenViewModel(
-                stopsRepository = mockBusStopsRepository,
-                locationRepository = mockLocationRepository,
-                permissionFlow = mockGrantedPermissionFlow,
-            )
+        val viewModel = mapScreenViewModel()
 
         runTest {
             val job =
@@ -51,15 +52,21 @@ class MapScreenViewModelTest {
         }
     }
 
+    private fun mapScreenViewModel() = MapScreenViewModel(
+        stopsRepository = mockBusStopsRepository,
+        locationRepository = mockLocationRepository,
+        permissionFlow = mockGrantedPermissionFlow,
+        getDeparturesUseCase = GetDeparturesUseCase(
+            busStopsRepository = mockBusStopsRepository,
+            vehiclesRepository = mockVehiclesRepository
+        )
+    )
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should receive default location when permission is not granted`() {
-        val viewModel =
-            MapScreenViewModel(
-                stopsRepository = mockBusStopsRepository,
-                locationRepository = mockLocationRepository,
-                permissionFlow = mockDeniedPermissionFlow,
-            )
+        val viewModel = mapScreenViewModel()
+
 
         runTest {
             val job =
@@ -79,12 +86,8 @@ class MapScreenViewModelTest {
 
     @Test
     fun `should receive real location when permission is granted`() {
-        val viewModel =
-            MapScreenViewModel(
-                stopsRepository = mockBusStopsRepository,
-                locationRepository = mockLocationRepository,
-                permissionFlow = mockGrantedPermissionFlow,
-            )
+        val viewModel = mapScreenViewModel()
+
 
         runTest {
             val job =
@@ -107,12 +110,8 @@ class MapScreenViewModelTest {
 
     @Test
     fun `should pick closest bus stop when data is loaded`() {
-        val viewModel =
-            MapScreenViewModel(
-                stopsRepository = mockBusStopsRepository,
-                locationRepository = mockLocationRepository,
-                permissionFlow = mockGrantedPermissionFlow,
-            )
+        val viewModel = mapScreenViewModel()
+
 
         runTest {
             val job =
