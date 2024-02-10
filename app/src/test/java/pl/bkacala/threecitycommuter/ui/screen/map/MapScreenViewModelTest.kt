@@ -25,11 +25,6 @@ class MapScreenViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun `jeba pis`() {
-
-    }
-
-    @Test
     fun `should load bus stops correctly`() {
         val viewModel = mapScreenViewModel()
 
