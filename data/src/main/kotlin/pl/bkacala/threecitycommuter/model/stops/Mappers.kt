@@ -3,7 +3,7 @@ package pl.bkacala.threecitycommuter.model.stops
 import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
 
 
-fun BusStopEntity.toStopData(): BusStopData {
+fun BusStopEntity.toStopData(isForBuses: Boolean, isForTrams: Boolean): BusStopData {
     return BusStopData(
         stopId = this.stopId,
         stopCode = this.stopCode,
@@ -26,7 +26,9 @@ fun BusStopEntity.toStopData(): BusStopData {
         locationType = this.locationType,
         parentStation = this.parentStation,
         stopTimezone = this.stopTimezone,
-        wheelchairBoarding = this.wheelchairBoarding
+        wheelchairBoarding = this.wheelchairBoarding,
+        isForBuses = isForBuses,
+        isForTrams = isForTrams
     )
 }
 

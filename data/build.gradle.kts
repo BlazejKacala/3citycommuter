@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin)
     id("com.google.devtools.ksp")
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 android {
@@ -43,6 +44,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.kotlinx.datetime)
     implementation(libs.permission.flow.android)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     testImplementation(libs.androidx.core.testing)

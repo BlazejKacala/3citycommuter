@@ -7,17 +7,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Mic
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -60,7 +51,7 @@ fun MapScreen() {
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
         when (busStops) {
             is UiState.Error -> {
-                Log.e("MapScreen", busStops.exception.toString())
+                Log.e("MapScreen", busStops.exception.stackTraceToString())
                 LaunchedEffect(busStops) {
                     val result = snackbarHostState.showSnackbar(
                         message = "Nie udało się wczytać przystanków",

@@ -1,5 +1,4 @@
 package pl.bkacala.threecitycommuter.model.stops
-
 data class BusStopData(
     val stopId: Int,
     val stopCode: String?,
@@ -23,6 +22,8 @@ data class BusStopData(
     val parentStation: String?,
     val stopTimezone: String?,
     val wheelchairBoarding: String?,
+    val isForBuses: Boolean,
+    val isForTrams: Boolean,
     @Transient
     val name: String = stopName ?: stopShortName ?: stopDesc ?: ""
 )

@@ -10,6 +10,10 @@ class BusStopMapItem(
     busStopItem: BusStopData
 ) : ClusterItem {
 
+    enum class Type {
+        Bus, Tram, Both
+    }
+
     private val latLng = LatLng(busStopItem.stopLat, busStopItem.stopLon)
 
     override fun getPosition(): LatLng {
@@ -32,4 +36,14 @@ class BusStopMapItem(
     val id = busStopItem.stopId
 
     val data = busStopItem
+
+    fun getStationType(): Type {
+        return if (data.isForBuses && data.isForTrams) {
+            Type.Both
+        } else if (data.isForTrams) {
+            Type.Tram
+        } else {
+            Type.Bus
+        }
+    }
 }

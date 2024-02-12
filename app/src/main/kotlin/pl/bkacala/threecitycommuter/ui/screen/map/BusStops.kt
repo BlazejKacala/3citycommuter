@@ -3,6 +3,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DirectionsBus
+import androidx.compose.material.icons.outlined.Tram
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,7 +46,7 @@ fun BusStops(
             Cluster(it = cluster)
         },
         clusterItemContent = {
-            BusStationIcon()
+            BusStationIcon(it.getStationType())
         },
         clusterManager = clusterManager,
     )
@@ -84,15 +85,17 @@ private fun Cluster(it: Cluster<BusStopMapItem>) {
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
-        BusStationIcon()
+        BusStationIcon(BusStopMapItem.Type.Bus)
     }
 }
 
 @Composable
-private fun BusStationIcon() {
-    val icon = remember { Icons.Outlined.DirectionsBus }
+private fun BusStationIcon(type: BusStopMapItem.Type) {
+    val busIcon = remember { Icons.Outlined.DirectionsBus }
+    val tramIcon = remember { Icons.Outlined.Tram }
+
     Icon(
-        imageVector = icon,
+        imageVector = if (type == BusStopMapItem.Type.Tram) tramIcon else busIcon,
         contentDescription = "Przystanek",
         tint = MaterialTheme.colorScheme.primary
     )
