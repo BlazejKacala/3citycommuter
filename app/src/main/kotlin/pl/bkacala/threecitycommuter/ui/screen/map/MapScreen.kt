@@ -38,7 +38,6 @@ import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen() {
     BoxWithConstraints {
@@ -93,33 +92,7 @@ fun MapScreen() {
             onMapClicked = { viewModel.onMapClicked() },
         )
 
-
-        var active by remember { mutableStateOf(false) }
-        var query by remember { mutableStateOf("") }
-        SearchBar(
-            query = query,
-            onQueryChange = { query = it },
-            onSearch = {},
-            active = active,
-            onActiveChange = { active = !active },
-            modifier = Modifier.align(Alignment.TopCenter),
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Mic,
-                    contentDescription = "szukajka"
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Search,
-                    contentDescription = "szukajka"
-                )
-            },
-            placeholder = { Text(text = "Szukaj przystanku") },
-            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background)
-        ) {
-
-        }
+        BusSearchBar()
 
         if (busStops is UiState.Loading) {
             LinearProgressIndicator(
