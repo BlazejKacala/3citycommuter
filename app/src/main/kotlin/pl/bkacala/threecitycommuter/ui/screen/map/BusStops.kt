@@ -1,6 +1,9 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material.icons.outlined.Tram
@@ -11,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
@@ -46,7 +49,7 @@ fun BusStops(
             Cluster(it = cluster)
         },
         clusterItemContent = {
-            BusStationIcon(it.getStationType())
+            StationIcon(it.getStationType(), isSelected = false)
         },
         clusterManager = clusterManager,
     )
@@ -76,27 +79,32 @@ fun BusStops(
 
 @Composable
 private fun Cluster(it: Cluster<BusStopMapItem>) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+    val text = if (it.size < 100) it.size.toString() else "99+"
+
+    Box(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = CircleShape
+            )
+            .size(28.dp)
     ) {
         Text(
-            text = "( ${it.size} )",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.align(Alignment.Center)
         )
-        BusStationIcon(BusStopMapItem.Type.Bus)
     }
 }
 
 @Composable
-private fun BusStationIcon(type: BusStopMapItem.Type) {
+internal fun StationIcon(type: BusStopMapItem.Type, isSelected: Boolean) {
     val busIcon = remember { Icons.Outlined.DirectionsBus }
     val tramIcon = remember { Icons.Outlined.Tram }
 
     Icon(
         imageVector = if (type == BusStopMapItem.Type.Tram) tramIcon else busIcon,
         contentDescription = "Przystanek",
-        tint = MaterialTheme.colorScheme.primary
+        tint = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
     )
 }

@@ -1,15 +1,14 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Man
-import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,6 +20,7 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MarkerComposable
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.R
@@ -81,20 +81,13 @@ fun Map(
 
 @Composable
 private fun SelectedBusStop(busStopMapItem: BusStopMapItem) {
-    val icon = remember { Icons.Outlined.DirectionsBus }
+    Log.d("2137", busStopMapItem.position.toString())
     MarkerComposable(
-        busStopMapItem.id,
-        state = rememberMarkerState(
-            key = busStopMapItem.id.toString(),
-            position = busStopMapItem.position
-        ),
+        busStopMapItem,
+        state = MarkerState(busStopMapItem.position),
         zIndex = 10f
     ) {
-        Icon(
-            imageVector = icon,
-            tint = MaterialTheme.colorScheme.tertiary,
-            contentDescription = "Zaznaczony przystanek"
-        )
+        StationIcon(type = busStopMapItem.getStationType(), isSelected = true)
     }
 }
 
