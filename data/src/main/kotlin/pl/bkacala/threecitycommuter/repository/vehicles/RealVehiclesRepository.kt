@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 private const val VEHICLES = "vehicles_key"
 
-class RealVehiclesRepository @Inject constructor(
+internal class RealVehiclesRepository @Inject constructor(
     private val vehiclesDao: VehiclesDao,
     private val networkClient: NetworkClient,
     private val lastUpdateRepository: LastUpdateRepository

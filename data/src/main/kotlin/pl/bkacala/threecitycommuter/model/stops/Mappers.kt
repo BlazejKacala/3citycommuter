@@ -58,3 +58,19 @@ fun BusStopsNetworkData.BusStopNetworkData.toEntity(): BusStopEntity {
         wheelchairBoarding = this.wheelchairBoarding
     )
 }
+
+fun BusStopType.toEntity(): BusStopTypeEntity {
+    return BusStopTypeEntity(
+        busStopId = this.stopId,
+        isForBuses = this.isForBuses,
+        isForTrams = this.isForTrams
+    )
+}
+
+fun BusStopTypeEntity.toData(): BusStopType {
+    return BusStopType(
+        stopId = this.busStopId,
+        isForBuses = this.isForBuses,
+        isForTrams = this.isForTrams
+    )
+}

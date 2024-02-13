@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import javax.inject.Inject
 
-class RealLocationRepository @Inject constructor(
+internal class RealLocationRepository @Inject constructor(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
 
     ) : LocationRepository {

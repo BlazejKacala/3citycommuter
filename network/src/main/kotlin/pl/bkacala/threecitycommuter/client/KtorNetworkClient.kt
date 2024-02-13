@@ -12,7 +12,7 @@ import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
 import pl.bkacala.threecitycommuter.model.DepartureList
 import pl.bkacala.threecitycommuter.model.VehiclesNetworkData
 
-class KtorNetworkClient(
+internal class KtorNetworkClient(
     private val httpClient: HttpClient,
     private val json: Json
 ) : NetworkClient {

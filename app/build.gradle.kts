@@ -10,6 +10,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
     id("com.diffplug.spotless") version "6.24.0"
     id("com.google.devtools.ksp")
+    kotlin("plugin.serialization") version "1.9.22"
 
 }
 
@@ -111,6 +112,7 @@ dependencies {
     implementation(libs.permission.flow.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     testImplementation(libs.androidx.core.testing)

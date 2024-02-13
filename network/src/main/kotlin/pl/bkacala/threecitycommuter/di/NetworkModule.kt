@@ -23,7 +23,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideNetworkClient(httpClient: HttpClient, json: Json): NetworkClient {
+    internal fun provideNetworkClient(httpClient: HttpClient, json: Json): NetworkClient {
         return KtorNetworkClient(httpClient, json)
     }
 

@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import pl.bkacala.threecitycommuter.dao.BusStopsDao
+import pl.bkacala.threecitycommuter.dao.BusStopsTypesDao
 import pl.bkacala.threecitycommuter.dao.VehiclesDao
 import pl.bkacala.threecitycommuter.database.CommuterDatabase
 
@@ -31,5 +32,10 @@ object DatabaseModule {
     @Provides
     fun providesVehiclesDao(commuterDatabase: CommuterDatabase): VehiclesDao {
         return commuterDatabase.vehiclesDao
+    }
+
+    @Provides
+    fun providesBusStopsTypesDao(commuterDatabase: CommuterDatabase): BusStopsTypesDao {
+        return commuterDatabase.busStopTypeDao
     }
 }

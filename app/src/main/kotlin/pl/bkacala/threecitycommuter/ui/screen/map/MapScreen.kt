@@ -42,7 +42,7 @@ fun MapScreen() {
             viewModel.location.collect {
                 userLocation = it
                 cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16.0f)
+                    CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18.0f)
                 )
             }
         }

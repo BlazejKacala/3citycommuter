@@ -20,25 +20,25 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindBusStopsRepository(
+    internal abstract fun bindBusStopsRepository(
         realRepositoryImpl: RealBusStopsRepository
     ): BusStopsRepository
 
     @Binds
     @Singleton
-    abstract fun bindLastUpdateRepository(
+    internal abstract fun bindLastUpdateRepository(
         realRepositoryImpl: RealLastUpdateRepository
     ): LastUpdateRepository
 
     @Binds
     @Singleton
-    abstract fun bindLocationRepository(
+    internal abstract fun bindLocationRepository(
         realRepositoryImpl: RealLocationRepository
     ): LocationRepository
 
     @Binds
     @Singleton
-    abstract fun bindVehiclesRepository(
+    internal abstract fun bindVehiclesRepository(
         realRepositoryImpl: RealVehiclesRepository
     ): VehiclesRepository
 

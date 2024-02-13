@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 private const val LAST_UPDATE_KEY = "last_update_key_"
 
-class RealLastUpdateRepository @Inject constructor(private val sharedPreferences: SharedPreferences) :
+internal class RealLastUpdateRepository @Inject constructor(private val sharedPreferences: SharedPreferences) :
     LastUpdateRepository {
 
     override fun getLastUpdateTimeStamp(key: String): Long {
