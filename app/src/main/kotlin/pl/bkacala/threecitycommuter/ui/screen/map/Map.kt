@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
@@ -42,11 +43,15 @@ fun Map(
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
-        properties = MapProperties().copy(
+        properties = MapProperties(
             mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
                 context,
                 mapStyle()
-            )
+            ),
+            minZoomPreference = 10.0f,
+            latLngBoundsForCameraTarget = LatLngBounds(
+                LatLng(54.2783173, 18.5874054), //south-west
+                LatLng(54.5413784, 18.792546)) //north-east
         ),
         onMapClick = {
             onMapClicked()
