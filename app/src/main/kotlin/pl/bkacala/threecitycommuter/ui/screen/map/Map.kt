@@ -1,6 +1,5 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
-import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -87,7 +86,6 @@ fun Map(
 
 @Composable
 private fun SelectedBusStop(busStopMapItem: BusStopMapItem) {
-    Log.d("2137", busStopMapItem.position.toString())
     MarkerComposable(
         busStopMapItem,
         state = MarkerState(busStopMapItem.position),

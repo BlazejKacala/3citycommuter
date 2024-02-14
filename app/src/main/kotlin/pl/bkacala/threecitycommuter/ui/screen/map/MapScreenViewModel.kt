@@ -12,13 +12,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -30,6 +28,7 @@ import pl.bkacala.threecitycommuter.ui.common.asUiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
 import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper
+import pl.bkacala.threecitycommuter.ui.screen.map.search.SearchBarModel
 import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
 import pl.bkacala.threecitycommuter.utils.stateInViewModelScope
 import javax.inject.Inject
@@ -61,27 +60,18 @@ class MapScreenViewModel
         .take(1)
         .stateInViewModelScope(this, initialValue = null)
 
+    val searchBarModel = SearchBarModel(
+        _isActive = MutableStateFlow(false),
+        _query = MutableStateFlow(""),
+        _results = MutableStateFlow(listOf()),
+        busStops = _busStops,
+        userLocation = _location,
+        scope = viewModelScope
+    )
+
     init {
         loadBusStops()
         showClosestStationBoard()
-    }
-
-    private fun showClosestStationBoard() {
-        viewModelScope.launch {
-            busStops.filter { it is UiState.Success }
-                .combine(location.filter { !it.isFixed }, ::Pair)
-                .take(1)
-                .collect { pair ->
-                    val (busStops, userLocation) = pair
-                    require(busStops is UiState.Success)
-                    val userLocationLatLng = LatLng(userLocation.latitude, userLocation.longitude)
-                    val closestBusStop =
-                        busStops.data.minByOrNull { it.position.sphericalDistance(userLocationLatLng) }
-                    closestBusStop?.let {
-                        onBusStopSelected(it)
-                    }
-                }
-        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -103,6 +93,24 @@ class MapScreenViewModel
 
     fun stopTracingUserLocation() {
         traceUserLocationJob?.cancel()
+    }
+
+    private fun showClosestStationBoard() {
+        viewModelScope.launch {
+            busStops.filter { it is UiState.Success }
+                .combine(location.filter { !it.isFixed }, ::Pair)
+                .take(1)
+                .collect { pair ->
+                    val (busStops, userLocation) = pair
+                    require(busStops is UiState.Success)
+                    val userLocationLatLng = LatLng(userLocation.latitude, userLocation.longitude)
+                    val closestBusStop =
+                        busStops.data.minByOrNull { it.position.sphericalDistance(userLocationLatLng) }
+                    closestBusStop?.let {
+                        onBusStopSelected(it)
+                    }
+                }
+        }
     }
 
     private fun loadBusStops() {
@@ -133,7 +141,6 @@ class MapScreenViewModel
                 delay(1000 * 30)
             }
         }
-
     }
 
     fun onMapClicked() {

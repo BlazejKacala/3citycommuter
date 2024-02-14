@@ -12,10 +12,8 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -30,10 +28,10 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.flow.filterNotNull
 import pl.bkacala.threecitycommuter.LocalSnackbarHostState
-import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
+import pl.bkacala.threecitycommuter.ui.screen.map.search.BusSearchBar
 
 @Composable
 fun MapScreen() {
@@ -83,7 +81,7 @@ fun MapScreen() {
             onMapClicked = { viewModel.onMapClicked() },
         )
 
-        BusSearchBar()
+        BusSearchBar(searchBarModel = viewModel.searchBarModel)
 
         if (busStops is UiState.Loading) {
             LinearProgressIndicator(
@@ -105,7 +103,7 @@ private fun TraceMapCamera(
     LaunchedEffect(viewModel) {
         viewModel.cameraPosition.filterNotNull().collect {
             cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18.0f)
+                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16.0f)
             )
         }
     }
