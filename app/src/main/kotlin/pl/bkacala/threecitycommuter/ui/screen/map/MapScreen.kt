@@ -26,7 +26,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.flow.filterNotNull
 import pl.bkacala.threecitycommuter.LocalSnackbarHostState
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.common.UiState
@@ -40,22 +42,9 @@ fun MapScreen() {
         val viewModel = hiltViewModel<MapScreenViewModel>()
         val cameraPositionState = rememberCameraPositionState()
         val snackbarHostState = LocalSnackbarHostState.current
-        var userLocation by remember { mutableStateOf<UserLocation?>(null) }
-
-        LaunchedEffect(viewModel) {
-            viewModel.location.collect {
-                Log.d("2137", "$it")
-                userLocation = it
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18.0f)
-                )
-            }
-        }
-
-
 
         TraceUserLocation(viewModel)
-
+        TraceMapCamera(viewModel, cameraPositionState)
 
         val busStops = viewModel.busStops.collectAsStateWithLifecycle().value
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
@@ -84,6 +73,7 @@ fun MapScreen() {
             }
         }
 
+        val userLocation = viewModel.location.collectAsStateWithLifecycle().value
         Map(
             cameraPositionState = cameraPositionState,
             busStops = busStopsState.value,
@@ -105,6 +95,20 @@ fun MapScreen() {
         DeparturesSheet(model = viewModel)
     }
 
+}
+
+@Composable
+private fun TraceMapCamera(
+    viewModel: MapScreenViewModel,
+    cameraPositionState: CameraPositionState
+) {
+    LaunchedEffect(viewModel) {
+        viewModel.cameraPosition.filterNotNull().collect {
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18.0f)
+            )
+        }
+    }
 }
 
 @Composable
