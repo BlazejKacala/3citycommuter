@@ -50,8 +50,9 @@ fun Map(
             ),
             minZoomPreference = 10.0f,
             latLngBoundsForCameraTarget = LatLngBounds(
-                LatLng(54.2783173, 18.5874054), //south-west
-                LatLng(54.5413784, 18.792546)) //north-east
+                LatLng(54.0783173, 18.1874054), //south-west
+                LatLng(54.9413784, 18.922546)
+            ) //north-east
         ),
         onMapClick = {
             onMapClicked()

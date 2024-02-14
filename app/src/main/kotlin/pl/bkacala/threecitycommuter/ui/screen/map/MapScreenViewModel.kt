@@ -40,7 +40,9 @@ class MapScreenViewModel
         private val permissionFlow: PermissionFlow,
         private val getDeparturesUseCase: GetDeparturesUseCase,
     ) : ViewModel() {
+
     private var updateDeparturesJob: Job? = null
+    private var traceUserLocationJob: Job? = null
 
     private val _location = MutableStateFlow(UserLocation.default())
     private val _departures = MutableStateFlow<DeparturesBottomSheetModel?>(null)
@@ -53,7 +55,6 @@ class MapScreenViewModel
     val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
 
         init {
-            traceUserLocation()
             loadBusStops()
             showClosestStationBoard()
         }
@@ -76,9 +77,10 @@ class MapScreenViewModel
             }
         }
 
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private fun traceUserLocation() {
-            viewModelScope.launch {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun traceUserLocation() {
+        traceUserLocationJob = viewModelScope.launch {
+            while (isActive) {
                 permissionFlow.getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
                     .filter { it.isGranted }.flatMapLatest {
                         locationRepository.getLocation()
@@ -87,18 +89,24 @@ class MapScreenViewModel
                             _location.value = userLocation
                         }
                     }
+                delay(1000 * 10)
             }
         }
+    }
 
-        private fun loadBusStops() {
-            viewModelScope.launch {
-                stopsRepository.getBusStops().map {
-                    it.map { busStopData -> BusStopMapItem(busStopData) }
-                }.asUiState()
-                    .collect {
-                        _busStops.value = it
-                    }
-            }
+    fun stopTracingUserLocation() {
+        traceUserLocationJob?.cancel()
+    }
+
+    private fun loadBusStops() {
+        viewModelScope.launch {
+            stopsRepository.getBusStops().map {
+                it.map { busStopData -> BusStopMapItem(busStopData) }
+            }.asUiState()
+                .collect {
+                    _busStops.value = it
+                }
+        }
         }
 
         fun onBusStopSelected(selected: BusStopMapItem) {

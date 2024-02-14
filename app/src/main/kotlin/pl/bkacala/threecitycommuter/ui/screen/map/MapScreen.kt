@@ -10,16 +10,20 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -40,6 +44,7 @@ fun MapScreen() {
 
         LaunchedEffect(viewModel) {
             viewModel.location.collect {
+                Log.d("2137", "$it")
                 userLocation = it
                 cameraPositionState.animate(
                     CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18.0f)
@@ -47,7 +52,12 @@ fun MapScreen() {
             }
         }
 
-        val busStops = viewModel.busStops.collectAsState().value
+
+
+        TraceUserLocation(viewModel)
+
+
+        val busStops = viewModel.busStops.collectAsStateWithLifecycle().value
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
         when (busStops) {
             is UiState.Error -> {
@@ -77,7 +87,7 @@ fun MapScreen() {
         Map(
             cameraPositionState = cameraPositionState,
             busStops = busStopsState.value,
-            selectedBusStop = viewModel.selectedBusStop.collectAsState().value,
+            selectedBusStop = viewModel.selectedBusStop.collectAsStateWithLifecycle().value,
             userLocation = userLocation,
             onBusStationSelected = { viewModel.onBusStopSelected(it) },
             onMapClicked = { viewModel.onMapClicked() },
@@ -98,9 +108,34 @@ fun MapScreen() {
 }
 
 @Composable
+private fun TraceUserLocation(viewModel: MapScreenViewModel) {
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(viewModel) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    viewModel.traceUserLocation()
+                }
+
+                Lifecycle.Event.ON_PAUSE -> {
+                    viewModel.stopTracingUserLocation()
+                }
+
+                else -> {}
+            }
+        }
+        lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
+    }
+}
+
+@Composable
 private fun BoxWithConstraintsScope.DeparturesSheet(model: MapScreenViewModel) {
 
-    val departuresModel = model.departures.collectAsState().value
+    val departuresModel = model.departures.collectAsStateWithLifecycle().value
 
     AnimatedVisibility(
         visible = departuresModel != null,
