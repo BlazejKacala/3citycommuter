@@ -30,7 +30,7 @@ fun SearchResultRowModel.Widget() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = Padding.large, vertical = Padding.normal),
+            .padding(horizontal = Padding.big, vertical = Padding.normal),
         verticalAlignment = Alignment.CenterVertically
 
     ) {

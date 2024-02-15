@@ -11,20 +11,25 @@ private val DarkColorScheme = darkColorScheme(
     primary = PrimaryColor,
     secondary = DarkPrimaryColor,
     tertiary = Accent,
-    surface = BackgroundDark
-    )
+    surface = BackgroundDark,
+    onSurface = PrimaryTextDark,
+    onSurfaceVariant = SecondaryTextDark
+)
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
     secondary = DarkPrimaryColor,
     tertiary = Accent,
-    surface = Background
+    surface = Background,
+    onSurface = PrimaryTextLight,
+    onSurfaceVariant = SecondaryTextLight
 )
 
 object Padding {
     val small = 5.dp
     val normal = 10.dp
-    val large = 20.dp
+    val large = 15.dp
+    val big = 20.dp
 }
 
 

@@ -15,8 +15,8 @@ fun DeparturesEmptyRow() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = Padding.large)
-            .padding(bottom = Padding.large)
+            .padding(horizontal = Padding.big)
+            .padding(bottom = Padding.big)
     ) {
         Text(text = "Brak odjazdów z tego przystanku w najbliższej przyszłości")
     }

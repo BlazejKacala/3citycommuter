@@ -35,7 +35,7 @@ object DeparturesMapper {
         )
     }
 
-    fun Departure.mapToUiRow(vehicle: Vehicle?): DepartureRowModel {
+    private fun Departure.mapToUiRow(vehicle: Vehicle?): DepartureRowModel {
 
         val now = Clock.System.now().epochSeconds
         val minutesToArrival = minutesToArrival(this.estimatedTime, now)
@@ -48,6 +48,7 @@ object DeparturesMapper {
             disabledFriendly = vehicle?.wheelchairsRamp ?: false,
             bikesAllowed = vehicle?.bikeHolders == 1,
             gpsPosition = this.delayInSeconds != null,
+            isSelected = false
         )
     }
 }

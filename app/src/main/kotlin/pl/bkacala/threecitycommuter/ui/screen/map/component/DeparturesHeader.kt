@@ -20,11 +20,13 @@ data class DeparturesHeaderModel(
 @Composable
 fun DeparturesHeaderModel.Widget() {
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(Padding.large)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Padding.big)
+    ) {
         Text(text = busStopName, style = MaterialTheme.typography.headlineSmall)
-        if(isForDemand) {
+        if (isForDemand) {
             Text(text = "na żądanie")
         }
     }

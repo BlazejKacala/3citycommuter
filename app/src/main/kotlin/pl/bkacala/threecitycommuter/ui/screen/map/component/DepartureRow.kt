@@ -1,17 +1,19 @@
 package pl.bkacala.threecitycommuter.ui.screen.map.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.GpsFixed
 import androidx.compose.material.icons.rounded.DirectionsBike
-import androidx.compose.material.icons.rounded.GpsFixed
-import androidx.compose.material.icons.rounded.GpsOff
+import androidx.compose.material.icons.rounded.GpsNotFixed
 import androidx.compose.material.icons.rounded.WheelchairPickup
 import androidx.compose.material.icons.sharp.DirectionsBusFilled
 import androidx.compose.material.icons.sharp.Tram
@@ -25,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -39,7 +42,8 @@ data class DepartureRowModel(
     val departureTime: String,
     val disabledFriendly: Boolean,
     val bikesAllowed: Boolean,
-    val gpsPosition: Boolean
+    val gpsPosition: Boolean,
+    val isSelected: Boolean
 ) {
     enum class VehicleType { Bus, Tram }
 }
@@ -50,31 +54,48 @@ fun DepartureRowModel.Widget() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .height(52.dp)
-            .padding(
-                vertical = Padding.small,
-                horizontal = Padding.normal
-            )
+            .height(58.dp)
     ) {
-
-        VehicleImage(vehicleType)
-        Spacer(modifier = Modifier.width(Padding.normal))
-        LineNumber(lineNumber)
-        Spacer(modifier = Modifier.width(Padding.normal))
-        Direction(direction)
-        if (disabledFriendly) {
+        Selection(isSelected)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(
+                    top = Padding.small,
+                    bottom = Padding.small,
+                    start = Padding.large,
+                    end = Padding.normal
+                )
+        ) {
+            VehicleImage(vehicleType)
+            Spacer(modifier = Modifier.width(Padding.large))
+            LineNumber(lineNumber)
+            Spacer(modifier = Modifier.width(Padding.large))
+            Direction(direction)
+            if (disabledFriendly) {
+                Spacer(modifier = Modifier.width(Padding.normal))
+                DisabledFriendlyIcon()
+            }
+            if (bikesAllowed) {
+                Spacer(modifier = Modifier.width(Padding.normal))
+                BikesAllowedIcon()
+            }
+            Spacer(modifier = Modifier.width(Padding.big))
             Spacer(modifier = Modifier.width(Padding.normal))
-            DisabledFriendlyIcon()
+            DepartureTime(isNear, departureTime)
+            GPSIcon(gpsPosition = gpsPosition)
         }
-        if (bikesAllowed) {
-            Spacer(modifier = Modifier.width(Padding.normal))
-            BikesAllowedIcon()
-        }
-        Spacer(modifier = Modifier.width(Padding.large))
-        GPSIcon(gpsPosition = gpsPosition)
-        Spacer(modifier = Modifier.width(Padding.normal))
-        DepartureTime(isNear, departureTime)
     }
+}
+
+@Composable
+private fun Selection(selected: Boolean) {
+    Box(
+        modifier = Modifier
+            .width(2.dp)
+            .fillMaxHeight()
+            .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
+    )
 }
 
 @Composable
@@ -82,9 +103,9 @@ private fun DepartureTime(isNear: Boolean, departureTime: String) {
 
     val isVisible = remember(departureTime) { mutableStateOf(true) }
 
-    if(isNear) {
+    if (isNear) {
         LaunchedEffect(departureTime) {
-            while(true) {
+            while (true) {
                 delay(300)
                 isVisible.value = !isVisible.value
             }
@@ -94,7 +115,8 @@ private fun DepartureTime(isNear: Boolean, departureTime: String) {
     Box(modifier = Modifier.width(65.dp)) {
         if (isVisible.value) {
             Text(
-                text = departureTime, style = MaterialTheme.typography.bodyLarge
+                text = departureTime,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -103,9 +125,13 @@ private fun DepartureTime(isNear: Boolean, departureTime: String) {
 @Composable
 private fun GPSIcon(gpsPosition: Boolean) {
     Icon(
-        imageVector = if (gpsPosition) Icons.Rounded.GpsFixed else Icons.Rounded.GpsOff,
+        imageVector = if (gpsPosition) Icons.Outlined.GpsFixed else Icons.Rounded.GpsNotFixed,
         contentDescription = "Czy pozycja pojazdu jest dostępna",
-        modifier = Modifier.size(12.dp)
+        modifier = Modifier.size(24.dp),
+        tint = if (gpsPosition)
+            MaterialTheme.colorScheme.secondary
+        else
+            MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
 
@@ -114,7 +140,8 @@ private fun BikesAllowedIcon() {
     Icon(
         imageVector = Icons.Rounded.DirectionsBike,
         contentDescription = "Można wsiąść z rowerem",
-        modifier = Modifier.size(12.dp)
+        modifier = Modifier.size(12.dp),
+        tint = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
 
@@ -123,7 +150,8 @@ private fun DisabledFriendlyIcon() {
     Icon(
         imageVector = Icons.Rounded.WheelchairPickup,
         contentDescription = "Dostosowany dla niepełnosprawnych",
-        modifier = Modifier.size(12.dp)
+        modifier = Modifier.size(12.dp),
+        tint = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
 
@@ -139,7 +167,7 @@ private fun RowScope.Direction(direction: String) {
 @Composable
 private fun LineNumber(lineNumber: String) {
     Text(
-        text = lineNumber, style = MaterialTheme.typography.headlineSmall
+        text = lineNumber, style = MaterialTheme.typography.titleLarge
     )
 }
 
@@ -153,7 +181,8 @@ private fun VehicleImage(vehicleType: DepartureRowModel.VehicleType) {
     Icon(
         imageVector = image,
         contentDescription = "typ pojazdu",
-        modifier = Modifier.size(24.dp)
+        modifier = Modifier.size(18.dp),
+        tint = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
 
@@ -168,7 +197,8 @@ private fun DepartureRowPreview() {
         disabledFriendly = true,
         departureTime = "Teraz",
         direction = "Orunia Górna",
-        gpsPosition = true
+        gpsPosition = true,
+        isSelected = true
     ).Widget()
 
 }

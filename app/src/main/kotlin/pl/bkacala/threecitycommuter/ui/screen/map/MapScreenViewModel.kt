@@ -1,6 +1,7 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
 import android.Manifest
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -12,7 +13,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -82,9 +82,8 @@ class MapScreenViewModel
                     .filter { it.isGranted }.flatMapLatest {
                         locationRepository.getLocation()
                     }.collect {
-                        locationRepository.getLocation().collectLatest { userLocation ->
-                            _location.value = userLocation
-                        }
+                        Log.d("2137", "$it")
+                        _location.value = it
                     }
                 delay(1000 * 10)
             }

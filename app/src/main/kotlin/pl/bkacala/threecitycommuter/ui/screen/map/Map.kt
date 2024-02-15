@@ -21,7 +21,6 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.R
 import pl.bkacala.threecitycommuter.model.location.UserLocation
@@ -50,8 +49,8 @@ fun Map(
             minZoomPreference = 10.0f,
             latLngBoundsForCameraTarget = LatLngBounds(
                 LatLng(54.0783173, 18.1874054), //south-west
-                LatLng(54.9413784, 18.922546)
-            ) //north-east
+                LatLng(54.9413784, 18.922546) //north-east
+            )
         ),
         onMapClick = {
             onMapClicked()
@@ -80,7 +79,6 @@ fun Map(
         selectedBusStop?.let {
             SelectedBusStop(it)
         }
-
     }
 }
 
@@ -100,12 +98,14 @@ private fun UserLocationMarker(userLocation: UserLocation?) {
     userLocation?.let {
         if (!userLocation.isFixed) {
             MarkerComposable(
-                userLocation,
-                state = rememberMarkerState(
-                    key = userLocation.toString(),
-                    position = LatLng(userLocation.latitude, userLocation.longitude)
+                state = MarkerState(
+                    LatLng(
+                        userLocation.latitude,
+                        userLocation.longitude
+                    )
                 )
-            ) {
+            )
+            {
                 Icon(
                     imageVector = Icons.Filled.Man,
                     modifier = Modifier.size(24.dp),
