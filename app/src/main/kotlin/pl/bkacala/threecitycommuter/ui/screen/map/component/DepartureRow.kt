@@ -1,6 +1,7 @@
 package pl.bkacala.threecitycommuter.ui.screen.map.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -22,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +45,9 @@ data class DepartureRowModel(
     val disabledFriendly: Boolean,
     val bikesAllowed: Boolean,
     val gpsPosition: Boolean,
-    val isSelected: Boolean
+    val isSelected: MutableState<Boolean>,
+    val vehicleId: Long?,
+    val onSelected: (id: Long) -> Unit,
 ) {
     enum class VehicleType { Bus, Tram }
 }
@@ -55,8 +59,13 @@ fun DepartureRowModel.Widget() {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .height(58.dp)
+            .clickable {
+                vehicleId?.let {
+                    onSelected(it)
+                }
+            }
     ) {
-        Selection(isSelected)
+        Selection(isSelected.value)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -198,7 +207,9 @@ private fun DepartureRowPreview() {
         departureTime = "Teraz",
         direction = "Orunia Górna",
         gpsPosition = true,
-        isSelected = true
+        isSelected = remember { mutableStateOf(true) },
+        vehicleId = 1,
+        onSelected = {}
     ).Widget()
 
 }

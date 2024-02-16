@@ -1,7 +1,7 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
 import android.Manifest
-import android.util.Log
+import androidx.compose.ui.util.fastForEach
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -26,6 +26,7 @@ import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.common.asUiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
 import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper
 import pl.bkacala.threecitycommuter.ui.screen.map.search.SearchBarModel
@@ -50,6 +51,7 @@ class MapScreenViewModel
     private val _departures = MutableStateFlow<DeparturesBottomSheetModel?>(null)
     private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
     private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
+    private val _selectedDeparture = MutableStateFlow<DepartureRowModel?>(null)
 
     val location: StateFlow<UserLocation> = _location
     val departures: StateFlow<DeparturesBottomSheetModel?> = _departures
@@ -82,7 +84,6 @@ class MapScreenViewModel
                     .filter { it.isGranted }.flatMapLatest {
                         locationRepository.getLocation()
                     }.collect {
-                        Log.d("2137", "$it")
                         _location.value = it
                     }
                 delay(1000 * 10)
@@ -124,6 +125,7 @@ class MapScreenViewModel
     }
 
     fun onBusStopSelected(selected: BusStopMapItem) {
+        _selectedDeparture.value = null
         updateDeparturesJob?.cancel()
         _selectedBusStop.value = selected
         updateDeparturesJob = viewModelScope.launch {
@@ -134,7 +136,9 @@ class MapScreenViewModel
                         _departures.value =
                             DeparturesMapper.mapToBottomSheetModel(
                                 busStopData = selected.data,
-                                departures = departures
+                                departures = departures.distinctBy { it.first.vehicleId },
+                                selectedDeparture = _selectedDeparture.value,
+                                onSelected = { onSelectDeparture(it) }
                             )
                     }
                 delay(1000 * 30)
@@ -142,8 +146,19 @@ class MapScreenViewModel
         }
     }
 
+    private fun onSelectDeparture(vehicleId: Long?) {
+        _selectedDeparture.value = departures.value?.departures?.first {
+            vehicleId != null && it.vehicleId == vehicleId
+        }
+        departures.value?.departures?.fastForEach {
+            it.isSelected.value = false
+        }
+        _selectedDeparture.value?.isSelected?.value = true
+    }
+
     fun onMapClicked() {
         _selectedBusStop.value = null
+        _selectedDeparture.value = null
         _departures.value = null
         updateDeparturesJob?.cancel()
     }

@@ -24,6 +24,10 @@ class SearchBarModel(
 
     fun onQueryChanged(query: String) {
         _query.value = query
+        updateResults(query)
+    }
+
+    private fun updateResults(query: String) {
         scope.launch {
             if (busStops.value is UiState.Success) {
                 val busStops = (busStops.value as UiState.Success<List<BusStopMapItem>>).data
@@ -32,7 +36,8 @@ class SearchBarModel(
                 _results.value = busStops.filter {
                     it.data.name.lowercase().contains(query.lowercase())
                 }.map {
-                    Pair(it,
+                    Pair(
+                        it,
                         it.position.sphericalDistance(LatLng(location.latitude, location.longitude))
                             .toInt()
                     )
@@ -58,6 +63,9 @@ class SearchBarModel(
 
     fun onSearchBarActiveChange() {
         _isActive.value = !_isActive.value
+        if (_isActive.value) {
+            updateResults(_query.value)
+        }
     }
 
 }

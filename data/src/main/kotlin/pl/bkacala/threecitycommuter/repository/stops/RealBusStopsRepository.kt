@@ -39,10 +39,12 @@ internal class RealBusStopsRepository @Inject constructor(
             val relations = busStopsTypesDao.getBusStopsTypes().map { it.toData() }
             emit(busStopsDao.getBusStations()
                 .filter { it.virtual == 0 }
-                .map { entity ->
+                .mapNotNull { entity ->
                     //TODO this should be done in more optimized way, using hashmap or directly through db relations
-                    val relation = relations.first { entity.stopId == it.stopId }
-                    entity.toStopData(relation.isForBuses, relation.isForTrams)
+                    val relation = relations.firstOrNull { entity.stopId == it.stopId }
+                    relation?.let {
+                        entity.toStopData(it.isForBuses, it.isForTrams)
+                    }
                 })
         }.flowOn(Dispatchers.IO)
     }

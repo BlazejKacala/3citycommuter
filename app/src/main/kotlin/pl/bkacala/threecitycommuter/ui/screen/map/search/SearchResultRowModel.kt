@@ -35,15 +35,27 @@ fun SearchResultRowModel.Widget() {
 
     ) {
         if (isForTrams) {
-            Icon(imageVector = Icons.Filled.Tram, contentDescription = "Przystanek tramwajowy")
+            Icon(
+                imageVector = Icons.Filled.Tram,
+                contentDescription = "Przystanek tramwajowy",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         if (isForBuses) {
-            Icon(imageVector = Icons.Filled.DirectionsBus, contentDescription = "Przystanek tramwajowy")
+            Icon(
+                imageVector = Icons.Filled.DirectionsBus,
+                contentDescription = "Przystanek tramwajowy",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         Spacer(modifier = Modifier.width(Padding.normal))
         Column {
-            Text(text = station, style = MaterialTheme.typography.titleSmall)
-            Text(text = distance, style = MaterialTheme.typography.bodyMedium)
+            Text(text = station, style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = distance,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
