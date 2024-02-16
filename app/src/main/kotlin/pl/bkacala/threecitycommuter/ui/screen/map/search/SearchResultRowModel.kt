@@ -1,5 +1,6 @@
 package pl.bkacala.threecitycommuter.ui.screen.map.search
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ data class SearchResultRowModel(
     val distance: String,
     val isForBuses: Boolean,
     val isForTrams: Boolean,
+    val onClicked: () -> Unit
 )
 
 @Composable
@@ -30,6 +32,7 @@ fun SearchResultRowModel.Widget() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClicked() }
             .padding(horizontal = Padding.big, vertical = Padding.normal),
         verticalAlignment = Alignment.CenterVertically
 
@@ -63,5 +66,5 @@ fun SearchResultRowModel.Widget() {
 @Preview(showBackground = true)
 @Composable
 fun SearchResultRowModelPreview() {
-    SearchResultRowModel("Orunia Górna", "Przystanek w odległy o 225m", true, true)
+    SearchResultRowModel("Orunia Górna", "Przystanek w odległy o 225m", true, true, {})
 }

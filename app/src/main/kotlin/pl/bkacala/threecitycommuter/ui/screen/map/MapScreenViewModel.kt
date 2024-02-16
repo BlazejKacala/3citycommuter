@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -52,14 +53,14 @@ class MapScreenViewModel
     private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
     private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
     private val _selectedDeparture = MutableStateFlow<DepartureRowModel?>(null)
+    private val _cameraFocusFlow = MutableStateFlow<LatLng?>(null)
 
     val location: StateFlow<UserLocation> = _location
     val departures: StateFlow<DeparturesBottomSheetModel?> = _departures
     val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
     val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
-    val cameraPosition = _location
-        .filter { !it.isFixed }
-        .take(1)
+
+    val cameraPosition = merge(_cameraFocusFlow, location.map { LatLng(it.latitude, it.longitude) })
         .stateInViewModelScope(this, initialValue = null)
 
     val searchBarModel = SearchBarModel(
@@ -68,7 +69,17 @@ class MapScreenViewModel
         _results = MutableStateFlow(listOf()),
         busStops = _busStops,
         userLocation = _location,
-        scope = viewModelScope
+        scope = viewModelScope,
+        onResultClicked = { id ->
+            if (_busStops.value is UiState.Success) {
+                val station = (_busStops.value as UiState.Success<List<BusStopMapItem>>)
+                    .data.first { it.id == id }
+                onBusStopSelected(station)
+                viewModelScope.launch {
+                    _cameraFocusFlow.emit(station.position)
+                }
+            }
+        }
     )
 
     init {
@@ -84,7 +95,7 @@ class MapScreenViewModel
                     .filter { it.isGranted }.flatMapLatest {
                         locationRepository.getLocation()
                     }.collect {
-                        _location.value = it
+                        _location.emit(it)
                     }
                 delay(1000 * 10)
             }

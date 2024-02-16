@@ -17,6 +17,7 @@ class SearchBarModel(
     private val busStops: MutableStateFlow<UiState<List<BusStopMapItem>>>,
     private val userLocation: MutableStateFlow<UserLocation>,
     private val scope: CoroutineScope,
+    private val onResultClicked: (id: Int) -> Unit
 ) {
     val isActive: StateFlow<Boolean> = _isActive
     val query: StateFlow<String> = _query
@@ -47,7 +48,11 @@ class SearchBarModel(
                         station = item.data.name,
                         distance = getDistanceString(distance, location),
                         isForBuses = item.data.isForBuses,
-                        isForTrams = item.data.isForTrams
+                        isForTrams = item.data.isForTrams,
+                        onClicked = {
+                            _isActive.value = false
+                            onResultClicked(item.id)
+                        }
                     )
                 }
             }

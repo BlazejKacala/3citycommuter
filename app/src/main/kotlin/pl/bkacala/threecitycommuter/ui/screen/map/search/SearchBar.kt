@@ -42,7 +42,7 @@ fun BoxScope.BusSearchBar(
                         searchBarModel.onQueryChanged("")
                     }
                 )
-            } else {
+            } else if (!isActive) {
                 Icon(
                     imageVector = Icons.Outlined.Mic,
                     contentDescription = "szukajka"
