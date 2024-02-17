@@ -11,13 +11,16 @@ import dev.shreyaspatil.permissionFlow.PermissionFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -30,10 +33,9 @@ import pl.bkacala.threecitycommuter.ui.common.asUiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
-import pl.bkacala.threecitycommuter.ui.screen.map.component.GpsQuality
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
-import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
 import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper
+import pl.bkacala.threecitycommuter.ui.screen.map.mapper.TrackedVehicleMapper.mapToTrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.search.SearchBarModel
 import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
 import pl.bkacala.threecitycommuter.utils.stateInViewModelScope
@@ -52,13 +54,14 @@ class MapScreenViewModel
 
     private var updateDeparturesJob: Job? = null
     private var traceUserLocationJob: Job? = null
+    private var traceVehicleJob: Job? = null
 
     private val _location = MutableStateFlow(UserLocation.default())
     private val _departures = MutableStateFlow<DeparturesBottomSheetModel?>(null)
     private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
     private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
     private val _selectedDeparture = MutableStateFlow<DepartureRowModel?>(null)
-    private val _cameraFocusFlow = MutableStateFlow<LatLng?>(null)
+    private val _cameraFocusFlow = MutableSharedFlow<LatLng?>(0)
     private val _trackedVehicle = MutableStateFlow<TrackedVehicle?>(null)
 
     val location: StateFlow<UserLocation> = _location
@@ -67,8 +70,12 @@ class MapScreenViewModel
     val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
     val trackedVehicle: StateFlow<TrackedVehicle?> = _trackedVehicle
 
-    val cameraPosition = merge(_cameraFocusFlow, location.map { LatLng(it.latitude, it.longitude) })
-        .stateInViewModelScope(this, initialValue = null)
+    val centerOnPositionVisibility = _location
+        .map { !it.isFixed }
+        .stateInViewModelScope(this, initialValue = false)
+
+    val cameraPosition = merge(_cameraFocusFlow, location.take(2).map { LatLng(it.latitude, it.longitude) })
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     val searchBarModel = SearchBarModel(
         _isActive = MutableStateFlow(false),
@@ -94,6 +101,11 @@ class MapScreenViewModel
         showClosestStationBoard()
     }
 
+    fun stopTracingJobs() {
+        traceUserLocationJob?.cancel()
+    }
+
+
     @OptIn(ExperimentalCoroutinesApi::class)
     fun traceUserLocation() {
         traceUserLocationJob = viewModelScope.launch {
@@ -107,10 +119,6 @@ class MapScreenViewModel
                 delay(1000 * 10)
             }
         }
-    }
-
-    fun stopTracingUserLocation() {
-        traceUserLocationJob?.cancel()
     }
 
     private fun showClosestStationBoard() {
@@ -143,6 +151,7 @@ class MapScreenViewModel
     }
 
     fun onBusStopSelected(selected: BusStopMapItem) {
+        _trackedVehicle.value = null
         _selectedDeparture.value = null
         updateDeparturesJob?.cancel()
         _selectedBusStop.value = selected
@@ -165,6 +174,9 @@ class MapScreenViewModel
     }
 
     private fun onSelectDeparture(vehicleId: Long?) {
+        traceVehicleJob?.cancel()
+        _trackedVehicle.value = null
+
         _selectedDeparture.value = departures.value?.departures?.first {
             vehicleId != null && it.vehicleId == vehicleId
         }
@@ -177,36 +189,52 @@ class MapScreenViewModel
     }
 
     private fun trackVehicle(vehicleId: Long) {
-        viewModelScope.launch {
-            vehiclesRepository.getVehiclePosition(vehicleId.toInt())
-                .collect {
-                    it?.let { vehiclePosition ->
-                        _trackedVehicle.emit(
-                            TrackedVehicle(
-                                type = VehicleType.Bus,
-                                delay = vehiclePosition.delay.toString(),
-                                gpsQuality = GpsQuality.Strong,
-                                number = "22",
-                                position = LatLng(vehiclePosition.lat, vehiclePosition.lon)
-                            )
-                        )
-                        _cameraFocusFlow.emit(LatLng(vehiclePosition.lat, vehiclePosition.lon))
+        traceVehicleJob = viewModelScope.launch {
+            while (isActive) {
+                vehiclesRepository.getVehiclePosition(vehicleId.toInt())
+                    .collect {
+                        it?.let { vehiclePosition ->
+                            if (_trackedVehicle.value == null) {
+                                _cameraFocusFlow.emit(
+                                    LatLng(
+                                        vehiclePosition.lat,
+                                        vehiclePosition.lon
+                                    )
+                                )
+                            }
+                            if (_selectedDeparture.value != null) {
+                                _trackedVehicle.emit(
+                                    mapToTrackedVehicle(vehiclePosition, _selectedDeparture.value!!)
+                                )
+                            }
+                        }
                     }
-                }
+                delay(1000 * 10)
+            }
         }
     }
 
     fun onMapClicked() {
+        _trackedVehicle.value = null
         _selectedBusStop.value = null
         _selectedDeparture.value = null
         _departures.value = null
         updateDeparturesJob?.cancel()
+        traceVehicleJob?.cancel()
     }
 
     fun onMapReloadRequest() {
         updateDeparturesJob?.cancel()
         viewModelScope.launch {
             loadBusStops()
+        }
+    }
+
+    fun centerOnUserPosition() {
+        viewModelScope.launch {
+            if(!_location.value.isFixed) {
+                _cameraFocusFlow.emit(LatLng(_location.value.latitude, _location.value.longitude))
+            }
         }
     }
 }

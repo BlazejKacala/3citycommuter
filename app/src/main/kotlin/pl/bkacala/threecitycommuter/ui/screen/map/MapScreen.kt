@@ -3,11 +3,22 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GpsFixed
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -26,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import pl.bkacala.threecitycommuter.LocalSnackbarHostState
 import pl.bkacala.threecitycommuter.ui.common.UiState
@@ -82,6 +94,14 @@ fun MapScreen() {
             onMapClicked = { viewModel.onMapClicked() },
         )
 
+        val displayCenterOnLocationButton =
+            viewModel.centerOnPositionVisibility.collectAsStateWithLifecycle().value
+        if (displayCenterOnLocationButton) {
+            CenterOnLocationButton(
+                onClicked = { viewModel.centerOnUserPosition() }
+            )
+        }
+
         BusSearchBar(searchBarModel = viewModel.searchBarModel)
 
         if (busStops is UiState.Loading) {
@@ -97,12 +117,36 @@ fun MapScreen() {
 }
 
 @Composable
+fun BoxWithConstraintsScope.CenterOnLocationButton(onClicked: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .absoluteOffset(x = maxWidth.minus(73.dp), y = 120.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = CircleShape
+            )
+            .size(58.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { onClicked() }
+
+    ) {
+        Icon(
+            imageVector = Icons.Default.GpsFixed,
+            contentDescription = "Wycentruj na twojej pozycji",
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+}
+
+@Composable
 private fun TraceMapCamera(
     viewModel: MapScreenViewModel,
     cameraPositionState: CameraPositionState
 ) {
     LaunchedEffect(viewModel) {
-        viewModel.cameraPosition.filterNotNull().collect {
+        viewModel.cameraPosition.filterNotNull().collectLatest {
             cameraPositionState.animate(
                 CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 16.0f)
             )
@@ -121,7 +165,7 @@ private fun TraceUserLocation(viewModel: MapScreenViewModel) {
                 }
 
                 Lifecycle.Event.ON_PAUSE -> {
-                    viewModel.stopTracingUserLocation()
+                    viewModel.stopTracingJobs()
                 }
 
                 else -> {}
