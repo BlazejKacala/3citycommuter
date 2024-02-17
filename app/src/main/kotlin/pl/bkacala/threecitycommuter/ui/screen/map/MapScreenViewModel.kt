@@ -103,11 +103,27 @@ class MapScreenViewModel
 
     fun stopTracingJobs() {
         traceUserLocationJob?.cancel()
+        traceVehicleJob?.cancel()
+        updateDeparturesJob?.cancel()
+    }
+
+    fun startTracingJobs() {
+        traceUserLocation()
+
+        val selectedDeparture = _selectedDeparture.value
+        if (selectedDeparture?.vehicleId != null) {
+            trackVehicle(selectedDeparture.vehicleId)
+        }
+
+        val selectedBusStop = _selectedBusStop.value
+        if (selectedBusStop != null) {
+            updateDepartures(selectedBusStop)
+        }
     }
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun traceUserLocation() {
+    private fun traceUserLocation() {
         traceUserLocationJob = viewModelScope.launch {
             while (isActive) {
                 permissionFlow.getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -155,6 +171,10 @@ class MapScreenViewModel
         _selectedDeparture.value = null
         updateDeparturesJob?.cancel()
         _selectedBusStop.value = selected
+        updateDepartures(selected)
+    }
+
+    private fun updateDepartures(selected: BusStopMapItem) {
         updateDeparturesJob = viewModelScope.launch {
             while (isActive) {
                 getDeparturesUseCase.getDepartures(selected.id)

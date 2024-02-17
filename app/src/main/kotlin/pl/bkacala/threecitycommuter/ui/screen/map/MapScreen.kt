@@ -53,7 +53,7 @@ fun MapScreen() {
         val cameraPositionState = rememberCameraPositionState()
         val snackbarHostState = LocalSnackbarHostState.current
 
-        TraceUserLocation(viewModel)
+        TraceLifecycleEvents(viewModel)
         TraceMapCamera(viewModel, cameraPositionState)
 
         val busStops = viewModel.busStops.collectAsStateWithLifecycle().value
@@ -155,13 +155,13 @@ private fun TraceMapCamera(
 }
 
 @Composable
-private fun TraceUserLocation(viewModel: MapScreenViewModel) {
+private fun TraceLifecycleEvents(viewModel: MapScreenViewModel) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(viewModel) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
-                    viewModel.traceUserLocation()
+                    viewModel.startTracingJobs()
                 }
 
                 Lifecycle.Event.ON_PAUSE -> {
