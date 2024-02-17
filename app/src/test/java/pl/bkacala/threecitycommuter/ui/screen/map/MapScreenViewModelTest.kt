@@ -19,7 +19,6 @@ import pl.bkacala.threecitycommuter.tools.MainDispatcherRule
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
-
 class MapScreenViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -28,9 +27,10 @@ class MapScreenViewModelTest {
         stopsRepository = mockBusStopsRepository,
         locationRepository = mockLocationRepository,
         permissionFlow = mockGrantedPermissionFlow,
+        vehiclesRepository = mockVehiclesRepository,
         getDeparturesUseCase = GetDeparturesUseCase(
             busStopsRepository = mockBusStopsRepository,
-            vehiclesRepository = mockVehiclesRepository
+            vehiclesRepository = mockVehiclesRepository,
         )
     )
 
@@ -65,17 +65,16 @@ class MapScreenViewModelTest {
                 launch {
                     viewModel.location.test {
                         val location = awaitItem()
-                        advanceTimeBy(200)
                         location.isFixed shouldBe true
                         ensureAllEventsConsumed()
                     }
                 }
-
             job.join()
             job.cancel()
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `should receive real location when permission is granted`() {
         runTest {
@@ -83,12 +82,15 @@ class MapScreenViewModelTest {
             val job =
                 launch {
                     viewModel.location.test {
+                        viewModel.startTracingJobs()
+
                         val initialLocation = awaitItem()
                         initialLocation.isFixed shouldBe true
 
                         val fusedLocation = awaitItem()
                         fusedLocation.isFixed shouldBe false
 
+                        viewModel.startTracingJobs()
                         cancelAndIgnoreRemainingEvents()
                     }
                 }

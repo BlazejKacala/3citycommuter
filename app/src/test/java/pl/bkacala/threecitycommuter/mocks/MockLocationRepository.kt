@@ -9,9 +9,8 @@ import pl.bkacala.threecitycommuter.repository.location.LocationRepository
 object MockLocationRepository {
     val mockLocationRepository = object: LocationRepository {
         override fun getLocation(): Flow<UserLocation> = flow {
-            delay(200)
+            delay(100)
             emit(UserLocation.default().copy(isFixed = false))
         }
-
     }
 }

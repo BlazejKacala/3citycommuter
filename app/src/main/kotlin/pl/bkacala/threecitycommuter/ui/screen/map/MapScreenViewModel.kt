@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.ktx.utils.sphericalDistance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.shreyaspatil.permissionFlow.PermissionFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -128,7 +129,7 @@ class MapScreenViewModel
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun traceUserLocation() {
-        traceUserLocationJob = viewModelScope.launch {
+        traceUserLocationJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 permissionFlow.getPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
                     .filter { it.isGranted }.flatMapLatest {
@@ -175,6 +176,7 @@ class MapScreenViewModel
         _trackedVehicle.value = null
         _selectedDeparture.value = null
         updateDeparturesJob?.cancel()
+        traceVehicleJob?.cancel()
         _selectedBusStop.value = selected
         updateDepartures(selected)
     }
@@ -215,7 +217,7 @@ class MapScreenViewModel
     }
 
     private fun trackVehicle(vehicleId: Long) {
-        traceVehicleJob = viewModelScope.launch {
+        traceVehicleJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 vehiclesRepository.getVehiclePosition(vehicleId.toInt())
                     .catch { _errorFlow.emit(it) }

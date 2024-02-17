@@ -1,6 +1,5 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
@@ -19,6 +18,7 @@ import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -57,29 +57,21 @@ fun MapScreen() {
         TraceMapCamera(viewModel, cameraPositionState)
         HandleErrorFlow(viewModel)
 
-        val busStops = viewModel.busStops.collectAsStateWithLifecycle().value
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
+        val displayLoader = remember(viewModel) { mutableStateOf(false) }
+
+        val busStops = viewModel.busStops.collectAsStateWithLifecycle().value
         when (busStops) {
             is UiState.Error -> {
-                Log.e("MapScreen", busStops.exception.stackTraceToString())
-                LaunchedEffect(busStops) {
-                    val result = snackbarHostState.showSnackbar(
-                        message = "Nie udało się wczytać przystanków",
-                        actionLabel = "Spróbuj ponownie"
-
-                    )
-                    when (result) {
-                        SnackbarResult.Dismissed -> {}
-                        SnackbarResult.ActionPerformed -> {
-                            viewModel.onMapReloadRequest()
-                        }
-                    }
-
-                }
+                displayLoader.value = false
+                ErrorSnackbar(busStops, snackbarHostState, viewModel)
             }
 
-            UiState.Loading -> {}
+            UiState.Loading -> {
+                displayLoader.value = true
+            }
             is UiState.Success -> {
+                displayLoader.value = false
                 busStopsState.value = busStops.data
             }
         }
@@ -115,6 +107,27 @@ fun MapScreen() {
         DeparturesSheet(model = viewModel)
     }
 
+}
+
+@Composable
+private fun ErrorSnackbar(
+    busStops: UiState<List<BusStopMapItem>>,
+    snackbarHostState: SnackbarHostState,
+    viewModel: MapScreenViewModel
+) {
+    LaunchedEffect(busStops) {
+        val result = snackbarHostState.showSnackbar(
+            message = "Nie udało się wczytać przystanków",
+            actionLabel = "Spróbuj ponownie"
+
+        )
+        when (result) {
+            SnackbarResult.Dismissed -> {}
+            SnackbarResult.ActionPerformed -> {
+                viewModel.onMapReloadRequest()
+            }
+        }
+    }
 }
 
 @Composable
@@ -210,5 +223,4 @@ private fun BoxWithConstraintsScope.DeparturesSheet(model: MapScreenViewModel) {
             )
         }
     }
-
 }

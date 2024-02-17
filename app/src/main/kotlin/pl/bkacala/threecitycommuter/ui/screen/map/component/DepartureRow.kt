@@ -108,7 +108,7 @@ private fun Selection(selected: Boolean) {
 @Composable
 private fun DepartureTime(isNear: Boolean, departureTime: String) {
 
-    val isVisible = remember(departureTime) { mutableStateOf(true) }
+    val isVisible = remember { mutableStateOf(true) }
 
     if (isNear) {
         LaunchedEffect(departureTime) {
