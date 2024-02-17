@@ -48,9 +48,7 @@ data class DepartureRowModel(
     val isSelected: MutableState<Boolean>,
     val vehicleId: Long?,
     val onSelected: (id: Long) -> Unit,
-) {
-    enum class VehicleType { Bus, Tram }
-}
+)
 
 @Composable
 fun DepartureRowModel.Widget() {
@@ -181,10 +179,10 @@ private fun LineNumber(lineNumber: String) {
 }
 
 @Composable
-private fun VehicleImage(vehicleType: DepartureRowModel.VehicleType) {
+private fun VehicleImage(vehicleType: VehicleType) {
     val image = when (vehicleType) {
-        DepartureRowModel.VehicleType.Bus -> Icons.Sharp.DirectionsBusFilled
-        DepartureRowModel.VehicleType.Tram -> Icons.Sharp.Tram
+        VehicleType.Bus -> Icons.Sharp.DirectionsBusFilled
+        VehicleType.Tram -> Icons.Sharp.Tram
     }
 
     Icon(
@@ -200,7 +198,7 @@ private fun VehicleImage(vehicleType: DepartureRowModel.VehicleType) {
 private fun DepartureRowPreview() {
     DepartureRowModel(
         isNear = true,
-        vehicleType = DepartureRowModel.VehicleType.Bus,
+        vehicleType = VehicleType.Bus,
         lineNumber = "154",
         bikesAllowed = true,
         disabledFriendly = true,

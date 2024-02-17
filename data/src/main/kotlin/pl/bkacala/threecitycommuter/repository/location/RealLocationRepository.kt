@@ -14,9 +14,8 @@ import pl.bkacala.threecitycommuter.model.location.UserLocation
 import javax.inject.Inject
 
 internal class RealLocationRepository @Inject constructor(
-    private val fusedLocationProviderClient: FusedLocationProviderClient,
-
-    ) : LocationRepository {
+    private val fusedLocationProviderClient: FusedLocationProviderClient
+) : LocationRepository {
 
     @SuppressLint("MissingPermission")
     override fun getLocation(): Flow<UserLocation> = callbackFlow {

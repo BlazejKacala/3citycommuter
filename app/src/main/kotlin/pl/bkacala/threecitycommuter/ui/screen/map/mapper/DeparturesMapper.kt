@@ -7,9 +7,9 @@ import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
-import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel.VehicleType
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesHeaderModel
+import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
 
 object DeparturesMapper {
     private fun minutesToArrival(

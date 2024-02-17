@@ -15,7 +15,7 @@ class GetDeparturesUseCase @Inject constructor(
     fun getDepartures(stopId: Int) : Flow<List<Pair<Departure, Vehicle?>>> {
         return busStopsRepository
             .getDepartures(stopId)
-            .combine(vehiclesRepository.vehicles()) { departures, vehicles ->
+            .combine(vehiclesRepository.getVehicles()) { departures, vehicles ->
                 departures.map { departure ->
                     Pair(
                         departure,

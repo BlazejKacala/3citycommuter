@@ -78,8 +78,8 @@ class MapScreenViewModelTest {
 
     @Test
     fun `should receive real location when permission is granted`() {
-        val viewModel = mapScreenViewModel()
         runTest {
+            val viewModel = mapScreenViewModel()
             val job =
                 launch {
                     viewModel.location.test {
@@ -100,8 +100,8 @@ class MapScreenViewModelTest {
 
     @Test
     fun `should pick closest bus stop when data is loaded`() {
-        val viewModel = mapScreenViewModel()
         runTest {
+            val viewModel = mapScreenViewModel()
             val job =
                 launch {
                     viewModel.departures.filter { it?.departures?.isNotEmpty() ?: false }.test {

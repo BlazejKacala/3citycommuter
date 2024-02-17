@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.flowOn
 import pl.bkacala.threecitycommuter.client.NetworkClient
 import pl.bkacala.threecitycommuter.dao.VehiclesDao
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
+import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.model.vehicles.toVehicle
 import pl.bkacala.threecitycommuter.model.vehicles.toVehicleEntity
+import pl.bkacala.threecitycommuter.model.vehicles.toVehiclePosition
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
 import pl.bkacala.threecitycommuter.utils.isOlderThenOneDay
 import javax.inject.Inject
@@ -33,11 +35,20 @@ internal class RealVehiclesRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun vehicles(): Flow<List<Vehicle>> {
+    override fun getVehicles(): Flow<List<Vehicle>> {
         return flow {
             ensureUpToDate()
             emit(vehiclesDao.getVehicles().map { it.toVehicle() })
         }.flowOn(Dispatchers.IO)
+    }
+
+    override fun getVehiclePosition(vehicleId: Int): Flow<VehiclePosition?> {
+        return flow {
+            emit(networkClient.getVehiclesPositions().vehiclePositions
+                .firstOrNull { it.vehicleId == vehicleId }
+                ?.toVehiclePosition()
+            )
+        }
     }
 
     private suspend fun ensureUpToDate() {

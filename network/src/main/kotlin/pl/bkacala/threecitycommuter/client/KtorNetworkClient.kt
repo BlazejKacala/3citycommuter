@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
 import pl.bkacala.threecitycommuter.model.DepartureList
+import pl.bkacala.threecitycommuter.model.VehiclePositionsNetworkData
 import pl.bkacala.threecitycommuter.model.VehiclesNetworkData
 
 internal class KtorNetworkClient(
@@ -20,6 +21,8 @@ internal class KtorNetworkClient(
     companion object {
         private const val BASE_URL = "https://ckan.multimediagdansk.pl"
         private const val BASE_URLV2 = "https://ckan2.multimediagdansk.pl"
+        private const val CLOUD_URL = "https://files.cloudgdansk.pl"
+
 
     }
 
@@ -43,8 +46,16 @@ internal class KtorNetworkClient(
 
     override suspend fun getVehicles(): VehiclesNetworkData {
         val vehicles = withContext(Dispatchers.IO) {
-            httpClient.get("https://files.cloudgdansk.pl/d/otwarte-dane/ztm/baza-pojazdow.json?v=2")
+            httpClient.get("$CLOUD_URL/d/otwarte-dane/ztm/baza-pojazdow.json?v=2")
                 .body<VehiclesNetworkData>()
+        }
+        return vehicles
+    }
+
+    override suspend fun getVehiclesPositions(): VehiclePositionsNetworkData {
+        val vehicles = withContext(Dispatchers.IO) {
+            httpClient.get("$BASE_URLV2/gpsPositions?v=2")
+                .body<VehiclePositionsNetworkData>()
         }
         return vehicles
     }

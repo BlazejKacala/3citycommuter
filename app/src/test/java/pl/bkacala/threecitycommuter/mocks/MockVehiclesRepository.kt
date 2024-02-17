@@ -21,7 +21,7 @@ object MockVehiclesRepository {
             }
         }
 
-        override fun vehicles(): Flow<List<Vehicle>> {
+        override fun getVehicles(): Flow<List<Vehicle>> {
             return flow {
                 delay(100)
                 emit(listOf(makeRandomInstance<Vehicle>().copy(vehicleCode = "1")))

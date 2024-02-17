@@ -24,11 +24,15 @@ import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
+import pl.bkacala.threecitycommuter.repository.vehicles.VehiclesRepository
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.common.asUiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
+import pl.bkacala.threecitycommuter.ui.screen.map.component.GpsQuality
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
 import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper
 import pl.bkacala.threecitycommuter.ui.screen.map.search.SearchBarModel
 import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
@@ -42,6 +46,7 @@ class MapScreenViewModel
         private val stopsRepository: BusStopsRepository,
         private val locationRepository: LocationRepository,
         private val permissionFlow: PermissionFlow,
+        private val vehiclesRepository: VehiclesRepository,
         private val getDeparturesUseCase: GetDeparturesUseCase,
     ) : ViewModel() {
 
@@ -54,11 +59,13 @@ class MapScreenViewModel
     private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
     private val _selectedDeparture = MutableStateFlow<DepartureRowModel?>(null)
     private val _cameraFocusFlow = MutableStateFlow<LatLng?>(null)
+    private val _trackedVehicle = MutableStateFlow<TrackedVehicle?>(null)
 
     val location: StateFlow<UserLocation> = _location
     val departures: StateFlow<DeparturesBottomSheetModel?> = _departures
     val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
     val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
+    val trackedVehicle: StateFlow<TrackedVehicle?> = _trackedVehicle
 
     val cameraPosition = merge(_cameraFocusFlow, location.map { LatLng(it.latitude, it.longitude) })
         .stateInViewModelScope(this, initialValue = null)
@@ -165,6 +172,28 @@ class MapScreenViewModel
             it.isSelected.value = false
         }
         _selectedDeparture.value?.isSelected?.value = true
+
+        vehicleId?.let { trackVehicle(it) }
+    }
+
+    private fun trackVehicle(vehicleId: Long) {
+        viewModelScope.launch {
+            vehiclesRepository.getVehiclePosition(vehicleId.toInt())
+                .collect {
+                    it?.let { vehiclePosition ->
+                        _trackedVehicle.emit(
+                            TrackedVehicle(
+                                type = VehicleType.Bus,
+                                delay = vehiclePosition.delay.toString(),
+                                gpsQuality = GpsQuality.Strong,
+                                number = "22",
+                                position = LatLng(vehiclePosition.lat, vehiclePosition.lon)
+                            )
+                        )
+                        _cameraFocusFlow.emit(LatLng(vehiclePosition.lat, vehiclePosition.lon))
+                    }
+                }
+        }
     }
 
     fun onMapClicked() {

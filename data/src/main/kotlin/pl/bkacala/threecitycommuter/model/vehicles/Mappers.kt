@@ -1,6 +1,7 @@
 package pl.bkacala.threecitycommuter.model.vehicles
 
 import pl.bkacala.threecitycommuter.model.VehicleNetworkData
+import pl.bkacala.threecitycommuter.model.VehiclePositionNetworkData
 
 fun VehicleNetworkData.toVehicleEntity(): VehicleEntity {
     return VehicleEntity(
@@ -63,5 +64,24 @@ fun VehicleEntity.toVehicle(): Vehicle {
         patron = this.patron,
         url = this.url,
         passengersDoors = this.passengersDoors
+    )
+}
+
+fun VehiclePositionNetworkData.toVehiclePosition(): VehiclePosition {
+    return VehiclePosition(
+        generated = generated,
+        routeShortName = routeShortName,
+        tripId = tripId,
+        headsign = headsign,
+        vehicleCode = vehicleCode,
+        vehicleService = vehicleService,
+        vehicleId = vehicleId,
+        speed = speed,
+        direction = direction,
+        delay = delay,
+        scheduledTripStartTime = scheduledTripStartTime,
+        lat = lat,
+        lon = lon,
+        gpsQuality = gpsQuality
     )
 }
