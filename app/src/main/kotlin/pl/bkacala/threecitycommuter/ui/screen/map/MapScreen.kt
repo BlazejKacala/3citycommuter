@@ -55,6 +55,7 @@ fun MapScreen() {
 
         TraceLifecycleEvents(viewModel)
         TraceMapCamera(viewModel, cameraPositionState)
+        HandleErrorFlow(viewModel)
 
         val busStops = viewModel.busStops.collectAsStateWithLifecycle().value
         val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
@@ -114,6 +115,16 @@ fun MapScreen() {
         DeparturesSheet(model = viewModel)
     }
 
+}
+
+@Composable
+fun HandleErrorFlow(viewModel: MapScreenViewModel) {
+    val snackbarHostState = LocalSnackbarHostState.current
+    LaunchedEffect(viewModel) {
+        viewModel.errors.collectLatest {
+            snackbarHostState.showSnackbar("Nie udało się wczytać danych")
+        }
+    }
 }
 
 @Composable

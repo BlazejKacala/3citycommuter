@@ -13,8 +13,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -63,12 +65,14 @@ class MapScreenViewModel
     private val _selectedDeparture = MutableStateFlow<DepartureRowModel?>(null)
     private val _cameraFocusFlow = MutableSharedFlow<LatLng?>(0)
     private val _trackedVehicle = MutableStateFlow<TrackedVehicle?>(null)
+    private val _errorFlow = MutableSharedFlow<Throwable>()
 
     val location: StateFlow<UserLocation> = _location
     val departures: StateFlow<DeparturesBottomSheetModel?> = _departures
     val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
     val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
     val trackedVehicle: StateFlow<TrackedVehicle?> = _trackedVehicle
+    val errors: SharedFlow<Throwable> = _errorFlow
 
     val centerOnPositionVisibility = _location
         .map { !it.isFixed }
@@ -142,6 +146,7 @@ class MapScreenViewModel
             busStops.filter { it is UiState.Success }
                 .combine(location.filter { !it.isFixed }, ::Pair)
                 .take(1)
+                .catch { _errorFlow.emit(it) }
                 .collect { pair ->
                     val (busStops, userLocation) = pair
                     require(busStops is UiState.Success)
@@ -179,6 +184,7 @@ class MapScreenViewModel
             while (isActive) {
                 getDeparturesUseCase.getDepartures(selected.id)
                     .take(1)
+                    .catch { _errorFlow.emit(it) }
                     .collect { departures ->
                         _departures.value =
                             DeparturesMapper.mapToBottomSheetModel(
@@ -212,6 +218,7 @@ class MapScreenViewModel
         traceVehicleJob = viewModelScope.launch {
             while (isActive) {
                 vehiclesRepository.getVehiclePosition(vehicleId.toInt())
+                    .catch { _errorFlow.emit(it) }
                     .collect {
                         it?.let { vehiclePosition ->
                             if (_trackedVehicle.value == null) {
