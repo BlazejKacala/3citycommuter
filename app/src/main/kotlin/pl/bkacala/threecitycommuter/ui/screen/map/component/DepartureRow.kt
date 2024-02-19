@@ -89,7 +89,7 @@ fun DepartureRowModel.Widget() {
             }
             Spacer(modifier = Modifier.width(Padding.big))
             Spacer(modifier = Modifier.width(Padding.normal))
-            DepartureTime(isNear, departureTime)
+            DepartureTime(this@Widget)
             GPSIcon(gpsPosition = gpsPosition)
         }
     }
@@ -106,12 +106,12 @@ private fun Selection(selected: Boolean) {
 }
 
 @Composable
-private fun DepartureTime(isNear: Boolean, departureTime: String) {
+private fun DepartureTime(model: DepartureRowModel) {
 
-    val isVisible = remember { mutableStateOf(true) }
+    val isVisible = remember(model) { mutableStateOf(true) }
 
-    if (isNear) {
-        LaunchedEffect(departureTime) {
+    if (model.isNear) {
+        LaunchedEffect(model) {
             while (true) {
                 delay(300)
                 isVisible.value = !isVisible.value
@@ -122,7 +122,7 @@ private fun DepartureTime(isNear: Boolean, departureTime: String) {
     Box(modifier = Modifier.width(65.dp)) {
         if (isVisible.value) {
             Text(
-                text = departureTime,
+                text = model.departureTime,
                 style = MaterialTheme.typography.bodyMedium
             )
         }

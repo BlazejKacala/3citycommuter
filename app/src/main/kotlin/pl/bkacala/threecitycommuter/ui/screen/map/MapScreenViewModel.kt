@@ -261,9 +261,11 @@ class MapScreenViewModel
 
     fun centerOnUserPosition() {
         viewModelScope.launch {
-            if(!_location.value.isFixed) {
+            if (!_location.value.isFixed) {
                 _cameraFocusFlow.emit(LatLng(_location.value.latitude, _location.value.longitude))
             }
         }
+        showClosestStationBoard()
+
     }
 }
