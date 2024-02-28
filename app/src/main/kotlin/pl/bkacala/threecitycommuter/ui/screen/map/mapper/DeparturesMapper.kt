@@ -13,9 +13,12 @@ import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
 
 object DeparturesMapper {
     private fun minutesToArrival(
-        estimatedTime: Instant,
+        estimatedTime: Instant?,
         now: Long,
     ): Int {
+        if(estimatedTime == null) {
+            return -1
+        }
         val secondsToArrival = estimatedTime.epochSeconds - now
         return secondsToArrival.toInt() / 60
     }
@@ -49,9 +52,9 @@ object DeparturesMapper {
         return DepartureRowModel(
             isNear = minutesToArrival == 0,
             vehicleType = if (this.routeId < 100) VehicleType.Tram else VehicleType.Bus,
-            departureTime = if (minutesToArrival == 0) "teraz" else "$minutesToArrival min",
+            departureTime = departureTime(minutesToArrival),
             lineNumber = this.routeId.toString(),
-            direction = this.headsign,
+            direction = this.headsign ?: "",
             disabledFriendly = vehicle?.wheelchairsRamp ?: false,
             bikesAllowed = vehicle?.bikeHolders == 1,
             gpsPosition = this.delayInSeconds != null,
@@ -60,4 +63,7 @@ object DeparturesMapper {
             onSelected = onSelected
         )
     }
+
+    private fun departureTime(minutesToArrival: Int) =
+        if (minutesToArrival == -1) "brak danych" else if(minutesToArrival == 0) "teraz" else "$minutesToArrival min"
 }
