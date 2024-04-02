@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -41,11 +40,6 @@ fun BoxScope.BusSearchBar(
                     modifier = Modifier.clickable {
                         searchBarModel.onQueryChanged("")
                     }
-                )
-            } else if (!isActive) {
-                Icon(
-                    imageVector = Icons.Outlined.Mic,
-                    contentDescription = "szukajka"
                 )
             }
         },
