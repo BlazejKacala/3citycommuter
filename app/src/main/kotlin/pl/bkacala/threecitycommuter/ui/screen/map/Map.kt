@@ -54,7 +54,7 @@ fun Map(
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
-        contentPadding = PaddingValues(top = 80.dp),
+        contentPadding = PaddingValues(top = 100.dp),
         properties = MapProperties(
             mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
                 context,
