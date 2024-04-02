@@ -85,7 +85,10 @@ fun Map(
             onClusterClick = {
                 coroutineScope.launch {
                     cameraPositionState.animate(
-                        CameraUpdateFactory.zoomIn()
+                        CameraUpdateFactory.newLatLngZoom(
+                            it.position,
+                            cameraPositionState.position.zoom * 1.2f
+                        )
                     )
                 }
             }

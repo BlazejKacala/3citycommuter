@@ -41,7 +41,7 @@ import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 fun BusStops(
     busStops: List<BusStopMapItem>,
     onClusterItemClick: (busStation: BusStopMapItem) -> Unit,
-    onClusterClick: () -> Unit,
+    onClusterClick: (cluster: Cluster<BusStopMapItem>) -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -67,7 +67,7 @@ fun BusStops(
     SideEffect {
         clusterManager ?: return@SideEffect
         clusterManager.setOnClusterClickListener {
-            onClusterClick()
+            onClusterClick(it)
             true
         }
         clusterManager.setOnClusterItemClickListener {
