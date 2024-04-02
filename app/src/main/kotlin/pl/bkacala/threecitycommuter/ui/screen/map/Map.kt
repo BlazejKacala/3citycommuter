@@ -118,20 +118,22 @@ fun TrackedVehicleMarker(trackedVehicle: TrackedVehicle) {
         state = MarkerState(LatLng(lat.value.toDouble(), long.value.toDouble())),
         zIndex = 10f
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            val busIcon = remember { Icons.Filled.DirectionsBus }
-            val tramIcon = remember { Icons.Filled.Tram }
-            Text(
-                text = trackedVehicle.number,
-                color = MaterialTheme.colorScheme.tertiary,
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Icon(
-                imageVector = if (trackedVehicle.type == VehicleType.Tram) tramIcon else busIcon,
-                contentDescription = "Pojazd",
-                tint = MaterialTheme.colorScheme.tertiary
-            )
+        MapMarkerBackground(color = MaterialTheme.colorScheme.tertiary) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                val busIcon = remember { Icons.Filled.DirectionsBus }
+                val tramIcon = remember { Icons.Filled.Tram }
+                Text(
+                    text = trackedVehicle.number,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Icon(
+                    imageVector = if (trackedVehicle.type == VehicleType.Tram) tramIcon else busIcon,
+                    contentDescription = "Pojazd",
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+            }
         }
     }
 }
