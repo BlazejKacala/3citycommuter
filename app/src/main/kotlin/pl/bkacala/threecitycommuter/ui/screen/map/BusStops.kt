@@ -95,6 +95,11 @@ private fun Cluster(it: Cluster<BusStopMapItem>) {
     Box(
         modifier = Modifier
             .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = CircleShape
+            )
+            .border(
+                width = 1.dp,
                 color = MaterialTheme.colorScheme.primary,
                 shape = CircleShape
             )
@@ -103,6 +108,7 @@ private fun Cluster(it: Cluster<BusStopMapItem>) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.align(Alignment.Center)
         )
     }
