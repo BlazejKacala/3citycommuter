@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
@@ -48,7 +49,8 @@ fun Map(
     route: List<LatLng>?,
     onBusStationSelected: (busStation: BusStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
-    userLocation: UserLocation?
+    userLocation: UserLocation?,
+    mapBottomPadding: Dp,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -56,7 +58,7 @@ fun Map(
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
-        contentPadding = PaddingValues(top = 100.dp),
+        contentPadding = PaddingValues(top = 96.dp, bottom = mapBottomPadding),
         properties = MapProperties(
             mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
                 context,

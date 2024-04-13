@@ -27,7 +27,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -43,6 +45,7 @@ import pl.bkacala.threecitycommuter.LocalSnackbarHostState
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
+import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
 import pl.bkacala.threecitycommuter.ui.screen.map.search.BusSearchBar
 
 @Composable
@@ -70,6 +73,7 @@ fun MapScreen() {
             UiState.Loading -> {
                 displayLoader.value = true
             }
+
             is UiState.Success -> {
                 displayLoader.value = false
                 busStopsState.value = busStops.data
@@ -77,6 +81,8 @@ fun MapScreen() {
         }
 
         val userLocation = viewModel.location.collectAsStateWithLifecycle().value
+        val departuresModel = viewModel.departures.collectAsStateWithLifecycle().value
+        val mapBottomPadding = remember(viewModel) { mutableStateOf(0.dp) }
         Map(
             cameraPositionState = cameraPositionState,
             busStops = busStopsState.value,
@@ -85,7 +91,8 @@ fun MapScreen() {
             userLocation = userLocation,
             onBusStationSelected = { viewModel.onBusStopSelected(it) },
             onMapClicked = { viewModel.onMapClicked() },
-            route = viewModel.route.collectAsStateWithLifecycle().value
+            route = viewModel.route.collectAsStateWithLifecycle().value,
+            mapBottomPadding = if (departuresModel == null) 0.dp else mapBottomPadding.value
         )
 
         val displayCenterOnLocationButton =
@@ -105,7 +112,9 @@ fun MapScreen() {
                     .align(Alignment.BottomCenter)
             )
         }
-        DeparturesSheet(model = viewModel)
+        DeparturesSheet(departuresModel) {
+            mapBottomPadding.value = it
+        }
     }
 
 }
@@ -206,13 +215,18 @@ private fun TraceLifecycleEvents(viewModel: MapScreenViewModel) {
 }
 
 @Composable
-private fun BoxWithConstraintsScope.DeparturesSheet(model: MapScreenViewModel) {
-
-    val departuresModel = model.departures.collectAsStateWithLifecycle().value
+private fun BoxWithConstraintsScope.DeparturesSheet(
+    departuresModel: DeparturesBottomSheetModel?,
+    maxSizeListener: (maxSize: Dp) -> Unit
+) {
+    val density = LocalDensity.current
 
     AnimatedVisibility(
         visible = departuresModel != null,
         enter = slideInVertically { fullHeight ->
+            with(density) {
+                maxSizeListener(fullHeight.toDp())
+            }
             fullHeight
         },
         modifier = Modifier
