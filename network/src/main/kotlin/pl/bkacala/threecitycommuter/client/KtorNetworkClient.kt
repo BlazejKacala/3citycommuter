@@ -10,6 +10,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
 import pl.bkacala.threecitycommuter.model.DepartureList
+import pl.bkacala.threecitycommuter.model.RouteNetworkData
 import pl.bkacala.threecitycommuter.model.VehiclePositionsNetworkData
 import pl.bkacala.threecitycommuter.model.VehiclesNetworkData
 
@@ -58,6 +59,14 @@ internal class KtorNetworkClient(
                 .body<VehiclePositionsNetworkData>()
         }
         return vehicles
+    }
+
+    override suspend fun getRoute(date: String, routeId: Int, tripId: Int): RouteNetworkData {
+        val route = withContext(Dispatchers.IO) {
+            httpClient.get("$BASE_URLV2/shapes?date=$date&routeId=$routeId&tripId=$tripId")
+                .body<RouteNetworkData>()
+        }
+        return route
     }
 
 }
