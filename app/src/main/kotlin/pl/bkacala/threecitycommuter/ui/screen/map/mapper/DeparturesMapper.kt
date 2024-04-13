@@ -60,6 +60,8 @@ object DeparturesMapper {
             gpsPosition = this.delayInSeconds != null,
             isSelected = mutableStateOf(this.vehicleId == selectedDeparture?.vehicleId && this.vehicleId != null),
             vehicleId = this.vehicleId,
+            routeId = this.routeId,
+            tripId = this.tripId,
             onSelected = onSelected
         )
     }

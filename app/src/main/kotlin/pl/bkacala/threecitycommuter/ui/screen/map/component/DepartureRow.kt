@@ -47,6 +47,8 @@ data class DepartureRowModel(
     val gpsPosition: Boolean,
     val isSelected: MutableState<Boolean>,
     val vehicleId: Long?,
+    val routeId: Int,
+    val tripId: Int,
     val onSelected: (id: Long) -> Unit,
 )
 
@@ -207,6 +209,8 @@ private fun DepartureRowPreview() {
         gpsPosition = true,
         isSelected = remember { mutableStateOf(true) },
         vehicleId = 1,
+        tripId = 1,
+        routeId = 1,
         onSelected = {}
     ).Widget()
 

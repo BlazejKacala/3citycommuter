@@ -31,6 +31,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.R
 import pl.bkacala.threecitycommuter.model.location.UserLocation
@@ -44,6 +45,7 @@ fun Map(
     busStops: List<BusStopMapItem>,
     selectedBusStop: BusStopMapItem?,
     trackedVehicle: TrackedVehicle?,
+    route: List<LatLng>?,
     onBusStationSelected: (busStation: BusStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
     userLocation: UserLocation?
@@ -99,7 +101,18 @@ fun Map(
         trackedVehicle?.let {
             TrackedVehicleMarker(it)
         }
+        route?.let {
+            Route(it)
+        }
     }
+}
+
+@Composable
+private fun Route(it: List<LatLng>) {
+    Polyline(
+        points = it,
+        color = MaterialTheme.colorScheme.tertiary
+    )
 }
 
 @Composable

@@ -85,6 +85,7 @@ fun MapScreen() {
             userLocation = userLocation,
             onBusStationSelected = { viewModel.onBusStopSelected(it) },
             onMapClicked = { viewModel.onMapClicked() },
+            route = viewModel.route.collectAsStateWithLifecycle().value
         )
 
         val displayCenterOnLocationButton =
@@ -135,6 +136,7 @@ fun HandleErrorFlow(viewModel: MapScreenViewModel) {
     val snackbarHostState = LocalSnackbarHostState.current
     LaunchedEffect(viewModel) {
         viewModel.errors.collectLatest {
+            it.printStackTrace()
             snackbarHostState.showSnackbar("Nie udało się wczytać danych")
         }
     }

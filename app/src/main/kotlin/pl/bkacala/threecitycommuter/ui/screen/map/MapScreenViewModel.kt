@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -29,6 +30,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
+import pl.bkacala.threecitycommuter.repository.routes.RealRoutesRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.repository.vehicles.VehiclesRepository
 import pl.bkacala.threecitycommuter.ui.common.UiState
@@ -53,6 +55,7 @@ class MapScreenViewModel
         private val permissionFlow: PermissionFlow,
         private val vehiclesRepository: VehiclesRepository,
         private val getDeparturesUseCase: GetDeparturesUseCase,
+        private val routesRepository: RealRoutesRepository
     ) : ViewModel() {
 
     private var updateDeparturesJob: Job? = null
@@ -63,6 +66,7 @@ class MapScreenViewModel
     private val _departures = MutableStateFlow<DeparturesBottomSheetModel?>(null)
     private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
     private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
+    private val _route = MutableStateFlow<List<LatLng>?>(null)
     private val _selectedDeparture = MutableStateFlow<DepartureRowModel?>(null)
     private val _cameraFocusFlow = MutableSharedFlow<LatLng?>(0)
     private val _trackedVehicle = MutableStateFlow<TrackedVehicle?>(null)
@@ -72,6 +76,7 @@ class MapScreenViewModel
     val departures: StateFlow<DeparturesBottomSheetModel?> = _departures
     val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
     val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
+    val route: StateFlow<List<LatLng>?> = _route
     val trackedVehicle: StateFlow<TrackedVehicle?> = _trackedVehicle
     val errors: SharedFlow<Throwable> = _errorFlow
 
@@ -175,10 +180,26 @@ class MapScreenViewModel
     fun onBusStopSelected(selected: BusStopMapItem) {
         _trackedVehicle.value = null
         _selectedDeparture.value = null
+        _route.value = null
         updateDeparturesJob?.cancel()
         traceVehicleJob?.cancel()
         _selectedBusStop.value = selected
         updateDepartures(selected)
+    }
+
+    private fun loadRoute() {
+        viewModelScope.launch {
+            _selectedDeparture.value?.let { departureRowModel ->
+                routesRepository.getRoute(
+                    routeId = departureRowModel.routeId,
+                    tripId = departureRowModel.tripId
+                ).catch { _errorFlow.emit(it) }.collectLatest {
+                    _route.value = it.shape.map { geoPoint ->
+                        LatLng(geoPoint.latitude, geoPoint.longitude)
+                    }
+                }
+            }
+        }
     }
 
     private fun updateDepartures(selected: BusStopMapItem) {
@@ -204,7 +225,7 @@ class MapScreenViewModel
     private fun onSelectDeparture(vehicleId: Long?) {
         traceVehicleJob?.cancel()
         _trackedVehicle.value = null
-
+        _route.value = null
         _selectedDeparture.value = departures.value?.departures?.first {
             vehicleId != null && it.vehicleId == vehicleId
         }
@@ -213,6 +234,7 @@ class MapScreenViewModel
         }
         _selectedDeparture.value?.isSelected?.value = true
 
+        loadRoute()
         vehicleId?.let { trackVehicle(it) }
     }
 
@@ -248,6 +270,7 @@ class MapScreenViewModel
         _selectedBusStop.value = null
         _selectedDeparture.value = null
         _departures.value = null
+        _route.value = null
         updateDeparturesJob?.cancel()
         traceVehicleJob?.cancel()
     }
