@@ -33,3 +33,7 @@ google-services.json
 # Android Profiling
 *.hprof
 /secrets.properties
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude/memory/
