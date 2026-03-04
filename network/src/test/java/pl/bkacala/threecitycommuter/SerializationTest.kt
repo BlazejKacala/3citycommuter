@@ -8,7 +8,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.Test
@@ -30,7 +29,7 @@ class SerializationTest {
             }
             val mockEngine = MockEngine { request ->
                 respond(
-                    content = ByteReadChannel(text = body),
+                    content = body,
                     status = HttpStatusCode.OK,
                     headers = headersOf(HttpHeaders.ContentType, "application/json")
                 )
@@ -81,4 +80,3 @@ val body: String = "{\n" +
         "\t\t]\n" +
         "\t}\n" +
         "}"
-
