@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
 import pl.bkacala.threecitycommuter.repository.routes.RealRoutesRepository
+import pl.bkacala.threecitycommuter.repository.routes.RoutesRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.repository.vehicles.VehiclesRepository
 import pl.bkacala.threecitycommuter.ui.common.UiState
@@ -55,7 +56,7 @@ class MapScreenViewModel
         private val permissionFlow: PermissionFlow,
         private val vehiclesRepository: VehiclesRepository,
         private val getDeparturesUseCase: GetDeparturesUseCase,
-        private val routesRepository: RealRoutesRepository
+        private val routesRepository: RoutesRepository
     ) : ViewModel() {
 
     private var updateDeparturesJob: Job? = null
@@ -68,7 +69,7 @@ class MapScreenViewModel
     private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
     private val _route = MutableStateFlow<List<LatLng>?>(null)
     private val _selectedDeparture = MutableStateFlow<DepartureRowModel?>(null)
-    private val _cameraFocusFlow = MutableSharedFlow<LatLng?>(0)
+    private val _cameraFocusFlow = MutableSharedFlow<LatLng?>(replay = 1)
     private val _trackedVehicle = MutableStateFlow<TrackedVehicle?>(null)
     private val _errorFlow = MutableSharedFlow<Throwable>()
 
@@ -96,12 +97,13 @@ class MapScreenViewModel
         scope = viewModelScope,
         onResultClicked = { id ->
             if (_busStops.value is UiState.Success) {
-                val station = (_busStops.value as UiState.Success<List<BusStopMapItem>>)
-                    .data.first { it.id == id }
-                onBusStopSelected(station)
-                viewModelScope.launch {
-                    _cameraFocusFlow.emit(station.position)
-                }
+                (_busStops.value as UiState.Success<List<BusStopMapItem>>)
+                    .data.find { it.id == id }?.let { station ->
+                        onBusStopSelected(station)
+                        viewModelScope.launch {
+                            _cameraFocusFlow.emit(station.position)
+                        }
+                    }
             }
         }
     )
@@ -155,12 +157,13 @@ class MapScreenViewModel
                 .catch { _errorFlow.emit(it) }
                 .collect { pair ->
                     val (busStops, userLocation) = pair
-                    require(busStops is UiState.Success)
-                    val userLocationLatLng = LatLng(userLocation.latitude, userLocation.longitude)
-                    val closestBusStop =
-                        busStops.data.minByOrNull { it.position.sphericalDistance(userLocationLatLng) }
-                    closestBusStop?.let {
-                        onBusStopSelected(it)
+                    if (busStops is UiState.Success) {
+                        val userLocationLatLng = LatLng(userLocation.latitude, userLocation.longitude)
+                        val closestBusStop =
+                            busStops.data.minByOrNull { it.position.sphericalDistance(userLocationLatLng) }
+                        closestBusStop?.let {
+                            onBusStopSelected(it)
+                        }
                     }
                 }
         }
@@ -226,7 +229,7 @@ class MapScreenViewModel
         traceVehicleJob?.cancel()
         _trackedVehicle.value = null
         _route.value = null
-        _selectedDeparture.value = departures.value?.departures?.first {
+        _selectedDeparture.value = departures.value?.departures?.find {
             vehicleId != null && it.vehicleId == vehicleId
         }
         departures.value?.departures?.fastForEach {
@@ -240,27 +243,32 @@ class MapScreenViewModel
 
     private fun trackVehicle(vehicleId: Long) {
         traceVehicleJob = viewModelScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                vehiclesRepository.getVehiclePosition(vehicleId.toInt())
-                    .catch { _errorFlow.emit(it) }
-                    .collect {
-                        it?.let { vehiclePosition ->
-                            if (_trackedVehicle.value == null) {
-                                _cameraFocusFlow.emit(
-                                    LatLng(
-                                        vehiclePosition.lat,
-                                        vehiclePosition.lon
+            try {
+                val vehicleIdInt = vehicleId.toInt()
+                while (isActive) {
+                    vehiclesRepository.getVehiclePosition(vehicleIdInt)
+                        .catch { _errorFlow.emit(it) }
+                        .collect {
+                            it?.let { vehiclePosition ->
+                                if (_trackedVehicle.value == null) {
+                                    _cameraFocusFlow.emit(
+                                        LatLng(
+                                            vehiclePosition.lat,
+                                            vehiclePosition.lon
+                                        )
                                     )
-                                )
-                            }
-                            if (_selectedDeparture.value != null) {
-                                _trackedVehicle.emit(
-                                    mapToTrackedVehicle(vehiclePosition, _selectedDeparture.value!!)
-                                )
+                                }
+                                if (_selectedDeparture.value != null) {
+                                    _trackedVehicle.emit(
+                                        mapToTrackedVehicle(vehiclePosition, _selectedDeparture.value!!)
+                                    )
+                                }
                             }
                         }
-                    }
-                delay(1000 * 10)
+                    delay(1000 * 10)
+                }
+            } catch (e: NumberFormatException) {
+                _errorFlow.emit(IllegalArgumentException("Nieprawidłowy identyfikator pojazdu"))
             }
         }
     }

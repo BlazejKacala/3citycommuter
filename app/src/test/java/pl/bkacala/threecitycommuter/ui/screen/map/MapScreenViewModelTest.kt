@@ -14,6 +14,7 @@ import org.junit.Test
 import pl.bkacala.threecitycommuter.mocks.MockBusStopsRepository.mockBusStopsRepository
 import pl.bkacala.threecitycommuter.mocks.MockLocationRepository.mockLocationRepository
 import pl.bkacala.threecitycommuter.mocks.MockPermissionFlows.mockGrantedPermissionFlow
+import pl.bkacala.threecitycommuter.mocks.MockRoutesRepository.mockRoutesRepository
 import pl.bkacala.threecitycommuter.mocks.MockVehiclesRepository.mockVehiclesRepository
 import pl.bkacala.threecitycommuter.tools.MainDispatcherRule
 import pl.bkacala.threecitycommuter.ui.common.UiState
@@ -31,7 +32,8 @@ class MapScreenViewModelTest {
         getDeparturesUseCase = GetDeparturesUseCase(
             busStopsRepository = mockBusStopsRepository,
             vehiclesRepository = mockVehiclesRepository,
-        )
+        ),
+        routesRepository = mockRoutesRepository
     )
 
     @Test
