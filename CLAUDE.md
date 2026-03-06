@@ -4,226 +4,207 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**3citycommuter** is an Android app for commuters in Gdańsk, Sopot, and Gdynia (Tri-City area). It displays public transport stops on a map, real-time departures, vehicle tracking, and route visualization.
+**3citycommuter** is a **Kotlin Multiplatform** app for commuters in Gdańsk, Sopot, and Gdynia (Tri-City area). It displays public transport stops on a map, real-time departures, vehicle tracking, and route visualization. Targets: **Android**, **Desktop (JVM)**, **iOS** (stub).
 
 ## Essential Commands
 
 ### Building
 ```bash
-./gradlew build                    # Build all modules
-./gradlew assembleDebug            # Build debug APK
-./gradlew assembleRelease          # Build release APK (requires signing config)
+./gradlew build                                      # Build all modules
+./gradlew :composeApp:android:assembleDebug          # Build debug APK
+./gradlew :composeApp:android:assembleRelease        # Build release APK (requires signing config)
+./gradlew :composeApp:desktop:run                    # Run desktop app
 ```
 
 ### Testing
 ```bash
-./gradlew test                     # Run all unit tests
-./gradlew testDebugUnitTest        # Run app module unit tests (debug)
-./gradlew connectedDebugAndroidTest # Run instrumented tests on device/emulator
+./gradlew :shared:ui:jvmTest                         # ViewModel tests (fast, no device needed)
+./gradlew :shared:network:jvmTest                    # Serialization tests
+./gradlew :composeApp:android:connectedDebugAndroidTest  # Instrumented tests on device/emulator
 ```
 
 **Run a single test class:**
 ```bash
-./gradlew test --tests "pl.bkacala.threecitycommuter.ui.screen.map.MapScreenViewModelTest"
+./gradlew :shared:ui:jvmTest --tests "pl.bkacala.threecitycommuter.ui.screen.map.MapScreenViewModelTest"
 ```
 
 ### Code Quality
 ```bash
-./gradlew ktlintCheck              # Check Kotlin code style
-./gradlew ktlintFormat             # Auto-fix Kotlin style issues
-./gradlew spotlessCheck            # Check formatting (Kotlin + misc files)
-./gradlew spotlessApply            # Auto-fix all formatting
-./gradlew lint                     # Run Android lint
-./gradlew lintFix                  # Apply safe lint fixes
-```
-
-**Always run before committing:**
-```bash
-./gradlew spotlessApply ktlintFormat test
+./gradlew spotlessApply ktlintFormat    # Auto-fix formatting (always run before committing)
+./gradlew spotlessCheck ktlintCheck     # Check only
+./gradlew lint                          # Android lint
 ```
 
 ## Architecture
 
 ### Module Structure
-The project uses a **multi-module architecture** with clear separation:
 
 ```
 3citycommuter/
-├── app/              UI layer (Compose, ViewModels, Navigation)
-├── data/             Repository implementations, domain models, use cases
-├── network/          Network client (Ktor), DTOs, API definitions
-└── database/         Room database, DAOs, entities
+├── build-logic/convention/    # Convention plugins (KmpLibrary, KmpCompose)
+├── shared/
+│   ├── core/                  # Domain models, LatLng, UiState, utilities (commonMain only)
+│   ├── network/               # Ktor client, DTOs, platform engines (commonMain + per-platform)
+│   ├── database/              # Room KMP, DAOs, entities, DatabaseModule (commonMain + per-platform builders)
+│   ├── data/                  # Repositories, mappers, use cases, location/permissions (commonMain + per-platform)
+│   └── ui/                    # Compose Multiplatform UI, ViewModels, navigation (commonMain + per-platform MapView)
+└── composeApp/
+    ├── android/               # MainActivity, CommuterApp (Koin init), AndroidManifest
+    └── desktop/               # main.kt (Window + Koin init)
 ```
 
-**Dependency flow:** `app` → `data` → `network` + `database`
+**Dependency flow:** `composeApp` → `shared:ui` → `shared:data` → `shared:network` + `shared:database` → `shared:core`
 
-### UI Architecture (app module)
+### KMP Targets
 
-**Pattern:** MVVM with Jetpack Compose + Unidirectional Data Flow
+- **Android**: `androidTarget()` via `KmpLibraryConventionPlugin`
+- **Desktop**: `jvm("jvm")` via `KmpLibraryConventionPlugin`
+- **iOS**: `iosX64()`, `iosArm64()`, `iosSimulatorArm64()` (disabled on Windows builds)
+
+### Convention Plugins (build-logic/convention/)
+
+- `threecitycommuter.kmp.library` — applies `kotlin-multiplatform` + `com.android.library`, configures all targets
+- `threecitycommuter.kmp.compose` — applies Compose Multiplatform plugin + compiler plugin
+
+### UI Architecture
+
+**Pattern:** MVVM with Compose Multiplatform + Unidirectional Data Flow
 
 **Key Components:**
-- `MainActivity.kt` - Single activity, handles location permission, splash screen
-- `AppNavHost.kt` - Navigation graph with nested navigation
-- `Destinations.kt` - Enum-based navigation destinations (Map, Schedule, Lines)
-
-**Main Screen:**
-- `MapScreen.kt` / `MapScreenViewModel.kt` - Google Maps with bus stops, departures, vehicle tracking
-  - Location: `app/src/main/kotlin/pl/bkacala/threecitycommuter/ui/screen/map/`
-  - State management: `MutableStateFlow` for screen state
-  - Lifecycle awareness: Pauses/resumes polling jobs on Activity lifecycle
-  - Real-time updates: Polls every 10-30 seconds for departures and vehicle positions
+- `App.kt` (`shared/ui/commonMain`) — root composable, Scaffold + NavHost
+- `AppNavHost.kt` — navigation graph (JetBrains KMP Navigation)
+- `MapScreen.kt` / `MapScreenViewModel.kt` — main screen with map, departures, vehicle tracking
+- `PlatformMapView.kt` — `expect fun` with `actual` per platform:
+  - `androidMain` — Mapbox Compose SDK (requires `MAPBOX_DOWNLOADS_TOKEN`) / Canvas placeholder
+  - `jvmMain` — Canvas placeholder with stop dots and route lines
+  - `iosMain` — TODO stub (UIKitView interop)
 
 **State Pattern:**
 ```kotlin
-sealed class UiState<out T> {
-    data object Loading : UiState<Nothing>()
-    data class Error(val error: Throwable) : UiState<Nothing>()
-    data class Success<T>(val data: T) : UiState<T>()
+sealed interface UiState<out T> {
+    data object Loading : UiState<Nothing>
+    data class Error(val error: Throwable) : UiState<Nothing>
+    data class Success<T>(val data: T) : UiState<T>
 }
 ```
 
-### Data Layer Architecture (data module)
+### Data Layer
 
-**Repository Pattern** with interfaces in `data/repository/`:
-- `BusStopsRepository` - Bus stops, departures (cached in DB if >1 day old)
-- `LocationRepository` - User location via Google Play Services
-- `VehiclesRepository` - Vehicle data, real-time GPS positions
-- `RoutesRepository` - Route shapes (GeoPoints for polyline visualization)
-- `LastUpdateRepository` - Cache invalidation timestamps
+**Repository Pattern** with interfaces in `shared/data/commonMain`:
+- `BusStopsRepository` — bus stops + departures (cached in Room if > 1 day old)
+- `LocationRepository` — user location (`expect`/`actual` per platform)
+- `VehiclesRepository` — vehicle data + real-time GPS positions
+- `RoutesRepository` — route shapes
+- `LastUpdateRepository` — cache invalidation via `multiplatform-settings`
 
-**Key Pattern:** All repositories return `Flow<T>` for reactive updates.
+**All repositories return `Flow<T>`.**
 
-**Dependency Injection:**
-- All repositories bound in `RepositoryModule.kt` as singletons
-- ViewModels use `@HiltViewModel` with constructor injection
-- Activities/Fragments use `@AndroidEntryPoint`
+### Dependency Injection (Koin 4.0)
 
-### Network Layer (network module)
+Modules declared per layer:
 
-**NetworkClient interface** implemented by `KtorNetworkClient`:
-- HTTP client: Ktor with JSON serialization, logging
-- APIs:
-  - `ckan.multimediagdansk.pl` - Bus stops master data
-  - `ckan2.multimediagdansk.pl` - Departures, GPS positions, routes
-  - `files.cloudgdansk.pl` - Vehicle details database
+| Module | Location | Contents |
+|---|---|---|
+| `databaseModule` | `shared:database` | Room DB, DAOs |
+| `networkModule` | `shared:network` | Ktor client (common) |
+| `platformNetworkModule` | `shared:network` (expect/actual) | HTTP engine per platform |
+| `dataModule` | `shared:data` | Repositories, use cases, Settings |
+| `platformDataModule` | `shared:data` (expect/actual) | LocationRepository, PermissionChecker per platform |
+| `uiModule` | `shared:ui` | ViewModels |
 
-**Adding a new endpoint:**
-1. Add method to `NetworkClient` interface (in `network/`)
-2. Create DTO in `network/model/`
-3. Implement in `KtorNetworkClient.kt`
-4. Add mapper to domain model in `data/`
+All modules started in `CommuterApp.kt` (Android) or `main.kt` (Desktop).
 
-### Database Layer (database module)
+### Network Layer
 
-**Room Database:** `CommuterDatabase`
-```
-Tables:
-├── bus_stops       - Bus stop master data (id, name, location, type)
-├── bus_stop_types  - Stop type relations (bus/tram)
-└── vehicles        - Vehicle details (type, capacity, amenities)
-```
+`KtorNetworkClient` in `shared:network/commonMain` — platform engine injected via `platformNetworkModule`:
+- Android: `HttpClient(Android)`
+- iOS: `HttpClient(Darwin)`
+- Desktop: `HttpClient(Java)`
 
-**DAOs:** `BusStopsDao`, `BusStopsTypesDao`, `VehiclesDao`
+### Database Layer
 
-**Caching strategy:** Data refreshes from network if >1 day old (timestamp tracked in SharedPreferences).
+Room KMP 2.7 with `@ConstructedBy(CommuterDatabaseConstructor::class)` pattern.
+`getDatabaseBuilder()` is `expect fun` with `actual` in `androidMain`, `jvmMain`, `iosMain`.
+
+### Platform Abstractions (expect/actual)
+
+| Interface | Android actual | Desktop actual | iOS actual |
+|---|---|---|---|
+| `PlatformMapView` | Mapbox / Canvas placeholder | Canvas placeholder | Stub |
+| `getDatabaseBuilder()` | Room + Context | Room + File | Room + NSFileManager |
+| `platformNetworkModule` | Ktor Android engine | Ktor Java engine | Ktor Darwin engine |
+| `platformDataModule` | FusedLocation | Default location | Stub |
+| `PermissionChecker` | ContextCompat | Always true | Stub |
 
 ## Common Development Workflows
 
 ### Adding a New Screen
-1. Create package: `app/src/main/kotlin/pl/bkacala/threecitycommuter/ui/screen/[name]/`
-2. Create Composable: `[Name]Screen.kt`
-3. Create ViewModel: `[Name]ScreenViewModel.kt` with `@HiltViewModel`
-4. Add destination to `Destinations.kt` enum
-5. Add route to `AppNavHost.kt`
-6. If bottom nav item needed, update `AppNavigationBar.kt`
+1. Create package: `shared/ui/src/commonMain/.../ui/screen/[name]/`
+2. Create `[Name]Screen.kt` (Composable)
+3. Create `[Name]ScreenViewModel.kt` (plain `ViewModel`, no Hilt)
+4. Register ViewModel in `shared/ui/.../di/UiModule.kt`: `viewModel { NameScreenViewModel(get(), ...) }`
+5. Add destination to `Destinations.kt`
+6. Add route to `AppNavHost.kt`
 
 ### Adding a New Repository
-1. Create interface in `data/repository/[Name]Repository.kt`
-2. Create implementation `Real[Name]Repository.kt` in same folder
-3. Add `@Binds` method in `data/di/RepositoryModule.kt`:
-```kotlin
-@Binds
-@Singleton
-abstract fun bind[Name]Repository(impl: Real[Name]Repository): [Name]Repository
-```
-4. Inject into ViewModels via constructor
+1. Create interface in `shared/data/.../repository/[Name]Repository.kt`
+2. Create `Real[Name]Repository.kt` in same folder
+3. Add to `dataModule` in `shared/data/.../di/DataModule.kt`:
+   ```kotlin
+   single<NameRepository> { RealNameRepository(get()) }
+   ```
 
-### Testing
+### Adding a New API Endpoint
+1. Add method to `NetworkClient` interface (`shared/network/commonMain`)
+2. Create DTO in `shared/network/.../model/`
+3. Implement in `KtorNetworkClient.kt`
+4. Add mapper in `shared/data/.../model/`
 
-**Unit Tests:**
-- ViewModels: Use `Turbine` for Flow testing, `kotlinx-coroutines-test` for `runTest`
-- Repositories: Mock dependencies with test doubles
-- Example: `app/src/test/java/pl/bkacala/threecitycommuter/ui/screen/map/MapScreenViewModelTest.kt`
+## Testing
+
+**Unit Tests** live in `commonTest` — run on JVM with `./gradlew :module:jvmTest`:
+- ViewModels: `shared/ui/src/commonTest/` — Turbine for Flow testing, `kotlin.test`
+- Serialization: `shared/network/src/commonTest/`
+- Mock repositories: `shared/ui/src/commonTest/.../mocks/`
+
+**No JUnit `@Rule`** — use `@BeforeTest`/`@AfterTest` with `Dispatchers.setMain(UnconfinedTestDispatcher())`.
 
 **Testing utilities:**
-- `MainDispatcherRule` - Sets Main dispatcher to TestDispatcher
-- `Turbine` - `Flow.test {}` for asserting emissions
-- `Kotest` - `shouldBe`, `shouldContain` assertions
-
-**Mock repositories:** Located in `app/src/test/java/pl/bkacala/threecitycommuter/mocks/`
-
-## Code Style
-
-**Formatting:**
-- Spotless enforces ktlint rules + trailing whitespace/indentation
-- Ratchet mode: Only formats files changed from `origin/main`
-- **Always run `./gradlew spotlessApply` before committing**
-
-**Conventions:**
-- Kotlin: 4-space indentation
-- Composables: PascalCase (e.g., `MapScreen()`)
-- ViewModels: Suffix with `ViewModel` (e.g., `MapScreenViewModel`)
-- Repositories: Prefix implementation with `Real` (e.g., `RealBusStopsRepository`)
-- Use `sealed class` for state modeling
-- Prefer `Flow` over LiveData
-- Use `@Composable` functions for UI, extract reusable components
-
-## Key Files to Understand
-
-**Entry points:**
-- `app/src/main/kotlin/pl/bkacala/threecitycommuter/CommuterApp.kt` - Hilt application
-- `app/src/main/kotlin/pl/bkacala/threecitycommuter/MainActivity.kt` - Single activity
-- `app/src/main/kotlin/pl/bkacala/threecitycommuter/AppNavHost.kt` - Navigation graph
-
-**Main feature:**
-- `app/src/main/kotlin/pl/bkacala/threecitycommuter/ui/screen/map/MapScreenViewModel.kt` (450+ lines)
-- `app/src/main/kotlin/pl/bkacala/threecitycommuter/ui/screen/map/MapScreen.kt`
-
-**Dependency injection:**
-- `data/src/main/kotlin/pl/bkacala/threecitycommuter/di/RepositoryModule.kt`
-- `network/src/main/kotlin/pl/bkacala/threecitycommuter/di/NetworkModule.kt`
-- `database/src/main/kotlin/pl/bkacala/threecitycommuter/di/DatabaseModule.kt`
-
-**Network client:**
-- `network/src/main/kotlin/pl/bkacala/threecitycommuter/network/KtorNetworkClient.kt`
+- `makeRandomInstance<T>()` — reflection-based random instance creation (`tools/RandomInstance.kt`)
+- `MockPermissionChecker` — `PermissionChecker` test double (granted/denied variants)
+- Turbine: `flow.test { awaitItem() shouldBe expected }`
 
 ## Configuration
 
-**Secrets:** `secrets.properties` (gitignored) contains:
-- Maps API key (automatically injected via Secrets Gradle Plugin)
-- Signing credentials (PASS, ALIAS, ALIAS_PASS)
+**Mapbox token** — required for Android map (add to `gradle.properties`):
+```properties
+MAPBOX_DOWNLOADS_TOKEN=sk.eyJ1...
+```
+Without token: Android builds use Canvas placeholder map (Mapbox deps are commented out in `shared/ui/build.gradle.kts`).
 
-**API Keys:**
-- Google Maps API key required for map functionality
-- Configured via `secrets.properties` and accessed in `AndroidManifest.xml`
+**Signing** — `secrets.properties` (gitignored):
+```properties
+PASS=keystore_password
+ALIAS=key_alias
+ALIAS_PASS=key_password
+```
 
 ## Tech Stack
 
-- **Language:** Kotlin 1.9.22
-- **UI:** Jetpack Compose, Material 3
-- **Maps:** Google Maps Compose (`com.google.maps.android:maps-compose`)
-- **Navigation:** Androidx Compose Navigation
-- **DI:** Hilt
-- **Networking:** Ktor Client
-- **Database:** Room
-- **Serialization:** Kotlinx Serialization
-- **Async:** Kotlin Coroutines + Flow
-- **Location:** Google Play Services Location
-- **Permissions:** PermissionFlow library
-- **Date/Time:** Kotlinx DateTime
-- **Testing:** JUnit, Kotest, Turbine, Coroutines Test
+- **Language:** Kotlin 2.1.10 + Kotlin Multiplatform
+- **UI:** Compose Multiplatform 1.7.3, Material 3
+- **Maps:** Mapbox Maps SDK 11.9.2 (Android, requires token)
+- **Navigation:** JetBrains Navigation Compose 2.9.0 (KMP)
+- **DI:** Koin 4.0.2
+- **Networking:** Ktor 3.1.1
+- **Database:** Room KMP 2.7.1
+- **Serialization:** Kotlinx Serialization 1.8.0
+- **Async:** Kotlin Coroutines 1.10.1 + Flow
+- **Date/Time:** Kotlinx DateTime 0.6.2
+- **Settings:** multiplatform-settings 1.3.0
+- **Testing:** kotlin.test, Kotest assertions, Turbine, Coroutines Test
 
-## Target SDK
+## Target SDKs (Android)
 - **Min SDK:** 29 (Android 10)
-- **Target SDK:** 34 (Android 14)
-- **Compile SDK:** 34
+- **Target SDK:** 35 (Android 15)
+- **Compile SDK:** 35
