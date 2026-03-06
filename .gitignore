@@ -34,6 +34,12 @@ google-services.json
 *.hprof
 /secrets.properties
 
+# Kotlin
+.kotlin/
+
+# Mapbox token
+MAPBOX_DOWNLOADS_TOKEN
+
 # Claude Code local settings
 .claude/settings.local.json
 .claude/memory/

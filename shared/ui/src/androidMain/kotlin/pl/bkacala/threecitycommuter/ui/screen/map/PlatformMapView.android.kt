@@ -1,0 +1,108 @@
+package pl.bkacala.threecitycommuter.ui.screen.map
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import pl.bkacala.threecitycommuter.model.LatLng
+import pl.bkacala.threecitycommuter.model.location.UserLocation
+import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+
+// TODO: Replace with Mapbox Compose SDK implementation once MAPBOX_DOWNLOADS_TOKEN is configured.
+// See PlatformMapView.android.kt.mapbox for the full Mapbox implementation.
+
+@Composable
+actual fun PlatformMapView(
+    modifier: Modifier,
+    cameraTarget: LatLng?,
+    cameraZoom: Float,
+    busStops: List<BusStopMapItem>,
+    selectedBusStop: BusStopMapItem?,
+    trackedVehicle: TrackedVehicle?,
+    route: List<LatLng>?,
+    userLocation: UserLocation?,
+    onBusStopSelected: (BusStopMapItem) -> Unit,
+    onMapClicked: () -> Unit,
+    mapBottomPadding: Dp,
+) {
+    val center = cameraTarget ?: LatLng(54.3520, 18.6466)
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFFE8E8E8))
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    onMapClicked()
+                }
+            }
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            busStops.forEach { stop ->
+                val x = ((stop.position.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
+                val y = (-(stop.position.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
+
+                if (x in 0f..size.width && y in 0f..size.height) {
+                    val isSelected = stop == selectedBusStop
+                    drawCircle(
+                        color = if (isSelected) Color(0xFF6750A4) else Color(0xFF1976D2),
+                        radius = if (isSelected) 8f else 4f,
+                        center = Offset(x, y)
+                    )
+                }
+            }
+
+            route?.let { routePoints ->
+                if (routePoints.size >= 2) {
+                    for (i in 0 until routePoints.size - 1) {
+                        val startX = ((routePoints[i].longitude - center.longitude) * 10000 + size.width / 2).toFloat()
+                        val startY = (-(routePoints[i].latitude - center.latitude) * 10000 + size.height / 2).toFloat()
+                        val endX = ((routePoints[i + 1].longitude - center.longitude) * 10000 + size.width / 2).toFloat()
+                        val endY = (-(routePoints[i + 1].latitude - center.latitude) * 10000 + size.height / 2).toFloat()
+                        drawLine(
+                            color = Color(0xFF6750A4),
+                            start = Offset(startX, startY),
+                            end = Offset(endX, endY),
+                            strokeWidth = 3f
+                        )
+                    }
+                }
+            }
+
+            trackedVehicle?.let { vehicle ->
+                val vx = ((vehicle.position.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
+                val vy = (-(vehicle.position.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
+                drawCircle(color = Color(0xFF6750A4), radius = 10f, center = Offset(vx, vy))
+            }
+
+            userLocation?.let { location ->
+                if (!location.isFixed) {
+                    val ux = ((location.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
+                    val uy = (-(location.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
+                    drawCircle(color = Color(0xFF6750A4), radius = 8f, center = Offset(ux, uy))
+                    drawCircle(color = Color.White, radius = 5f, center = Offset(ux, uy))
+                }
+            }
+        }
+
+        Text(
+            text = "Map Placeholder — ${busStops.size} przystanków",
+            modifier = Modifier.align(Alignment.TopCenter).padding(8.dp),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        )
+    }
+}
