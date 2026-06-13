@@ -1,3 +1,8 @@
+@file:Suppress("UnstableApiUsage")
+
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import io.gitlab.arturbosch.detekt.Detekt
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -9,4 +14,125 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.room) apply false
+    // Quality plugins - apply to root project
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.detekt)
+}
+
+// Store detekt version for use in subprojects
+val detektVersion = libs.versions.detekt.get()
+
+// Configure Spotless - simple DSL without excludes
+// (Spotless automatically skips build directories)
+spotless {
+    // Format Kotlin files
+    kotlin {
+        target("**/*.kt")
+        ktlint()
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+    }
+    kotlinGradle {
+        target("**/*.kts")
+        ktlint()
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+    }
+    // Format other files
+    format("misc") {
+        target("*.md", ".gitignore", "*.yml", "*.yaml")
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+    }
+}
+
+// Apply and configure Spotless for all subprojects
+subprojects {
+    apply(plugin = "com.diffplug.spotless")
+    
+    the<com.diffplug.gradle.spotless.SpotlessExtension>().apply {
+        kotlin {
+            target("**/*.kt")
+            ktlint()
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+        }
+        kotlinGradle {
+            target("**/*.kts")
+            ktlint()
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+        }
+    }
+}
+
+// Configure Detekt
+detekt {
+    toolVersion = detektVersion
+    config.setFrom("${rootDir}/config/detekt/detekt.yml")
+    ignoreFailures = false
+}
+
+// Configure Detekt reports on the task
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        sarif.required.set(true)
+    }
+}
+
+// Apply and configure Detekt for all subprojects
+subprojects {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    
+    the<DetektExtension>().apply {
+        toolVersion = detektVersion
+        config.setFrom("${rootDir}/config/detekt/detekt.yml")
+        ignoreFailures = false
+    }
+}
+
+// Configure Detekt reports for subprojects
+subprojects {
+    tasks.withType<Detekt>().configureEach {
+        reports {
+            html.required.set(true)
+            xml.required.set(true)
+            sarif.required.set(true)
+        }
+    }
+}
+
+// Common lint task that runs all quality checks
+tasks.register("lint") {
+    description = "Runs all code quality checks (Spotless and Detekt)"
+    group = "verification"
+    
+    dependsOn(
+        tasks.named("spotlessCheck"),
+        tasks.named("detekt")
+    )
+    
+    // Collect all subproject tasks
+    val spotlessTasks = subprojects.mapNotNull { subproject ->
+        subproject.tasks.findByName("spotlessCheck")
+    }
+    val detektTasks = subprojects.mapNotNull { subproject ->
+        subproject.tasks.findByName("detekt")
+    }
+    
+    (spotlessTasks + detektTasks).forEach { task ->
+        dependsOn(task)
+    }
+}
+
+// Make check depend on lint for quality gate
+tasks.named("check") {
+    finalizedBy(tasks.named("lint"))
 }

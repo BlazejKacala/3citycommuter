@@ -93,8 +93,92 @@ MAPBOX_DOWNLOADS_TOKEN=sk.eyJ1...
 
 Bez tokenu Android używa uproszczonego placeholdera Canvas.
 
+## Narzędzia do kontroli jakości kodu
+
+### Spotless (Formatowanie kodu)
+
+Projekt używa **Spotless 6.25.0** z **ktlint** do automatycznego formatowania kodu Kotlin.
+
+**Dostępne komendy:**
+```bash
+# Sprawdź formatowanie (nie modyfikuje plików)
+./gradlew spotlessCheck
+
+# Sformatuj kod
+./gradlew spotlessApply
+```
+
+**Konfiguracja:**
+- Kotlin: 4 spacje, usuwanie białych znaków na końcu linii, nowa linia na końcu pliku
+- Kotlin Gradle (`.kts`): takie same reguły jak Kotlin
+- Markdown, YAML, `.gitignore`: 2 spacje, usuwanie białych znaków
+
+**Wykluczenia:** `**/build/**`, `**/.gradle/**`, `**/generated/**`
+
+### Detekt (Analiza statyczna kodu)
+
+Projekt używa **Detekt 1.23.6** do analizy statycznej kodu Kotlin z obsługą Kotlin Multiplatform.
+
+**Dostępne komendy:**
+```bash
+# Uruchom analizę Detekt
+./gradlew detekt
+
+# Generowanie raportów (HTML, XML, SARIF)
+./gradlew detektAll  # w wszystkich modułach
+```
+
+**Konfiguracja:** `config/detekt/detekt.yml`
+
+**Raporty generowane w:**
+- HTML: `build/reports/detekt/detekt.html`
+- XML: `build/reports/detekt/detekt.xml`
+- SARIF: `build/reports/detekt/detekt.sarif`
+
+**Ograniczenia z KMP:**
+Analiza typów (type resolution) jest włączona, ale może mieć ograniczenia w zależności od wersji Kotlin i konfiguracji multiplatform. Jeśli wystąpią problemy, można ją wyłączyć w pliku konfiguracyjnym.
+
+### Zadanie `lint`
+
+Połączone zadanie uruchamiające wszystkie narzędzia kontroli jakości:
+```bash
+# Uruchom wszystkie sprawdzenia (Spotless + Detekt)
+./gradlew lint
+
+# Zadanie `check` obejmuje również `lint`
+./gradlew check
+```
+
+## Baseline Detekt
+
+Jeśli istniejący kod generuje dużo ostrzeżeń Detekt, użyj baseline zamiast masowego wyłączania reguł:
+
+1. Uruchom: `./gradlew detektGenerateConfig`
+2. Skopiuj wygenerowaną konfigurację do `config/detekt/detekt.yml`
+3. Dodaj plik baseline: `./gradlew detektBaseline`
+4. Skonfiguruj `baseline` w `detekt.yml`
+
+**Lokalizacja pliku baseline:** `config/detekt/baseline.yml`
+
+## Aktualizacja konfiguracji
+
+- **Spotless**: Konfiguracja w `build.gradle.kts` (root project)
+- **Detekt**: Konfiguracja w `config/detekt/detekt.yml`
+- **Wersje pluginów**: `gradle/libs.versions.toml`
+
 ## Formatowanie kodu
 
+Zalecany workflow przed commitem:
 ```bash
-./gradlew spotlessApply ktlintFormat    # zawsze uruchamiaj przed commitem
+# 1. Sformatuj kod
+./gradlew spotlessApply
+
+# 2. Sprawdź analize statyczną
+./gradlew detekt
+
+# 3. Uruchom wszystkie sprawdzenia
+./gradlew lint
+
+# 4. Zbuduj projekt
+./gradlew build
 ```

@@ -237,3 +237,34 @@ Keystore file expected at `signing/key.jks`.
 6. **File modifications** — Respect existing code style: 4-space indentation, ktlint-compatible formatting.
 7. **Test execution** — Instrumented tests require Android device/emulator. Use `jvmTest` for fast feedback.
 8. **Blast radius** — Commands like `./gradlew clean`, `rm -rf`, or git force-push require explicit confirmation.
+
+## Code Quality Tools
+
+### Spotless
+**Spotless 6.25.0** with ktlint is configured for automatic code formatting:
+- **Check formatting:** `./gradlew spotlessCheck`
+- **Apply formatting:** `./gradlew spotlessApply`
+- **Configuration:** `build.gradle.kts` (root project)
+- **Exclusions:** `**/build/**`, `**/.gradle/**`, `**/generated/**`
+- **Formats:** Kotlin files (`.kt`, `.kts`), Markdown, YAML, `.gitignore`
+- **Rules:** ktlint, trim trailing whitespace, indent with 4 spaces (Kotlin) or 2 spaces (other files), newline at end of file
+
+### Detekt
+**Detekt 1.23.6** is configured for static code analysis with Kotlin Multiplatform support:
+- **Run analysis:** `./gradlew detekt`
+- **Configuration:** `config/detekt/detekt.yml`
+- **Reports:** HTML, XML, SARIF generated in `build/reports/detekt/`
+- **Type resolution:** Enabled (may have limitations with KMP - see configuration for details)
+- **Baseline:** Use `detektGenerateConfig` and `detektBaseline` if existing code has many warnings
+
+### Combined Lint Task
+- **Run all quality checks:** `./gradlew lint` (runs `spotlessCheck` + `detekt` for all modules)
+- **Included in `check`:** `./gradlew check` also runs `lint` as a quality gate
+
+## Quality-Related Safety Notes
+
+1. **Always run `./gradlew lint` before committing** to ensure code meets formatting and quality standards.
+2. **Spotless configuration covers all modules** - format changes will apply to all Kotlin files.
+3. **Detekt baseline recommended** - if the existing codebase has many warnings, generate a baseline instead of disabling rules.
+4. **Type resolution limitations** - Detekt's type resolution with KMP may have edge cases. If build failures occur, try disabling type resolution in `detekt.yml`.
+5. **Configuration cache compatibility** - Both Spotless and Detekt configurations are compatible with Gradle's configuration cache.
