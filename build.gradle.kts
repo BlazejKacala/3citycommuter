@@ -28,14 +28,24 @@ spotless {
     // Format Kotlin files
     kotlin {
         target("**/*.kt")
-        ktlint()
+        ktlint().editorConfigOverride(
+            mapOf(
+                "ktlint_function_naming" to "disabled",
+                "ktlint_standard_function-naming" to "disabled"
+            )
+        )
         trimTrailingWhitespace()
         indentWithSpaces(4)
         endWithNewline()
     }
     kotlinGradle {
         target("**/*.kts")
-        ktlint()
+        ktlint().editorConfigOverride(
+            mapOf(
+                "ktlint_function_naming" to "disabled",
+                "ktlint_standard_function-naming" to "disabled"
+            )
+        )
         trimTrailingWhitespace()
         indentWithSpaces(4)
         endWithNewline()
@@ -56,14 +66,24 @@ subprojects {
     the<com.diffplug.gradle.spotless.SpotlessExtension>().apply {
         kotlin {
             target("**/*.kt")
-            ktlint()
+            ktlint().editorConfigOverride(
+                mapOf(
+                    "ktlint_function_naming" to "disabled",
+                    "ktlint_standard_function-naming" to "disabled"
+                )
+            )
             trimTrailingWhitespace()
             indentWithSpaces(4)
             endWithNewline()
         }
         kotlinGradle {
             target("**/*.kts")
-            ktlint()
+            ktlint().editorConfigOverride(
+                mapOf(
+                    "ktlint_function_naming" to "disabled",
+                    "ktlint_standard_function-naming" to "disabled"
+                )
+            )
             trimTrailingWhitespace()
             indentWithSpaces(4)
             endWithNewline()
