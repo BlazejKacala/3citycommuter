@@ -32,6 +32,8 @@ spotless {
             mapOf(
                 "ktlint_function_naming" to "disabled",
                 "ktlint_standard_function-naming" to "disabled",
+                // Force LF line endings for cross-platform consistency (Windows/WSL)
+                "end_of_line" to "lf",
             ),
         )
         trimTrailingWhitespace()
@@ -44,6 +46,8 @@ spotless {
             mapOf(
                 "ktlint_function_naming" to "disabled",
                 "ktlint_standard_function-naming" to "disabled",
+                // Force LF line endings for cross-platform consistency (Windows/WSL)
+                "end_of_line" to "lf",
             ),
         )
         trimTrailingWhitespace()
@@ -70,6 +74,8 @@ subprojects {
                 mapOf(
                     "ktlint_function_naming" to "disabled",
                     "ktlint_standard_function-naming" to "disabled",
+                    // Force LF line endings for cross-platform consistency (Windows/WSL)
+                    "end_of_line" to "lf",
                 ),
             )
             trimTrailingWhitespace()
@@ -82,6 +88,8 @@ subprojects {
                 mapOf(
                     "ktlint_function_naming" to "disabled",
                     "ktlint_standard_function-naming" to "disabled",
+                    // Force LF line endings for cross-platform consistency (Windows/WSL)
+                    "end_of_line" to "lf",
                 ),
             )
             trimTrailingWhitespace()
