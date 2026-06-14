@@ -60,6 +60,8 @@ spotless {
         trimTrailingWhitespace()
         indentWithSpaces(2)
         endWithNewline()
+        // Force LF line endings for cross-platform consistency (Windows/WSL)
+        lineEndings = com.diffplug.spotless.LineEnding.UNIX
     }
 }
 
@@ -95,6 +97,15 @@ subprojects {
             trimTrailingWhitespace()
             indentWithSpaces(4)
             endWithNewline()
+        }
+        // Format other files
+        format("misc") {
+            target("*.md", ".gitignore", "*.yml", "*.yaml")
+            trimTrailingWhitespace()
+            indentWithSpaces(2)
+            endWithNewline()
+            // Force LF line endings for cross-platform consistency (Windows/WSL)
+            lineEndings = com.diffplug.spotless.LineEnding.UNIX
         }
     }
 }
