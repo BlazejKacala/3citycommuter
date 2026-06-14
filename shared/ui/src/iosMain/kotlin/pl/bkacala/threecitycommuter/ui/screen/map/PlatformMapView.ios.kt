@@ -33,8 +33,10 @@ actual fun PlatformMapView(
     onMapClicked: () -> Unit,
     mapBottomPadding: Dp,
 ) {
-    // TODO: Implement iOS MapView using UIKitView interop with Mapbox iOS SDK
-    // For now, placeholder view
+    // TODO: Implement iOS MapView using MapLibre Native via CocoaPods
+    // Requires: pod 'MapLibreGL', '~> 5.11.0' in Podfile
+    // For now, placeholder view with information
+    // See: https://maplibre.org/maplibre-gl-native/docs/
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -46,7 +48,8 @@ actual fun PlatformMapView(
             },
     ) {
         Text(
-            text = "iOS Map — ${busStops.size} przystanków",
+            text = "iOS MapLibre Map — ${busStops.size} przystankow\n" +
+                    "(Requires MapLibre Native CocoaPods integration)",
             modifier = Modifier.align(Alignment.Center).padding(16.dp),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,

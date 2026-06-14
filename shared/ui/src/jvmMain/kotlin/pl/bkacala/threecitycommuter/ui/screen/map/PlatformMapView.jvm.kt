@@ -21,6 +21,11 @@ import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 
+private val DEFAULT_CENTER = LatLng(54.3520, 18.6466)
+private val SELECTED_STOP_COLOR = Color(0xFF6750A4)
+private val DEFAULT_STOP_COLOR = Color(0xFF1976D2)
+private val ROUTE_COLOR = Color(0xFF6750A4)
+
 @Composable
 actual fun PlatformMapView(
     modifier: Modifier,
@@ -35,7 +40,7 @@ actual fun PlatformMapView(
     onMapClicked: () -> Unit,
     mapBottomPadding: Dp,
 ) {
-    val center = cameraTarget ?: LatLng(54.3520, 18.6466)
+    val center = cameraTarget ?: DEFAULT_CENTER
 
     Box(
         modifier = modifier
@@ -56,7 +61,7 @@ actual fun PlatformMapView(
                 if (x in 0f..size.width && y in 0f..size.height) {
                     val isSelected = stop == selectedBusStop
                     drawCircle(
-                        color = if (isSelected) Color(0xFF6750A4) else Color(0xFF1976D2),
+                        color = if (isSelected) SELECTED_STOP_COLOR else DEFAULT_STOP_COLOR,
                         radius = if (isSelected) 8f else 4f,
                         center = Offset(x, y),
                     )
@@ -72,7 +77,7 @@ actual fun PlatformMapView(
                         val endX = ((routePoints[i + 1].longitude - center.longitude) * 10000 + size.width / 2).toFloat()
                         val endY = (-(routePoints[i + 1].latitude - center.latitude) * 10000 + size.height / 2).toFloat()
                         drawLine(
-                            color = Color(0xFF6750A4),
+                            color = ROUTE_COLOR,
                             start = Offset(startX, startY),
                             end = Offset(endX, endY),
                             strokeWidth = 3f,
@@ -119,7 +124,7 @@ actual fun PlatformMapView(
         )
 
         Text(
-            text = "${busStops.size} przystanków",
+            text = "${busStops.size} przystankow",
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = mapBottomPadding + 8.dp),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
@@ -128,3 +133,4 @@ actual fun PlatformMapView(
 }
 
 private fun Double.format(digits: Int): String = String.format("%.${digits}f", this)
+

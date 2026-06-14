@@ -30,9 +30,14 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
         }
         androidMain.dependencies {
-            // Mapbox requires MAPBOX_DOWNLOADS_TOKEN in gradle.properties to resolve
-            // implementation(libs.mapbox.maps.android)
-            // implementation(libs.mapbox.maps.compose)
+            // MapLibre Compose - open-source fork of Mapbox GL
+            implementation(libs.maplibre.compose)
+            // MapLibre Native (optional, for lower-level API access)
+            // implementation(libs.maplibre.native)
+        }
+        jvmMain.dependencies {
+            // MapLibre Compose works on JVM (Desktop) too
+            implementation(libs.maplibre.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

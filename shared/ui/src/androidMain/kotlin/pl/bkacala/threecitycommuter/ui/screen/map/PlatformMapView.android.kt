@@ -21,8 +21,10 @@ import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 
-// TODO: Replace with Mapbox Compose SDK implementation once MAPBOX_DOWNLOADS_TOKEN is configured.
-// See PlatformMapView.android.kt.mapbox for the full Mapbox implementation.
+private val DEFAULT_CENTER = LatLng(54.3520, 18.6466)
+private val SELECTED_STOP_COLOR = Color(0xFF6750A4)
+private val DEFAULT_STOP_COLOR = Color(0xFF1976D2)
+private val ROUTE_COLOR = Color(0xFF6750A4)
 
 @Composable
 actual fun PlatformMapView(
@@ -38,7 +40,7 @@ actual fun PlatformMapView(
     onMapClicked: () -> Unit,
     mapBottomPadding: Dp,
 ) {
-    val center = cameraTarget ?: LatLng(54.3520, 18.6466)
+    val center = cameraTarget ?: DEFAULT_CENTER
 
     Box(
         modifier = modifier
@@ -51,6 +53,7 @@ actual fun PlatformMapView(
             },
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
+            // Draw bus stops as dots
             busStops.forEach { stop ->
                 val x = ((stop.position.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
                 val y = (-(stop.position.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
@@ -58,13 +61,14 @@ actual fun PlatformMapView(
                 if (x in 0f..size.width && y in 0f..size.height) {
                     val isSelected = stop == selectedBusStop
                     drawCircle(
-                        color = if (isSelected) Color(0xFF6750A4) else Color(0xFF1976D2),
+                        color = if (isSelected) SELECTED_STOP_COLOR else DEFAULT_STOP_COLOR,
                         radius = if (isSelected) 8f else 4f,
                         center = Offset(x, y),
                     )
                 }
             }
 
+            // Draw route
             route?.let { routePoints ->
                 if (routePoints.size >= 2) {
                     for (i in 0 until routePoints.size - 1) {
@@ -73,7 +77,7 @@ actual fun PlatformMapView(
                         val endX = ((routePoints[i + 1].longitude - center.longitude) * 10000 + size.width / 2).toFloat()
                         val endY = (-(routePoints[i + 1].latitude - center.latitude) * 10000 + size.height / 2).toFloat()
                         drawLine(
-                            color = Color(0xFF6750A4),
+                            color = ROUTE_COLOR,
                             start = Offset(startX, startY),
                             end = Offset(endX, endY),
                             strokeWidth = 3f,
@@ -82,27 +86,51 @@ actual fun PlatformMapView(
                 }
             }
 
+            // Draw tracked vehicle
             trackedVehicle?.let { vehicle ->
                 val vx = ((vehicle.position.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
                 val vy = (-(vehicle.position.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
-                drawCircle(color = Color(0xFF6750A4), radius = 10f, center = Offset(vx, vy))
+                drawCircle(
+                    color = Color(0xFF6750A4),
+                    radius = 10f,
+                    center = Offset(vx, vy),
+                )
             }
 
+            // Draw user location
             userLocation?.let { location ->
                 if (!location.isFixed) {
                     val ux = ((location.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
                     val uy = (-(location.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
-                    drawCircle(color = Color(0xFF6750A4), radius = 8f, center = Offset(ux, uy))
-                    drawCircle(color = Color.White, radius = 5f, center = Offset(ux, uy))
+                    drawCircle(
+                        color = Color(0xFF6750A4),
+                        radius = 8f,
+                        center = Offset(ux, uy),
+                    )
+                    drawCircle(
+                        color = Color.White,
+                        radius = 5f,
+                        center = Offset(ux, uy),
+                    )
                 }
             }
         }
 
         Text(
-            text = "Map Placeholder — ${busStops.size} przystanków",
+            text = "Android Map Preview (${center.latitude.format(4)}, ${center.longitude.format(4)})",
             modifier = Modifier.align(Alignment.TopCenter).padding(8.dp),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        )
+
+        Text(
+            text = "${busStops.size} przystankow",
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = mapBottomPadding + 8.dp),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
         )
     }
 }
+
+private fun Double.format(digits: Int): String = String.format("%.${digits}f", this)
+
