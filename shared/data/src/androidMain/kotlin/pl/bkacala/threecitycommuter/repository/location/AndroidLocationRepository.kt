@@ -13,12 +13,11 @@ import kotlinx.coroutines.flow.flowOn
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 
 internal class AndroidLocationRepository(
-    private val fusedLocationProviderClient: FusedLocationProviderClient
+    private val fusedLocationProviderClient: FusedLocationProviderClient,
 ) : LocationRepository {
 
     @SuppressLint("MissingPermission")
     override fun getLocation(): Flow<UserLocation> = callbackFlow {
-
         var isCancellationRequested = false
 
         val callback = object : CancellationToken() {
@@ -38,8 +37,8 @@ internal class AndroidLocationRepository(
                         UserLocation(
                             latitude = it.latitude,
                             longitude = it.longitude,
-                            isFixed = false
-                        )
+                            isFixed = false,
+                        ),
                     )
                 }
             }

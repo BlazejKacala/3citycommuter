@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
     private val busStopsRepository: BusStopsRepository by inject()
 
     private val locationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { _ -> }
 
     override fun onCreate(savedInstanceState: Bundle?) {

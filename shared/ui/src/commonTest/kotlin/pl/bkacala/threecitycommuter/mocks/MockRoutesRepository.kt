@@ -9,11 +9,11 @@ object MockRoutesRepository {
     val mockRoutesRepository = object : RoutesRepository {
         override fun getRoute(
             routeId: Int,
-            tripId: Int
+            tripId: Int,
         ): Flow<Route> {
             val mockPoints = listOf(
                 Route.GeoPoint(54.372158, 18.638306),
-                Route.GeoPoint(54.351959, 18.648064)
+                Route.GeoPoint(54.351959, 18.648064),
             )
             return flowOf(Route(mockPoints))
         }

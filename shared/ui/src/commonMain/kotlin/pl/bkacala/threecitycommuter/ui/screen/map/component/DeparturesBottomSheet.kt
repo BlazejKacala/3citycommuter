@@ -23,15 +23,15 @@ data class DeparturesBottomSheetModel(
 @Composable
 fun DeparturesBottomSheet(
     model: DeparturesBottomSheetModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
+            modifier = Modifier.verticalScroll(rememberScrollState()),
         ) {
             model.header.Widget()
             model.departures.fastForEachIndexed { index, it ->

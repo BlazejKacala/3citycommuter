@@ -12,7 +12,7 @@ fun LinesScreen() {
     Box(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Tu będzie lista linii autobusowych i tramwajowych",
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center),
         )
     }
 }

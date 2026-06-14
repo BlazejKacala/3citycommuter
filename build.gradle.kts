@@ -1,7 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -31,8 +31,8 @@ spotless {
         ktlint().editorConfigOverride(
             mapOf(
                 "ktlint_function_naming" to "disabled",
-                "ktlint_standard_function-naming" to "disabled"
-            )
+                "ktlint_standard_function-naming" to "disabled",
+            ),
         )
         trimTrailingWhitespace()
         indentWithSpaces(4)
@@ -43,8 +43,8 @@ spotless {
         ktlint().editorConfigOverride(
             mapOf(
                 "ktlint_function_naming" to "disabled",
-                "ktlint_standard_function-naming" to "disabled"
-            )
+                "ktlint_standard_function-naming" to "disabled",
+            ),
         )
         trimTrailingWhitespace()
         indentWithSpaces(4)
@@ -62,15 +62,15 @@ spotless {
 // Apply and configure Spotless for all subprojects
 subprojects {
     apply(plugin = "com.diffplug.spotless")
-    
+
     the<com.diffplug.gradle.spotless.SpotlessExtension>().apply {
         kotlin {
             target("**/*.kt")
             ktlint().editorConfigOverride(
                 mapOf(
                     "ktlint_function_naming" to "disabled",
-                    "ktlint_standard_function-naming" to "disabled"
-                )
+                    "ktlint_standard_function-naming" to "disabled",
+                ),
             )
             trimTrailingWhitespace()
             indentWithSpaces(4)
@@ -81,8 +81,8 @@ subprojects {
             ktlint().editorConfigOverride(
                 mapOf(
                     "ktlint_function_naming" to "disabled",
-                    "ktlint_standard_function-naming" to "disabled"
-                )
+                    "ktlint_standard_function-naming" to "disabled",
+                ),
             )
             trimTrailingWhitespace()
             indentWithSpaces(4)
@@ -94,7 +94,7 @@ subprojects {
 // Configure Detekt
 detekt {
     toolVersion = detektVersion
-    config.setFrom("${rootDir}/config/detekt/detekt.yml")
+    config.setFrom("$rootDir/config/detekt/detekt.yml")
     ignoreFailures = false
 }
 
@@ -110,10 +110,10 @@ tasks.withType<Detekt>().configureEach {
 // Apply and configure Detekt for all subprojects
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
-    
+
     the<DetektExtension>().apply {
         toolVersion = detektVersion
-        config.setFrom("${rootDir}/config/detekt/detekt.yml")
+        config.setFrom("$rootDir/config/detekt/detekt.yml")
         ignoreFailures = false
     }
 }
@@ -133,12 +133,12 @@ subprojects {
 tasks.register("lint") {
     description = "Runs all code quality checks (Spotless and Detekt)"
     group = "verification"
-    
+
     dependsOn(
         tasks.named("spotlessCheck"),
-        tasks.named("detekt")
+        tasks.named("detekt"),
     )
-    
+
     // Collect all subproject tasks
     val spotlessTasks = subprojects.mapNotNull { subproject ->
         subproject.tasks.findByName("spotlessCheck")
@@ -146,7 +146,7 @@ tasks.register("lint") {
     val detektTasks = subprojects.mapNotNull { subproject ->
         subproject.tasks.findByName("detekt")
     }
-    
+
     (spotlessTasks + detektTasks).forEach { task ->
         dependsOn(task)
     }

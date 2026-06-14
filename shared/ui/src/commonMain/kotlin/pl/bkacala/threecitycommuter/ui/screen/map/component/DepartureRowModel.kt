@@ -61,7 +61,7 @@ fun DepartureRowModel.Widget() {
                 vehicleId?.let {
                     onSelected(it)
                 }
-            }
+            },
     ) {
         Selection(isSelected.value)
         Row(
@@ -71,8 +71,8 @@ fun DepartureRowModel.Widget() {
                     top = Padding.small,
                     bottom = Padding.small,
                     start = Padding.large,
-                    end = Padding.normal
-                )
+                    end = Padding.normal,
+                ),
         ) {
             VehicleImage(vehicleType)
             Spacer(modifier = Modifier.width(Padding.large))
@@ -101,7 +101,7 @@ private fun Selection(selected: Boolean) {
         modifier = Modifier
             .width(2.dp)
             .fillMaxHeight()
-            .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
+            .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent),
     )
 }
 
@@ -122,7 +122,7 @@ private fun DepartureTime(model: DepartureRowModel) {
         if (isVisible.value) {
             Text(
                 text = model.departureTime,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }
@@ -134,10 +134,11 @@ private fun GPSIcon(gpsPosition: Boolean) {
         imageVector = if (gpsPosition) Icons.Outlined.GpsFixed else Icons.Rounded.GpsNotFixed,
         contentDescription = "Czy pozycja pojazdu jest dostępna",
         modifier = Modifier.size(24.dp),
-        tint = if (gpsPosition)
+        tint = if (gpsPosition) {
             MaterialTheme.colorScheme.secondary
-        else
+        } else {
             MaterialTheme.colorScheme.onSurfaceVariant
+        },
     )
 }
 
@@ -147,7 +148,7 @@ private fun BikesAllowedIcon() {
         imageVector = Icons.Rounded.DirectionsBike,
         contentDescription = "Można wsiąść z rowerem",
         modifier = Modifier.size(12.dp),
-        tint = MaterialTheme.colorScheme.onSurfaceVariant
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
 
@@ -157,23 +158,25 @@ private fun DisabledFriendlyIcon() {
         imageVector = Icons.Rounded.WheelchairPickup,
         contentDescription = "Dostosowany dla niepełnosprawnych",
         modifier = Modifier.size(12.dp),
-        tint = MaterialTheme.colorScheme.onSurfaceVariant
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
 
 @Composable
 private fun RowScope.Direction(direction: String) {
     Text(
-        text = direction, style = MaterialTheme.typography.bodyMedium,
+        text = direction,
+        style = MaterialTheme.typography.bodyMedium,
         maxLines = 2,
-        modifier = Modifier.weight(1f)
+        modifier = Modifier.weight(1f),
     )
 }
 
 @Composable
 private fun LineNumber(lineNumber: String) {
     Text(
-        text = lineNumber, style = MaterialTheme.typography.titleLarge
+        text = lineNumber,
+        style = MaterialTheme.typography.titleLarge,
     )
 }
 
@@ -188,6 +191,6 @@ private fun VehicleImage(vehicleType: VehicleType) {
         imageVector = image,
         contentDescription = "typ pojazdu",
         modifier = Modifier.size(18.dp),
-        tint = MaterialTheme.colorScheme.onSurfaceVariant
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }

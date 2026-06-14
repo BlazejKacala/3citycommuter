@@ -48,7 +48,7 @@ class MapScreenViewModel(
     private val permissionChecker: PermissionChecker,
     private val vehiclesRepository: VehiclesRepository,
     private val getDeparturesUseCase: GetDeparturesUseCase,
-    private val routesRepository: RoutesRepository
+    private val routesRepository: RoutesRepository,
 ) : ViewModel() {
 
     private var updateDeparturesJob: Job? = null
@@ -69,9 +69,11 @@ class MapScreenViewModel(
     val departures: StateFlow<DeparturesBottomSheetModel?> = _departures
     val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
     val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
+    val selectedDeparture: StateFlow<DepartureRowModel?> = _selectedDeparture
     val route: StateFlow<List<LatLng>?> = _route
     val trackedVehicle: StateFlow<TrackedVehicle?> = _trackedVehicle
-    val errors: SharedFlow<Throwable> = _errorFlow
+    val cameraFocusFlow: SharedFlow<LatLng?> = _cameraFocusFlow
+    val errorFlow: SharedFlow<Throwable> = _errorFlow
 
     val centerOnPositionVisibility = _location
         .map { !it.isFixed }
@@ -97,7 +99,7 @@ class MapScreenViewModel(
                         }
                     }
             }
-        }
+        },
     )
 
     init {
@@ -184,7 +186,7 @@ class MapScreenViewModel(
             _selectedDeparture.value?.let { departureRowModel ->
                 routesRepository.getRoute(
                     routeId = departureRowModel.routeId,
-                    tripId = departureRowModel.tripId
+                    tripId = departureRowModel.tripId,
                 ).catch { _errorFlow.emit(it) }.collectLatest {
                     _route.value = it.shape.map { geoPoint ->
                         LatLng(geoPoint.latitude, geoPoint.longitude)
@@ -206,7 +208,7 @@ class MapScreenViewModel(
                                 busStopData = selected.data,
                                 departures = departures.distinctBy { it.first.vehicleId },
                                 selectedDeparture = _selectedDeparture.value,
-                                onSelected = { onSelectDeparture(it) }
+                                onSelected = { onSelectDeparture(it) },
                             )
                     }
                 delay(1000 * 30)
@@ -243,13 +245,13 @@ class MapScreenViewModel(
                                     _cameraFocusFlow.emit(
                                         LatLng(
                                             vehiclePosition.lat,
-                                            vehiclePosition.lon
-                                        )
+                                            vehiclePosition.lon,
+                                        ),
                                     )
                                 }
                                 if (_selectedDeparture.value != null) {
                                     _trackedVehicle.emit(
-                                        mapToTrackedVehicle(vehiclePosition, _selectedDeparture.value!!)
+                                        mapToTrackedVehicle(vehiclePosition, _selectedDeparture.value!!),
                                     )
                                 }
                             }

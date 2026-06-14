@@ -12,7 +12,7 @@ fun <T> Flow<T>.stateInViewModelScope(
     viewModel: ViewModel,
     scope: CoroutineScope = viewModel.viewModelScope,
     started: SharingStarted = SharingStarted.WhileSubscribed(5_000),
-    initialValue: T
+    initialValue: T,
 ): StateFlow<T> {
     return this.stateIn(scope, started, initialValue)
 }

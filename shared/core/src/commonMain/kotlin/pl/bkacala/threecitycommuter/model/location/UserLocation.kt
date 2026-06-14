@@ -6,13 +6,13 @@ data class UserLocation(
     /**
      * if true then real location isn't available and it's fixed on Gdańsk Główny station.
      */
-    val isFixed: Boolean
+    val isFixed: Boolean,
 ) {
     companion object Factory {
         fun default(): UserLocation = UserLocation(
             latitude = 54.3552444,
             longitude = 18.6465378,
-            isFixed = true
+            isFixed = true,
         )
     }
 }

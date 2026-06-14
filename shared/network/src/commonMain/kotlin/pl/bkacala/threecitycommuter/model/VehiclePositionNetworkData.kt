@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VehiclePositionsNetworkData(
-    @SerialName("vehicles") val vehiclePositions: List<VehiclePositionNetworkData>
+    @SerialName("vehicles") val vehiclePositions: List<VehiclePositionNetworkData>,
 )
 
 @Serializable
@@ -24,5 +24,5 @@ data class VehiclePositionNetworkData(
     @SerialName("scheduledTripStartTime") val scheduledTripStartTime: Instant?,
     @SerialName("lat") val lat: Double,
     @SerialName("lon") val lon: Double,
-    @SerialName("gpsQuality") val gpsQuality: Int?
+    @SerialName("gpsQuality") val gpsQuality: Int?,
 )

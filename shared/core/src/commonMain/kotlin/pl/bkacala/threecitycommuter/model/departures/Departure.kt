@@ -16,5 +16,5 @@ data class Departure(
     val trip: Long?,
     val vehicleCode: Int?,
     val vehicleId: Long?,
-    val vehicleService: String?
+    val vehicleService: String?,
 )

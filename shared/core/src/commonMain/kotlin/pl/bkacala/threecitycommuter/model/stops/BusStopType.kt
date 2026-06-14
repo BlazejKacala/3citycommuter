@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 class BusStopType(
     val stopId: Int,
     val isForBuses: Boolean,
-    val isForTrams: Boolean
+    val isForTrams: Boolean,
 )

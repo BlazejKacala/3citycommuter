@@ -25,5 +25,5 @@ data class BusStopData(
     val wheelchairBoarding: String?,
     val isForBuses: Boolean,
     val isForTrams: Boolean,
-    val name: String = stopName ?: stopShortName ?: stopDesc ?: ""
+    val name: String = stopName ?: stopShortName ?: stopDesc ?: "",
 )

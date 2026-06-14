@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VehiclesNetworkData(
-    val results: List<VehicleNetworkData>
+    val results: List<VehicleNetworkData>,
 )
 
 @Serializable
@@ -36,5 +36,5 @@ data class VehicleNetworkData(
     val ticketMachine: Boolean,
     val patron: String,
     val url: String,
-    val passengersDoors: Int
+    val passengersDoors: Int,
 )

@@ -20,7 +20,7 @@ private const val VEHICLES = "vehicles_key"
 internal class RealVehiclesRepository(
     private val vehiclesDao: VehiclesDao,
     private val networkClient: NetworkClient,
-    private val lastUpdateRepository: LastUpdateRepository
+    private val lastUpdateRepository: LastUpdateRepository,
 ) : VehiclesRepository {
 
     override suspend fun updateVehiclesBase() {
@@ -47,7 +47,7 @@ internal class RealVehiclesRepository(
             emit(
                 networkClient.getVehiclesPositions().vehiclePositions
                     .firstOrNull { it.vehicleId == vehicleId }
-                    ?.toVehiclePosition()
+                    ?.toVehiclePosition(),
             )
         }
     }

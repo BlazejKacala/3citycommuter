@@ -27,24 +27,24 @@ object DeparturesMapper {
         busStopData: BusStopData,
         departures: List<Pair<Departure, Vehicle?>>,
         selectedDeparture: DepartureRowModel?,
-        onSelected: (vehicleId: Long) -> Unit
+        onSelected: (vehicleId: Long) -> Unit,
     ): DeparturesBottomSheetModel {
         return DeparturesBottomSheetModel(
             header = DeparturesHeaderModel(
                 busStopName = busStopData.name,
-                isForDemand = busStopData.onDemand
+                isForDemand = busStopData.onDemand,
             ),
             departures = departures.map {
                 val (departure, vehicle) = it
                 departure.mapToUiRow(vehicle, selectedDeparture, onSelected)
-            }
+            },
         )
     }
 
     private fun Departure.mapToUiRow(
         vehicle: Vehicle?,
         selectedDeparture: DepartureRowModel?,
-        onSelected: (vehicleId: Long) -> Unit
+        onSelected: (vehicleId: Long) -> Unit,
     ): DepartureRowModel {
         val now = Clock.System.now().epochSeconds
         val minutesToArrival = minutesToArrival(this.estimatedTime, now)
@@ -61,10 +61,16 @@ object DeparturesMapper {
             vehicleId = this.vehicleId,
             routeId = this.routeId,
             tripId = this.tripId,
-            onSelected = onSelected
+            onSelected = onSelected,
         )
     }
 
     private fun departureTime(minutesToArrival: Int) =
-        if (minutesToArrival == -1) "brak danych" else if (minutesToArrival == 0) "teraz" else "$minutesToArrival min"
+        if (minutesToArrival == -1) {
+            "brak danych"
+        } else if (minutesToArrival == 0) {
+            "teraz"
+        } else {
+            "$minutesToArrival min"
+        }
 }

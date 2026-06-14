@@ -31,7 +31,7 @@ fun VehicleNetworkData.toVehicleEntity(): VehicleEntity {
         ticketMachine = this.ticketMachine,
         patron = this.patron,
         url = this.url,
-        passengersDoors = this.passengersDoors
+        passengersDoors = this.passengersDoors,
     )
 }
 
@@ -63,7 +63,7 @@ fun VehicleEntity.toVehicle(): Vehicle {
         ticketMachine = this.ticketMachine,
         patron = this.patron,
         url = this.url,
-        passengersDoors = this.passengersDoors
+        passengersDoors = this.passengersDoors,
     )
 }
 
@@ -82,6 +82,6 @@ fun VehiclePositionNetworkData.toVehiclePosition(): VehiclePosition {
         scheduledTripStartTime = scheduledTripStartTime,
         lat = lat,
         lon = lon,
-        gpsQuality = gpsQuality
+        gpsQuality = gpsQuality,
     )
 }

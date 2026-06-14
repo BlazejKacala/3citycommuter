@@ -6,11 +6,13 @@ import pl.bkacala.threecitycommuter.model.stops.BusStopData
 
 @Stable
 class BusStopMapItem(
-    busStopItem: BusStopData
+    busStopItem: BusStopData,
 ) {
 
     enum class Type {
-        Bus, Tram, Both
+        Bus,
+        Tram,
+        Both,
     }
 
     val position = LatLng(busStopItem.stopLat, busStopItem.stopLon)

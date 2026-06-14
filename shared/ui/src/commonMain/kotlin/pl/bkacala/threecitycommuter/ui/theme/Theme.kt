@@ -13,7 +13,7 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = Accent,
     surface = BackgroundDark,
     onSurface = PrimaryTextDark,
-    onSurfaceVariant = SecondaryTextDark
+    onSurfaceVariant = SecondaryTextDark,
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -22,7 +22,7 @@ private val LightColorScheme = lightColorScheme(
     tertiary = Accent,
     surface = Background,
     onSurface = PrimaryTextLight,
-    onSurfaceVariant = SecondaryTextLight
+    onSurfaceVariant = SecondaryTextLight,
 )
 
 object Padding {
@@ -35,7 +35,7 @@ object Padding {
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         darkTheme -> DarkColorScheme
@@ -45,6 +45,6 @@ fun AppTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

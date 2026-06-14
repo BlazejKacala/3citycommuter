@@ -26,7 +26,7 @@ class SerializationTest {
             respond(
                 content = body,
                 status = HttpStatusCode.OK,
-                headers = headersOf(HttpHeaders.ContentType, "application/json")
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
             )
         }
         val httpClient = HttpClient(engine = mockEngine) {

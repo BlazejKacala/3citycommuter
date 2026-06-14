@@ -1,7 +1,6 @@
 package pl.bkacala.threecitycommuter.model
 
 import kotlin.math.PI
-import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -9,7 +8,7 @@ import kotlin.math.sqrt
 
 data class LatLng(
     val latitude: Double,
-    val longitude: Double
+    val longitude: Double,
 )
 
 private const val EARTH_RADIUS_METERS = 6371000.0

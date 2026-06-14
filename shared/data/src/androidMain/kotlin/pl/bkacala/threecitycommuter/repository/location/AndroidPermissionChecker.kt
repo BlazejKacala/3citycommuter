@@ -9,7 +9,7 @@ class AndroidPermissionChecker(private val context: Context) : PermissionChecker
     override fun isLocationPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION,
         ) == PackageManager.PERMISSION_GRANTED
     }
 }

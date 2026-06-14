@@ -47,7 +47,6 @@ import pl.bkacala.threecitycommuter.ui.screen.map.search.BusSearchBar
 @Composable
 fun MapScreen(snackbarHostState: SnackbarHostState) {
     BoxWithConstraints {
-
         val viewModel = koinViewModel<MapScreenViewModel>()
 
         TraceLifecycleEvents(viewModel)
@@ -93,14 +92,14 @@ fun MapScreen(snackbarHostState: SnackbarHostState) {
             onBusStopSelected = { viewModel.onBusStopSelected(it) },
             onMapClicked = { viewModel.onMapClicked() },
             route = viewModel.route.collectAsStateWithLifecycle().value,
-            mapBottomPadding = if (departuresModel == null) 0.dp else mapBottomPadding.value
+            mapBottomPadding = if (departuresModel == null) 0.dp else mapBottomPadding.value,
         )
 
         val displayCenterOnLocationButton =
             viewModel.centerOnPositionVisibility.collectAsStateWithLifecycle().value
         if (displayCenterOnLocationButton) {
             CenterOnLocationButton(
-                onClicked = { viewModel.centerOnUserPosition() }
+                onClicked = { viewModel.centerOnUserPosition() },
             )
         }
 
@@ -110,7 +109,7 @@ fun MapScreen(snackbarHostState: SnackbarHostState) {
             LinearProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
+                    .align(Alignment.BottomCenter),
             )
         }
         DeparturesSheet(departuresModel) {
@@ -123,12 +122,12 @@ fun MapScreen(snackbarHostState: SnackbarHostState) {
 private fun ErrorSnackbar(
     busStops: UiState<List<BusStopMapItem>>,
     snackbarHostState: SnackbarHostState,
-    viewModel: MapScreenViewModel
+    viewModel: MapScreenViewModel,
 ) {
     LaunchedEffect(busStops) {
         val result = snackbarHostState.showSnackbar(
             message = "Nie udało się wczytać przystanków",
-            actionLabel = "Spróbuj ponownie"
+            actionLabel = "Spróbuj ponownie",
         )
         when (result) {
             SnackbarResult.Dismissed -> {}
@@ -142,7 +141,7 @@ private fun ErrorSnackbar(
 @Composable
 fun HandleErrorFlow(viewModel: MapScreenViewModel, snackbarHostState: SnackbarHostState) {
     LaunchedEffect(viewModel) {
-        viewModel.errors.collectLatest {
+        viewModel.errorFlow.collectLatest {
             it.printStackTrace()
             snackbarHostState.showSnackbar("Nie udało się wczytać danych")
         }
@@ -156,18 +155,18 @@ fun BoxWithConstraintsScope.CenterOnLocationButton(onClicked: () -> Unit) {
             .absoluteOffset(x = maxWidth.minus(73.dp), y = 120.dp)
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = CircleShape
+                shape = CircleShape,
             )
             .size(58.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onClicked() }
+                indication = null,
+            ) { onClicked() },
     ) {
         Icon(
             imageVector = Icons.Default.GpsFixed,
             contentDescription = "Wycentruj na twojej pozycji",
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center),
         )
     }
 }
@@ -198,7 +197,7 @@ private fun TraceLifecycleEvents(viewModel: MapScreenViewModel) {
 @Composable
 private fun BoxWithConstraintsScope.DeparturesSheet(
     departuresModel: DeparturesBottomSheetModel?,
-    maxSizeListener: (maxSize: Dp) -> Unit
+    maxSizeListener: (maxSize: Dp) -> Unit,
 ) {
     val density = LocalDensity.current
 
@@ -212,7 +211,7 @@ private fun BoxWithConstraintsScope.DeparturesSheet(
         },
         modifier = Modifier
             .align(Alignment.BottomCenter)
-            .heightIn(min = 0.dp, max = maxHeight * 2 / 5)
+            .heightIn(min = 0.dp, max = maxHeight * 2 / 5),
     ) {
         departuresModel?.let {
             DeparturesBottomSheet(

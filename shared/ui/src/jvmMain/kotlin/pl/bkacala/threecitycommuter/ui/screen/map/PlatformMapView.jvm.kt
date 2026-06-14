@@ -2,7 +2,6 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -47,7 +45,7 @@ actual fun PlatformMapView(
                 detectTapGestures {
                     onMapClicked()
                 }
-            }
+            },
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             // Draw bus stops as dots
@@ -60,7 +58,7 @@ actual fun PlatformMapView(
                     drawCircle(
                         color = if (isSelected) Color(0xFF6750A4) else Color(0xFF1976D2),
                         radius = if (isSelected) 8f else 4f,
-                        center = Offset(x, y)
+                        center = Offset(x, y),
                     )
                 }
             }
@@ -77,7 +75,7 @@ actual fun PlatformMapView(
                             color = Color(0xFF6750A4),
                             start = Offset(startX, startY),
                             end = Offset(endX, endY),
-                            strokeWidth = 3f
+                            strokeWidth = 3f,
                         )
                     }
                 }
@@ -90,7 +88,7 @@ actual fun PlatformMapView(
                 drawCircle(
                     color = Color(0xFF6750A4),
                     radius = 10f,
-                    center = Offset(vx, vy)
+                    center = Offset(vx, vy),
                 )
             }
 
@@ -102,12 +100,12 @@ actual fun PlatformMapView(
                     drawCircle(
                         color = Color(0xFF6750A4),
                         radius = 8f,
-                        center = Offset(ux, uy)
+                        center = Offset(ux, uy),
                     )
                     drawCircle(
                         color = Color.White,
                         radius = 5f,
-                        center = Offset(ux, uy)
+                        center = Offset(ux, uy),
                     )
                 }
             }
@@ -117,14 +115,14 @@ actual fun PlatformMapView(
             text = "Desktop Map Preview (${center.latitude.format(4)}, ${center.longitude.format(4)})",
             modifier = Modifier.align(Alignment.TopCenter).padding(8.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
         )
 
         Text(
             text = "${busStops.size} przystanków",
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = mapBottomPadding + 8.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
         )
     }
 }

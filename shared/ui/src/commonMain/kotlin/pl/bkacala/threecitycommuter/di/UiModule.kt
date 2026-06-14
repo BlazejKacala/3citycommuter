@@ -12,7 +12,7 @@ val uiModule = module {
             permissionChecker = get(),
             vehiclesRepository = get(),
             getDeparturesUseCase = get(),
-            routesRepository = get()
+            routesRepository = get(),
         )
     }
 }

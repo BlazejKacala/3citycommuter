@@ -16,5 +16,5 @@ data class VehiclePosition(
     val scheduledTripStartTime: Instant?,
     val lat: Double,
     val lon: Double,
-    val gpsQuality: Int?
+    val gpsQuality: Int?,
 )

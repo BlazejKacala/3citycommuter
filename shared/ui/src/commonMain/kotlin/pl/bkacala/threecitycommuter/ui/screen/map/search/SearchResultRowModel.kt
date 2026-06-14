@@ -23,7 +23,7 @@ data class SearchResultRowModel(
     val distance: String,
     val isForBuses: Boolean,
     val isForTrams: Boolean,
-    val onClicked: () -> Unit
+    val onClicked: () -> Unit,
 )
 
 @Composable
@@ -33,20 +33,20 @@ fun SearchResultRowModel.Widget() {
             .fillMaxWidth()
             .clickable { onClicked() }
             .padding(horizontal = Padding.big, vertical = Padding.normal),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         if (isForTrams) {
             Icon(
                 imageVector = Icons.Filled.Tram,
                 contentDescription = "Przystanek tramwajowy",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         if (isForBuses) {
             Icon(
                 imageVector = Icons.Filled.DirectionsBus,
                 contentDescription = "Przystanek autobusowy",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Spacer(modifier = Modifier.width(Padding.normal))
@@ -55,7 +55,7 @@ fun SearchResultRowModel.Widget() {
             Text(
                 text = distance,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

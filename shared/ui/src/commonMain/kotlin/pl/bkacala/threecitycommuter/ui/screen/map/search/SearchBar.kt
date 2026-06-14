@@ -39,18 +39,18 @@ fun BoxScope.BusSearchBar(
                     contentDescription = "kasowajka",
                     modifier = Modifier.clickable {
                         searchBarModel.onQueryChanged("")
-                    }
+                    },
                 )
             }
         },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Outlined.Search,
-                contentDescription = "szukajka"
+                contentDescription = "szukajka",
             )
         },
         placeholder = { Text(text = "Szukaj przystanku") },
-        colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background)
+        colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
     ) {
         val searchResult = searchBarModel.results.collectAsStateWithLifecycle().value
         LazyColumn {

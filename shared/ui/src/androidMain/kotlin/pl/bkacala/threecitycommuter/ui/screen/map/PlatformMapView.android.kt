@@ -48,7 +48,7 @@ actual fun PlatformMapView(
                 detectTapGestures {
                     onMapClicked()
                 }
-            }
+            },
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             busStops.forEach { stop ->
@@ -60,7 +60,7 @@ actual fun PlatformMapView(
                     drawCircle(
                         color = if (isSelected) Color(0xFF6750A4) else Color(0xFF1976D2),
                         radius = if (isSelected) 8f else 4f,
-                        center = Offset(x, y)
+                        center = Offset(x, y),
                     )
                 }
             }
@@ -76,7 +76,7 @@ actual fun PlatformMapView(
                             color = Color(0xFF6750A4),
                             start = Offset(startX, startY),
                             end = Offset(endX, endY),
-                            strokeWidth = 3f
+                            strokeWidth = 3f,
                         )
                     }
                 }
@@ -102,7 +102,7 @@ actual fun PlatformMapView(
             text = "Map Placeholder — ${busStops.size} przystanków",
             modifier = Modifier.align(Alignment.TopCenter).padding(8.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
         )
     }
 }

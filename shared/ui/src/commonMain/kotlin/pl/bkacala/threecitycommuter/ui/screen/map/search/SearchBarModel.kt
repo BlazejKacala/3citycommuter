@@ -17,7 +17,7 @@ class SearchBarModel(
     private val busStops: MutableStateFlow<UiState<List<BusStopMapItem>>>,
     private val userLocation: MutableStateFlow<UserLocation>,
     private val scope: CoroutineScope,
-    private val onResultClicked: (id: Int) -> Unit
+    private val onResultClicked: (id: Int) -> Unit,
 ) {
     val isActive: StateFlow<Boolean> = _isActive
     val query: StateFlow<String> = _query
@@ -40,7 +40,7 @@ class SearchBarModel(
                     Pair(
                         it,
                         it.position.sphericalDistance(LatLng(location.latitude, location.longitude))
-                            .toInt()
+                            .toInt(),
                     )
                 }.sortedBy { it.second }.map {
                     val (item, distance) = it
@@ -52,7 +52,7 @@ class SearchBarModel(
                         onClicked = {
                             _isActive.value = false
                             onResultClicked(item.id)
-                        }
+                        },
                     )
                 }
             }
@@ -60,10 +60,11 @@ class SearchBarModel(
     }
 
     private fun getDistanceString(distance: Int, userLocation: UserLocation): String {
-        return if (userLocation.isFixed)
+        return if (userLocation.isFixed) {
             "Odległość od przystanka nieznana, brak Twojej lokalizacji"
-        else
+        } else {
             "Przystanek odległy o ${distance}m"
+        }
     }
 
     fun onSearchBarActiveChange() {

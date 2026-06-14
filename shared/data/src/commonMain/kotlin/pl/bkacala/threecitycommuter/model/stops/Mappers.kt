@@ -27,7 +27,7 @@ fun BusStopEntity.toStopData(isForBuses: Boolean, isForTrams: Boolean): BusStopD
         stopTimezone = this.stopTimezone,
         wheelchairBoarding = this.wheelchairBoarding,
         isForBuses = isForBuses,
-        isForTrams = isForTrams
+        isForTrams = isForTrams,
     )
 }
 
@@ -54,7 +54,7 @@ fun BusStopsNetworkData.BusStopNetworkData.toEntity(): BusStopEntity {
         locationType = this.locationType,
         parentStation = this.parentStation,
         stopTimezone = this.stopTimezone,
-        wheelchairBoarding = this.wheelchairBoarding
+        wheelchairBoarding = this.wheelchairBoarding,
     )
 }
 
@@ -62,7 +62,7 @@ fun BusStopType.toEntity(): BusStopTypeEntity {
     return BusStopTypeEntity(
         busStopId = this.stopId,
         isForBuses = this.isForBuses,
-        isForTrams = this.isForTrams
+        isForTrams = this.isForTrams,
     )
 }
 
@@ -70,6 +70,6 @@ fun BusStopTypeEntity.toData(): BusStopType {
     return BusStopType(
         stopId = this.busStopId,
         isForBuses = this.isForBuses,
-        isForTrams = this.isForTrams
+        isForTrams = this.isForTrams,
     )
 }

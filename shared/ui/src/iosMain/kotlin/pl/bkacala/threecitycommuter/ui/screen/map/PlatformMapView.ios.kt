@@ -43,13 +43,13 @@ actual fun PlatformMapView(
                 detectTapGestures {
                     onMapClicked()
                 }
-            }
+            },
     ) {
         Text(
             text = "iOS Map — ${busStops.size} przystanków",
             modifier = Modifier.align(Alignment.Center).padding(16.dp),
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

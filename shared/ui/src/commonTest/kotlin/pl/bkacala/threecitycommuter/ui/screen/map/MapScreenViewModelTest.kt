@@ -362,7 +362,7 @@ class MapScreenViewModelTest {
             advanceTimeBy(200)
             val stop = busStopsFrom(vm).first()
 
-            vm.errors.test {
+            vm.errorFlow.test {
                 vm.onBusStopSelected(stop)
                 val error = awaitItem()
                 error.message shouldBe "Departures unavailable"

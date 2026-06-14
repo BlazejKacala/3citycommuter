@@ -10,6 +10,6 @@ fun RouteNetworkData.mapToRoute(): Route {
             } else {
                 null
             }
-        }
+        },
     )
 }

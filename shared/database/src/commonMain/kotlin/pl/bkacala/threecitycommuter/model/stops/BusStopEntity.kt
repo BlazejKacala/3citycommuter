@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "bus_stops"
+    tableName = "bus_stops",
 )
 data class BusStopEntity(
     @PrimaryKey

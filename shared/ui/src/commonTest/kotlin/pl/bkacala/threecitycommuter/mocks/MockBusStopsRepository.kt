@@ -19,9 +19,9 @@ object MockBusStopsRepository {
                 listOf(
                     makeRandomInstance<BusStopData>().copy(
                         stopLat = UserLocation.default().latitude,
-                        stopLon = UserLocation.default().longitude
-                    )
-                )
+                        stopLon = UserLocation.default().longitude,
+                    ),
+                ),
             )
         }
 

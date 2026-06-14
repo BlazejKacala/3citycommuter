@@ -17,6 +17,6 @@ fun DepartureNetworkData.toDepartureData(): Departure {
         trip = this.trip,
         vehicleCode = this.vehicleCode,
         vehicleId = this.vehicleId,
-        vehicleService = this.vehicleService
+        vehicleService = this.vehicleService,
     )
 }

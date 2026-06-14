@@ -10,14 +10,14 @@ object TrackedVehicleMapper {
 
     fun mapToTrackedVehicle(
         vehiclePosition: VehiclePosition,
-        departure: DepartureRowModel
+        departure: DepartureRowModel,
     ): TrackedVehicle {
         return TrackedVehicle(
             type = departure.vehicleType,
             delay = vehiclePosition.delay.toString(),
             position = LatLng(vehiclePosition.lat, vehiclePosition.lon),
             number = departure.lineNumber,
-            gpsQuality = getGpsQuality(vehiclePosition.gpsQuality)
+            gpsQuality = getGpsQuality(vehiclePosition.gpsQuality),
         )
     }
 

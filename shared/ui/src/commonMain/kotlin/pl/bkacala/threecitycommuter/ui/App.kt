@@ -25,7 +25,7 @@ fun App() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .padding(paddingValues),
                 ) {
                     AppNavHost(navController = navController, snackbarHostState = snackbarHostState)
                 }

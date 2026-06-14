@@ -23,10 +23,10 @@ data class DepartureNetworkData(
     val trip: Long?,
     val vehicleCode: Int?,
     val vehicleId: Long?,
-    val vehicleService: String?
+    val vehicleService: String?,
 )
 
 @Serializable
 data class DepartureList(
-    val departures: List<DepartureNetworkData>
+    val departures: List<DepartureNetworkData>,
 )

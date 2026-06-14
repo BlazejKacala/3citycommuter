@@ -48,15 +48,15 @@ fun StationIcon(type: BusStopMapItem.Type, isSelected: Boolean) {
                     drawOval(
                         color = color,
                         size = Size(8.dp.toPx(), 8.dp.toPx()),
-                        topLeft = Offset(0f, 4.dp.toPx())
+                        topLeft = Offset(0f, 4.dp.toPx()),
                     )
                     drawLine(
                         color = color,
                         start = Offset(4.dp.toPx(), 6.dp.toPx()),
                         end = Offset(4.dp.toPx(), 22.dp.toPx()),
-                        strokeWidth = 2.dp.toPx()
+                        strokeWidth = 2.dp.toPx(),
                     )
-                }
+                },
             )
         }
     }
@@ -65,20 +65,20 @@ fun StationIcon(type: BusStopMapItem.Type, isSelected: Boolean) {
 @Composable
 fun MapMarkerBackground(
     color: Color,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Box(
         Modifier
             .background(
                 shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.background
+                color = MaterialTheme.colorScheme.background,
             )
             .border(
                 width = 1.dp,
                 shape = RoundedCornerShape(8.dp),
-                color = color
+                color = color,
             )
-            .padding(2.dp)
+            .padding(2.dp),
     ) {
         content()
     }
@@ -92,20 +92,20 @@ fun ClusterMarker(size: Int) {
         modifier = Modifier
             .background(
                 color = MaterialTheme.colorScheme.background,
-                shape = CircleShape
+                shape = CircleShape,
             )
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.primary,
-                shape = CircleShape
+                shape = CircleShape,
             )
-            .size(28.dp)
+            .size(28.dp),
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.align(Alignment.Center)
+            modifier = Modifier.align(Alignment.Center),
         )
     }
 }

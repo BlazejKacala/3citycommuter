@@ -9,7 +9,7 @@ import pl.bkacala.threecitycommuter.repository.vehicles.VehiclesRepository
 
 class GetDeparturesUseCase(
     private val busStopsRepository: BusStopsRepository,
-    private val vehiclesRepository: VehiclesRepository
+    private val vehiclesRepository: VehiclesRepository,
 ) {
     fun getDepartures(stopId: Int): Flow<List<Pair<Departure, Vehicle?>>> {
         return busStopsRepository
@@ -18,7 +18,7 @@ class GetDeparturesUseCase(
                 departures.map { departure ->
                     Pair(
                         departure,
-                        vehicles.firstOrNull { it.vehicleCode.toInt() == departure.vehicleCode }
+                        vehicles.firstOrNull { it.vehicleCode.toInt() == departure.vehicleCode },
                     )
                 }
             }

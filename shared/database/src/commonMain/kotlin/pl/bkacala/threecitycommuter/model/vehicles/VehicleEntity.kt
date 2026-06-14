@@ -32,5 +32,5 @@ data class VehicleEntity(
     val ticketMachine: Boolean,
     val patron: String,
     val url: String,
-    val passengersDoors: Int
+    val passengersDoors: Int,
 )

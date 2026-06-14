@@ -44,7 +44,7 @@ internal class RealBusStopsRepository(
                         relation?.let {
                             entity.toStopData(it.isForBuses, it.isForTrams)
                         }
-                    }
+                    },
             )
         }.flowOn(Dispatchers.IO)
     }

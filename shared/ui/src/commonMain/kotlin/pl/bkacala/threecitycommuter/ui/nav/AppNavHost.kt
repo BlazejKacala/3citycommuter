@@ -14,7 +14,7 @@ fun AppNavHost(navController: NavHostController, snackbarHostState: SnackbarHost
     NavHost(navController = navController, startDestination = TopLvlDestinations.Map.route) {
         navigation(
             route = TopLvlDestinations.Map.route,
-            startDestination = Destinations.Maps.route
+            startDestination = Destinations.Maps.route,
         ) {
             composable(Destinations.Maps.route) {
                 MapScreen(snackbarHostState)
@@ -22,7 +22,7 @@ fun AppNavHost(navController: NavHostController, snackbarHostState: SnackbarHost
         }
         navigation(
             route = TopLvlDestinations.Schedule.route,
-            startDestination = Destinations.Lines.route
+            startDestination = Destinations.Lines.route,
         ) {
             composable(Destinations.Lines.route) {
                 LinesScreen()
