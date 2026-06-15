@@ -55,7 +55,7 @@ actual fun PlatformMapView(
     
     val cameraState = rememberCameraState(
         firstPosition = CameraPosition(
-            target = Position(center.latitude, center.longitude),
+            target = Position(center.longitude, center.latitude),
             zoom = cameraZoom.toDouble()
         )
     )
@@ -65,8 +65,8 @@ actual fun PlatformMapView(
         cameraState.animateTo(
             finalPosition = CameraPosition(
                 target = Position(
-                    (cameraTarget ?: DEFAULT_CENTER).latitude,
-                    (cameraTarget ?: DEFAULT_CENTER).longitude
+                    (cameraTarget ?: DEFAULT_CENTER).longitude,
+                    (cameraTarget ?: DEFAULT_CENTER).latitude
                 ),
                 zoom = cameraZoom.toDouble()
             )
@@ -82,7 +82,7 @@ actual fun PlatformMapView(
             FeatureCollection<Point, Map<String, Any>>(
                 busStops.mapIndexed { index, stop ->
                     Feature(
-                        geometry = Point(Position(stop.position.latitude, stop.position.longitude)),
+                        geometry = Point(Position(stop.position.longitude, stop.position.latitude)),
                         properties = mapOf("index" to index)
                     )
                 }
@@ -100,7 +100,7 @@ actual fun PlatformMapView(
                             Feature(
                                 geometry = LineString(
                                     coordinates = routePoints.map { 
-                                        Position(it.latitude, it.longitude) 
+                                        Position(it.longitude, it.latitude) 
                                     }
                                 ),
                                 properties = emptyMap()
@@ -119,7 +119,7 @@ actual fun PlatformMapView(
                 FeatureCollection<Point, Map<String, Any>>(
                     listOf(
                         Feature(
-                            geometry = Point(Position(vehicle.position.latitude, vehicle.position.longitude)),
+                            geometry = Point(Position(vehicle.position.longitude, vehicle.position.latitude)),
                             properties = emptyMap()
                         )
                     )
@@ -135,7 +135,7 @@ actual fun PlatformMapView(
                 FeatureCollection<Point, Map<String, Any>>(
                     listOf(
                         Feature(
-                            geometry = Point(Position(location.latitude, location.longitude)),
+                            geometry = Point(Position(location.longitude, location.latitude)),
                             properties = emptyMap()
                         )
                     )
@@ -189,7 +189,7 @@ actual fun PlatformMapView(
                         FeatureCollection<Point, Map<String, Any>>(
                             listOf(
                                 Feature(
-                                    geometry = Point(Position(selectedStop.position.latitude, selectedStop.position.longitude)),
+                                    geometry = Point(Position(selectedStop.position.longitude, selectedStop.position.latitude)),
                                     properties = emptyMap()
                                 )
                             )

@@ -84,7 +84,7 @@ fun MapScreen(snackbarHostState: SnackbarHostState) {
         PlatformMapView(
             modifier = Modifier.fillMaxSize(),
             cameraTarget = cameraTarget.value,
-            cameraZoom = 16.0f,
+            cameraZoom = 5.0f,
             busStops = busStopsState.value,
             selectedBusStop = viewModel.selectedBusStop.collectAsStateWithLifecycle().value,
             trackedVehicle = viewModel.trackedVehicle.collectAsStateWithLifecycle().value,
