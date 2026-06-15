@@ -1,7 +1,9 @@
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 
 class KmpLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -13,11 +15,6 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<KotlinMultiplatformExtension> {
                 androidTarget {
-                    compilations.all {
-                        kotlinOptions {
-                            jvmTarget = "17"
-                        }
-                    }
                 }
                 jvm("jvm")
                 listOf(
@@ -34,7 +31,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<com.android.build.gradle.LibraryExtension> {
                 namespace = "pl.bkacala.threecitycommuter.${project.name}"
-                compileSdk = 35
+                compileSdk = 36
                 defaultConfig {
                     minSdk = 29
                 }

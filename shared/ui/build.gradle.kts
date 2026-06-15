@@ -32,8 +32,10 @@ kotlin {
         androidMain.dependencies {
             // MapLibre Compose - open-source fork of Mapbox GL
             implementation(libs.maplibre.compose)
-            // MapLibre Native (optional, for lower-level API access)
-            // implementation(libs.maplibre.native)
+            // MapLibre Native Android SDK (required by MapLibre Compose)
+            implementation(libs.maplibre.native)
+            // Kotlin Multiplatform Compose Animation for animateFloatAsState
+            implementation("org.jetbrains.compose.animation:animation:1.7.3")
         }
         jvmMain.dependencies {
             // MapLibre Compose works on JVM (Desktop) too

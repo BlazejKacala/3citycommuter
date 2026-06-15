@@ -1,5 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
@@ -10,12 +11,12 @@ plugins {
 
 android {
     namespace = "pl.bkacala.threecitycommuter"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "pl.bkacala.threecitycommuter"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 4
         versionName = "2.0"
 
@@ -56,8 +57,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
     buildFeatures {
         compose = true

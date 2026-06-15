@@ -1,21 +1,30 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.maplibre.compose.camera.CameraPosition
+import org.maplibre.compose.camera.CameraState
+import org.maplibre.compose.camera.rememberCameraState
+import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.layers.CircleLayer
+import org.maplibre.compose.layers.LineLayer
+import org.maplibre.compose.map.MaplibreMap
+import org.maplibre.compose.sources.GeoJsonData
+import org.maplibre.compose.sources.rememberGeoJsonSource
+import org.maplibre.compose.style.BaseStyle
+import org.maplibre.compose.util.ClickResult
+import org.maplibre.spatialk.geojson.Feature
+import org.maplibre.spatialk.geojson.FeatureCollection
+import org.maplibre.spatialk.geojson.LineString
+import org.maplibre.spatialk.geojson.Point
+import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
@@ -25,6 +34,8 @@ private val DEFAULT_CENTER = LatLng(54.3520, 18.6466)
 private val SELECTED_STOP_COLOR = Color(0xFF6750A4)
 private val DEFAULT_STOP_COLOR = Color(0xFF1976D2)
 private val ROUTE_COLOR = Color(0xFF6750A4)
+private val VEHICLE_COLOR = Color(0xFF6750A4)
+private val USER_LOCATION_COLOR = Color(0xFF6750A4)
 
 @Composable
 actual fun PlatformMapView(
@@ -41,96 +52,184 @@ actual fun PlatformMapView(
     mapBottomPadding: Dp,
 ) {
     val center = cameraTarget ?: DEFAULT_CENTER
+    
+    val cameraState = rememberCameraState(
+        firstPosition = CameraPosition(
+            target = Position(center.latitude, center.longitude),
+            zoom = cameraZoom.toDouble()
+        )
+    )
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFE8E8E8))
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    onMapClicked()
-                }
-            },
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            // Draw bus stops as dots
-            busStops.forEach { stop ->
-                val x = ((stop.position.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
-                val y = (-(stop.position.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
+    // Update camera when target or zoom changes
+    LaunchedEffect(cameraTarget, cameraZoom) {
+        cameraState.animateTo(
+            finalPosition = CameraPosition(
+                target = Position(
+                    (cameraTarget ?: DEFAULT_CENTER).latitude,
+                    (cameraTarget ?: DEFAULT_CENTER).longitude
+                ),
+                zoom = cameraZoom.toDouble()
+            )
+        )
+    }
 
-                if (x in 0f..size.width && y in 0f..size.height) {
-                    val isSelected = stop == selectedBusStop
-                    drawCircle(
-                        color = if (isSelected) SELECTED_STOP_COLOR else DEFAULT_STOP_COLOR,
-                        radius = if (isSelected) 8f else 4f,
-                        center = Offset(x, y),
+    // Remember bus stops list for click handling
+    val busStopsList = remember(busStops) { busStops }
+
+    // Convert bus stops to GeoJSON features
+    val busStopFeatures = rememberGeoJsonSource(
+        data = GeoJsonData.Features(
+            FeatureCollection<Point, Map<String, Any>>(
+                busStops.mapIndexed { index, stop ->
+                    Feature(
+                        geometry = Point(Position(stop.position.latitude, stop.position.longitude)),
+                        properties = mapOf("index" to index)
                     )
                 }
+            )
+        )
+    )
+
+    // Convert route to GeoJSON feature
+    val routeFeature = route?.let { routePoints ->
+        if (routePoints.size >= 2) {
+            rememberGeoJsonSource(
+                data = GeoJsonData.Features(
+                    FeatureCollection<LineString, Map<String, Any>>(
+                        listOf(
+                            Feature(
+                                geometry = LineString(
+                                    coordinates = routePoints.map { 
+                                        Position(it.latitude, it.longitude) 
+                                    }
+                                ),
+                                properties = emptyMap()
+                            )
+                        )
+                    )
+                )
+            )
+        } else null
+    }
+
+    // Convert tracked vehicle to GeoJSON feature
+    val vehicleFeature = trackedVehicle?.let { vehicle ->
+        rememberGeoJsonSource(
+            data = GeoJsonData.Features(
+                FeatureCollection<Point, Map<String, Any>>(
+                    listOf(
+                        Feature(
+                            geometry = Point(Position(vehicle.position.latitude, vehicle.position.longitude)),
+                            properties = emptyMap()
+                        )
+                    )
+                )
+            )
+        )
+    }
+
+    // Convert user location to GeoJSON feature
+    val userLocationFeature = userLocation?.takeIf { !it.isFixed }?.let { location ->
+        rememberGeoJsonSource(
+            data = GeoJsonData.Features(
+                FeatureCollection<Point, Map<String, Any>>(
+                    listOf(
+                        Feature(
+                            geometry = Point(Position(location.latitude, location.longitude)),
+                            properties = emptyMap()
+                        )
+                    )
+                )
+            )
+        )
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        MaplibreMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraState = cameraState,
+            baseStyle = BaseStyle.Uri("https://demotiles.maplibre.org/style.json"),
+            onMapClick = { _, _ -> 
+                onMapClicked()
+                ClickResult.Pass
+            }
+        ) {
+            // Draw route as line
+            routeFeature?.let { source ->
+                LineLayer(
+                    id = "route-line",
+                    source = source,
+                    color = const(ROUTE_COLOR),
+                    width = const(3.0.dp)
+                )
             }
 
-            // Draw route
-            route?.let { routePoints ->
-                if (routePoints.size >= 2) {
-                    for (i in 0 until routePoints.size - 1) {
-                        val startX = ((routePoints[i].longitude - center.longitude) * 10000 + size.width / 2).toFloat()
-                        val startY = (-(routePoints[i].latitude - center.latitude) * 10000 + size.height / 2).toFloat()
-                        val endX = ((routePoints[i + 1].longitude - center.longitude) * 10000 + size.width / 2).toFloat()
-                        val endY = (-(routePoints[i + 1].latitude - center.latitude) * 10000 + size.height / 2).toFloat()
-                        drawLine(
-                            color = ROUTE_COLOR,
-                            start = Offset(startX, startY),
-                            end = Offset(endX, endY),
-                            strokeWidth = 3f,
-                        )
+            // Draw bus stops as circles
+            CircleLayer(
+                id = "bus-stops",
+                source = busStopFeatures,
+                color = const(DEFAULT_STOP_COLOR),
+                radius = const(4.0.dp),
+                onClick = { features ->
+                    features.firstOrNull()?.let { feature ->
+                        feature.properties?.get("index")?.toString()?.toIntOrNull()?.let { index ->
+                            if (index in busStopsList.indices) {
+                                onBusStopSelected(busStopsList[index])
+                            }
+                        }
                     }
+                    ClickResult.Consume
                 }
+            )
+
+            // Draw selected bus stop as larger circle
+            selectedBusStop?.let { selectedStop ->
+                val selectedSource = rememberGeoJsonSource(
+                    data = GeoJsonData.Features(
+                        FeatureCollection<Point, Map<String, Any>>(
+                            listOf(
+                                Feature(
+                                    geometry = Point(Position(selectedStop.position.latitude, selectedStop.position.longitude)),
+                                    properties = emptyMap()
+                                )
+                            )
+                        )
+                    )
+                )
+                CircleLayer(
+                    id = "selected-bus-stop",
+                    source = selectedSource,
+                    color = const(SELECTED_STOP_COLOR),
+                    radius = const(8.0.dp)
+                )
             }
 
             // Draw tracked vehicle
-            trackedVehicle?.let { vehicle ->
-                val vx = ((vehicle.position.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
-                val vy = (-(vehicle.position.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
-                drawCircle(
-                    color = Color(0xFF6750A4),
-                    radius = 10f,
-                    center = Offset(vx, vy),
+            vehicleFeature?.let { source ->
+                CircleLayer(
+                    id = "tracked-vehicle",
+                    source = source,
+                    color = const(VEHICLE_COLOR),
+                    radius = const(10.0.dp)
                 )
             }
 
             // Draw user location
-            userLocation?.let { location ->
-                if (!location.isFixed) {
-                    val ux = ((location.longitude - center.longitude) * 10000 + size.width / 2).toFloat()
-                    val uy = (-(location.latitude - center.latitude) * 10000 + size.height / 2).toFloat()
-                    drawCircle(
-                        color = Color(0xFF6750A4),
-                        radius = 8f,
-                        center = Offset(ux, uy),
-                    )
-                    drawCircle(
-                        color = Color.White,
-                        radius = 5f,
-                        center = Offset(ux, uy),
-                    )
-                }
+            userLocationFeature?.let { source ->
+                CircleLayer(
+                    id = "user-location-outer",
+                    source = source,
+                    color = const(USER_LOCATION_COLOR),
+                    radius = const(8.0.dp)
+                )
+                CircleLayer(
+                    id = "user-location-inner",
+                    source = source,
+                    color = const(Color.White),
+                    radius = const(5.0.dp)
+                )
             }
         }
-
-        Text(
-            text = "Desktop Map Preview (${center.latitude.format(4)}, ${center.longitude.format(4)})",
-            modifier = Modifier.align(Alignment.TopCenter).padding(8.dp),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        )
-
-        Text(
-            text = "${busStops.size} przystankow",
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = mapBottomPadding + 8.dp),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        )
     }
 }
-
-private fun Double.format(digits: Int): String = String.format("%.${digits}f", this)
 
