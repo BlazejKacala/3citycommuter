@@ -21,7 +21,13 @@ import org.maplibre.compose.sources.GeoJsonOptions
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.ClickResult
+import org.maplibre.spatialk.geojson.Feature
+import org.maplibre.spatialk.geojson.FeatureCollection
+import org.maplibre.spatialk.geojson.LineString
+import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
@@ -94,8 +100,11 @@ actual fun PlatformMapView(
                     append("]}")
                 }
             }
+            val encodedBusStopJson = remember(busStops) {
+                URLEncoder.encode(busStopGeoJson, StandardCharsets.UTF_8.toString())
+            }
             val busStopFeatures = rememberGeoJsonSource(
-                data = GeoJsonData.Uri("data:application/json,$busStopGeoJson")
+                data = GeoJsonData.Uri("data:application/json,$encodedBusStopJson")
             )
 
             // Build route GeoJSON as string
@@ -114,7 +123,8 @@ actual fun PlatformMapView(
                 } else null
             }
             val routeFeature = routeGeoJson?.let { geoJson ->
-                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$geoJson"))
+                val encodedJson = remember(routeGeoJson) { URLEncoder.encode(geoJson, StandardCharsets.UTF_8.toString()) }
+                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$encodedJson"))
             }
 
             // Build vehicle GeoJSON as string
@@ -126,7 +136,8 @@ actual fun PlatformMapView(
                 }
             }
             val vehicleFeature = vehicleGeoJson?.let { geoJson ->
-                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$geoJson"))
+                val encodedJson = remember(vehicleGeoJson) { URLEncoder.encode(geoJson, StandardCharsets.UTF_8.toString()) }
+                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$encodedJson"))
             }
 
             // Build user location GeoJSON as string
@@ -138,7 +149,8 @@ actual fun PlatformMapView(
                 }
             }
             val userLocationFeature = userLocationGeoJson?.let { geoJson ->
-                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$geoJson"))
+                val encodedJson = remember(userLocationGeoJson) { URLEncoder.encode(geoJson, StandardCharsets.UTF_8.toString()) }
+                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$encodedJson"))
             }
 
             // Draw route as line
@@ -178,8 +190,9 @@ actual fun PlatformMapView(
                         append("]}")
                     }
                 }
+                val encodedSelectedJson = remember(selectedGeoJson) { URLEncoder.encode(selectedGeoJson, StandardCharsets.UTF_8.toString()) }
                 val selectedSource = rememberGeoJsonSource(
-                    data = GeoJsonData.Uri("data:application/json,$selectedGeoJson")
+                    data = GeoJsonData.Uri("data:application/json,$encodedSelectedJson")
                 )
                 CircleLayer(
                     id = "selected-bus-stop",
