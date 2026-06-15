@@ -17,9 +17,11 @@ import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.layers.LineLayer
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.sources.GeoJsonData
+import org.maplibre.compose.sources.GeoJsonOptions
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.ClickResult
+import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
@@ -93,7 +95,7 @@ actual fun PlatformMapView(
                 }
             }
             val busStopFeatures = rememberGeoJsonSource(
-                data = GeoJsonData.String(busStopGeoJson)
+                data = GeoJsonData.Uri("data:application/json,$busStopGeoJson")
             )
 
             // Build route GeoJSON as string
@@ -112,7 +114,7 @@ actual fun PlatformMapView(
                 } else null
             }
             val routeFeature = routeGeoJson?.let { geoJson ->
-                rememberGeoJsonSource(data = GeoJsonData.String(geoJson))
+                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$geoJson"))
             }
 
             // Build vehicle GeoJSON as string
@@ -124,7 +126,7 @@ actual fun PlatformMapView(
                 }
             }
             val vehicleFeature = vehicleGeoJson?.let { geoJson ->
-                rememberGeoJsonSource(data = GeoJsonData.String(geoJson))
+                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$geoJson"))
             }
 
             // Build user location GeoJSON as string
@@ -136,7 +138,7 @@ actual fun PlatformMapView(
                 }
             }
             val userLocationFeature = userLocationGeoJson?.let { geoJson ->
-                rememberGeoJsonSource(data = GeoJsonData.String(geoJson))
+                rememberGeoJsonSource(data = GeoJsonData.Uri("data:application/json,$geoJson"))
             }
 
             // Draw route as line
@@ -177,7 +179,7 @@ actual fun PlatformMapView(
                     }
                 }
                 val selectedSource = rememberGeoJsonSource(
-                    data = GeoJsonData.String(selectedGeoJson)
+                    data = GeoJsonData.Uri("data:application/json,$selectedGeoJson")
                 )
                 CircleLayer(
                     id = "selected-bus-stop",
