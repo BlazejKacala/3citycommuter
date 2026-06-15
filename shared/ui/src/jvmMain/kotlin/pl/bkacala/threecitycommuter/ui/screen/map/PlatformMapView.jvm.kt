@@ -29,6 +29,7 @@ import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 
 private val DEFAULT_CENTER = LatLng(54.3520, 18.6466)
 private val SELECTED_STOP_COLOR = Color(0xFF6750A4)
@@ -50,13 +51,16 @@ actual fun PlatformMapView(
     onBusStopSelected: (BusStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
     mapBottomPadding: Dp,
+    mapStyle: MapStyle,
+    stadiaToken: String?,
 ) {
     val center = cameraTarget ?: DEFAULT_CENTER
+    val effectiveZoom = cameraZoom.coerceAtLeast(mapStyle.defaultZoom)
     
     val cameraState = rememberCameraState(
         firstPosition = CameraPosition(
             target = Position(center.longitude, center.latitude),
-            zoom = cameraZoom.toDouble()
+            zoom = effectiveZoom.toDouble()
         )
     )
 
@@ -68,7 +72,7 @@ actual fun PlatformMapView(
                     (cameraTarget ?: DEFAULT_CENTER).longitude,
                     (cameraTarget ?: DEFAULT_CENTER).latitude
                 ),
-                zoom = cameraZoom.toDouble()
+                zoom = effectiveZoom.toDouble()
             )
         )
     }
@@ -148,7 +152,7 @@ actual fun PlatformMapView(
         MaplibreMap(
             modifier = Modifier.fillMaxSize(),
             cameraState = cameraState,
-            baseStyle = BaseStyle.Uri("https://demotiles.maplibre.org/style.json"),
+            baseStyle = BaseStyle.Uri(mapStyle.getUriWithToken(stadiaToken)),
             onMapClick = { _, _ -> 
                 onMapClicked()
                 ClickResult.Pass

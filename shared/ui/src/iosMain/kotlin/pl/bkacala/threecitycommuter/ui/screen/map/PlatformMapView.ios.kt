@@ -18,6 +18,7 @@ import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 
 @Composable
 actual fun PlatformMapView(
@@ -32,6 +33,8 @@ actual fun PlatformMapView(
     onBusStopSelected: (BusStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
     mapBottomPadding: Dp,
+    mapStyle: MapStyle,
+    stadiaToken: String?,
 ) {
     // TODO: Implement iOS MapView using MapLibre Native via CocoaPods
     // Requires: pod 'MapLibreGL', '~> 5.11.0' in Podfile

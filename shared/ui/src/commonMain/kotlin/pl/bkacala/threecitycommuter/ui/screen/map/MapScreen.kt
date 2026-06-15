@@ -42,10 +42,15 @@ import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
+import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 import pl.bkacala.threecitycommuter.ui.screen.map.search.BusSearchBar
 
 @Composable
-fun MapScreen(snackbarHostState: SnackbarHostState) {
+fun MapScreen(
+    snackbarHostState: SnackbarHostState,
+    mapStyle: MapStyle = MapStyle.DEMO,
+    stadiaToken: String? = null,
+) {
     BoxWithConstraints {
         val viewModel = koinViewModel<MapScreenViewModel>()
 
@@ -84,7 +89,7 @@ fun MapScreen(snackbarHostState: SnackbarHostState) {
         PlatformMapView(
             modifier = Modifier.fillMaxSize(),
             cameraTarget = cameraTarget.value,
-            cameraZoom = 5.0f,
+            cameraZoom = 14.0f,
             busStops = busStopsState.value,
             selectedBusStop = viewModel.selectedBusStop.collectAsStateWithLifecycle().value,
             trackedVehicle = viewModel.trackedVehicle.collectAsStateWithLifecycle().value,
@@ -93,6 +98,8 @@ fun MapScreen(snackbarHostState: SnackbarHostState) {
             onMapClicked = { viewModel.onMapClicked() },
             route = viewModel.route.collectAsStateWithLifecycle().value,
             mapBottomPadding = if (departuresModel == null) 0.dp else mapBottomPadding.value,
+            mapStyle = mapStyle,
+            stadiaToken = stadiaToken,
         )
 
         val displayCenterOnLocationButton =

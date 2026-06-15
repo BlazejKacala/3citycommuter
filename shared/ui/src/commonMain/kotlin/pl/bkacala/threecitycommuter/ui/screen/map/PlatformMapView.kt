@@ -7,6 +7,7 @@ import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 
 @Composable
 expect fun PlatformMapView(
@@ -21,4 +22,6 @@ expect fun PlatformMapView(
     onBusStopSelected: (BusStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
     mapBottomPadding: Dp,
+    mapStyle: MapStyle,
+    stadiaToken: String?,
 )
