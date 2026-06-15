@@ -20,11 +20,6 @@ import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.ClickResult
-import org.maplibre.spatialk.geojson.Feature
-import org.maplibre.spatialk.geojson.FeatureCollection
-import org.maplibre.spatialk.geojson.LineString
-import org.maplibre.spatialk.geojson.Point
-import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
@@ -86,72 +81,62 @@ actual fun PlatformMapView(
                 ClickResult.Pass
             }
         ) {
-            // Convert bus stops to GeoJSON features
+            // Build bus stops GeoJSON as string to avoid serialization issues
+            val busStopGeoJson = remember(busStops) {
+                buildString {
+                    append("{\"type\":\"FeatureCollection\",\"features\":[")
+                    busStops.forEachIndexed { index, stop ->
+                        if (index > 0) append(",")
+                        append("{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${stop.position.longitude},${stop.position.latitude}]},\"properties\":{\"index\":$index}}")
+                    }
+                    append("]}")
+                }
+            }
             val busStopFeatures = rememberGeoJsonSource(
-                data = GeoJsonData.Features(
-                    FeatureCollection<Point, Map<String, Any>>(
-                        busStops.mapIndexed { index, stop ->
-                            Feature(
-                                geometry = Point(Position(stop.position.latitude, stop.position.longitude)),
-                                properties = mutableMapOf("index" to index.toString())
-                            )
-                        }
-                    )
-                )
+                data = GeoJsonData.String(busStopGeoJson)
             )
 
-            // Convert route to GeoJSON feature
-            val routeFeature = route?.let { routePoints ->
+            // Build route GeoJSON as string
+            val routeGeoJson = route?.let { routePoints ->
                 if (routePoints.size >= 2) {
-                    rememberGeoJsonSource(
-                        data = GeoJsonData.Features(
-                            FeatureCollection<LineString, Map<String, Any>>(
-                                listOf(
-                                    Feature(
-                                        geometry = LineString(
-                                            coordinates = routePoints.map { 
-                                                Position(it.latitude, it.longitude) 
-                                            }
-                                        ),
-                                        properties = mutableMapOf<String, Any>()
-                                    )
-                                )
-                            )
-                        )
-                    )
+                    buildString {
+                        append("{\"type\":\"FeatureCollection\",\"features\":[{")
+                        append("\"type\":\"Feature\",\"geometry\":{\"type\":\"LineString\",\"coordinates\":[")
+                        routePoints.forEachIndexed { index, point ->
+                            if (index > 0) append(",")
+                            append("[${point.longitude},${point.latitude}]")
+                        }
+                        append("]},\"properties\":{}}")
+                        append("]}")
+                    }
                 } else null
             }
-
-            // Convert tracked vehicle to GeoJSON feature
-            val vehicleFeature = trackedVehicle?.let { vehicle ->
-                rememberGeoJsonSource(
-                    data = GeoJsonData.Features(
-                        FeatureCollection<Point, Map<String, Any>>(
-                            listOf(
-                                Feature(
-                                    geometry = Point(Position(vehicle.position.latitude, vehicle.position.longitude)),
-                                    properties = mutableMapOf<String, Any>()
-                                )
-                            )
-                        )
-                    )
-                )
+            val routeFeature = routeGeoJson?.let { geoJson ->
+                rememberGeoJsonSource(data = GeoJsonData.String(geoJson))
             }
 
-            // Convert user location to GeoJSON feature
-            val userLocationFeature = userLocation?.takeIf { !it.isFixed }?.let { location ->
-                rememberGeoJsonSource(
-                    data = GeoJsonData.Features(
-                        FeatureCollection<Point, Map<String, Any>>(
-                            listOf(
-                                Feature(
-                                    geometry = Point(Position(location.latitude, location.longitude)),
-                                    properties = mutableMapOf<String, Any>()
-                                )
-                            )
-                        )
-                    )
-                )
+            // Build vehicle GeoJSON as string
+            val vehicleGeoJson = trackedVehicle?.let { vehicle ->
+                buildString {
+                    append("{\"type\":\"FeatureCollection\",\"features\":[{")
+                    append("\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${vehicle.position.longitude},${vehicle.position.latitude}]},\"properties\":{}}")
+                    append("]}")
+                }
+            }
+            val vehicleFeature = vehicleGeoJson?.let { geoJson ->
+                rememberGeoJsonSource(data = GeoJsonData.String(geoJson))
+            }
+
+            // Build user location GeoJSON as string
+            val userLocationGeoJson = userLocation?.takeIf { !it.isFixed }?.let { location ->
+                buildString {
+                    append("{\"type\":\"FeatureCollection\",\"features\":[{")
+                    append("\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${location.longitude},${location.latitude}]},\"properties\":{}}")
+                    append("]}")
+                }
+            }
+            val userLocationFeature = userLocationGeoJson?.let { geoJson ->
+                rememberGeoJsonSource(data = GeoJsonData.String(geoJson))
             }
 
             // Draw route as line
@@ -184,17 +169,15 @@ actual fun PlatformMapView(
 
             // Draw selected bus stop as larger circle
             selectedBusStop?.let { selectedStop ->
+                val selectedGeoJson = remember(selectedStop) {
+                    buildString {
+                        append("{\"type\":\"FeatureCollection\",\"features\":[{")
+                        append("\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${selectedStop.position.longitude},${selectedStop.position.latitude}]},\"properties\":{}}")
+                        append("]}")
+                    }
+                }
                 val selectedSource = rememberGeoJsonSource(
-                    data = GeoJsonData.Features(
-                        FeatureCollection<Point, Map<String, Any>>(
-                            listOf(
-                                Feature(
-                                    geometry = Point(Position(selectedStop.position.latitude, selectedStop.position.longitude)),
-                                    properties = mutableMapOf<String, Any>()
-                                )
-                            )
-                        )
-                    )
+                    data = GeoJsonData.String(selectedGeoJson)
                 )
                 CircleLayer(
                     id = "selected-bus-stop",
