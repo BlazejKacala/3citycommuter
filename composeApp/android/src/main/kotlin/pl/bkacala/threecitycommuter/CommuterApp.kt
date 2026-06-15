@@ -15,7 +15,6 @@ class CommuterApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Initialize database context before starting Koin
         initDatabaseContext(this)
         startKoin {
             androidContext(this@CommuterApp)
