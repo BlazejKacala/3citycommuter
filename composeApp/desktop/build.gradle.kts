@@ -11,10 +11,10 @@ dependencies {
     implementation(project(":shared:network"))
     implementation(project(":shared:database"))
 
-    implementation(compose.desktop.currentOs)
-    implementation(compose.runtime)
-    implementation(compose.foundation)
-    implementation(compose.material3)
+    implementation(libs.compose.desktop.current.os)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.material3)
 
     implementation(libs.koin.core)
     implementation(libs.kotlinx.coroutines.swing)

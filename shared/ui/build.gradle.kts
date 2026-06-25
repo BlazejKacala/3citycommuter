@@ -19,12 +19,12 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":shared:core"))
             implementation(project(":shared:data"))
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.extended)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.navigation.compose)
@@ -41,7 +41,7 @@ kotlin {
             // MapLibre Native Android SDK (required by MapLibre Compose)
             implementation(libs.maplibre.native)
             // Kotlin Multiplatform Compose Animation for animateFloatAsState
-            implementation("org.jetbrains.compose.animation:animation:1.7.3")
+            implementation(libs.compose.animation)
         }
         jvmMain.dependencies {
             // MapLibre Compose works on JVM (Desktop) too
