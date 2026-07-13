@@ -4,12 +4,10 @@ plugins {
     alias(libs.plugins.room)
 }
 
-android {
-    namespace = "pl.bkacala.threecitycommuter.database"
-}
-
 kotlin {
-    androidTarget()
+    android {
+        namespace = "pl.bkacala.threecitycommuter.database"
+    }
     jvm("jvm")
     iosX64()
     iosArm64()

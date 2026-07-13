@@ -1,4 +1,4 @@
-import org.gradle.api.JavaVersion
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -9,27 +9,14 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("org.jetbrains.kotlin.multiplatform")
-                apply("com.android.library")
+                apply("com.android.kotlin.multiplatform.library")
             }
 
-            extensions.configure<com.android.build.gradle.LibraryExtension> {
-                namespace = "pl.bkacala.threecitycommuter.${project.name}"
-                compileSdk = 36
-
-                defaultConfig {
-                    minSdk = 29
-                }
-                compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_17
-                    targetCompatibility = JavaVersion.VERSION_17
-                }
-            }
-
-            // W AGP 9.0+ z android.newDsl=false, trzeba jawnie opublikowac androidTarget
-            // dla KMP modulow, aby byly dostepne w module Android
             extensions.configure<KotlinMultiplatformExtension> {
-                androidTarget {
-                    publishLibraryVariants("debug", "release")
+                targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java).configureEach {
+                    compileSdk = 36
+                    minSdk = 29
+                    withHostTestBuilder {}
                 }
             }
         }

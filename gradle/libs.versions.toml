@@ -28,12 +28,9 @@ kotlinxSerialization = "1.8.0"
 kotlinxDatetime = "0.6.2"
 kotlinxCoroutines = "1.10.1"
 
-# Mapbox (deprecated - replaced by MapLibre)
-# mapbox = "11.9.2"
-
 # MapLibre
 maplibreCompose = "0.13.0"
-maplibreNative = "10.0.0"
+maplibreNative = "13.3.1"
 
 # Multiplatform Settings
 multiplatformSettings = "1.3.0"
@@ -100,10 +97,6 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 
-# Mapbox (deprecated - replaced by MapLibre)
-# mapbox-maps-android = { module = "com.mapbox.maps:android", version.ref = "mapbox" }
-# mapbox-maps-compose = { module = "com.mapbox.maps:android-compose", version.ref = "mapbox" }
-
 # MapLibre (Android + Compose + Desktop)
 maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.ref = "maplibreCompose" }
 maplibre-native = { module = "org.maplibre.gl:android-sdk", version.ref = "maplibreNative" }
@@ -122,10 +115,8 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

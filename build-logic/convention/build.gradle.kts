@@ -4,8 +4,8 @@ plugins {
 
 dependencies {
     compileOnly(libs.plugins.kotlin.multiplatform.toDep())
-    compileOnly(libs.plugins.android.library.toDep())
     compileOnly(libs.plugins.android.kotlin.multiplatform.library.toDep())
+    compileOnly("com.android.tools.build:gradle-api:${libs.versions.agp.get()}")
     compileOnly(libs.plugins.compose.multiplatform.toDep())
     compileOnly(libs.plugins.compose.compiler.toDep())
 }

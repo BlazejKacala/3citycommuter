@@ -4,7 +4,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map.model
  * Available map styles for the application.
  * Each style has a display name and a URI that can be used with MaplibreMap.
  *
- * NOTE: For styles requiring tokens (Stadia, Mapbox), you need to:
+ * NOTE: For styles requiring tokens (Stadia), you need to:
  * 1. Obtain a token from the respective provider
  * 2. Add it to your local.properties or build configuration
  * 3. Replace the placeholder in the URI
@@ -52,35 +52,6 @@ enum class MapStyle(
         defaultZoom = 14.0f,
     ),
 
-    // Mapbox - requires token
-    // Get token at: https://www.mapbox.com/
-    // Requires MAPBOX_DOWNLOADS_TOKEN in gradle.properties
-    MAPBOX_STREETS(
-        displayName = "Mapbox Streets",
-        styleUri = "mapbox://styles/mapbox/streets-v12",
-        requiresToken = true,
-        // Configured via gradle.properties
-        tokenPlaceholder = null,
-        defaultZoom = 14.0f,
-    ),
-
-    MAPBOX_LIGHT(
-        displayName = "Mapbox Light",
-        styleUri = "mapbox://styles/mapbox/light-v11",
-        requiresToken = true,
-        // Configured via gradle.properties
-        tokenPlaceholder = null,
-        defaultZoom = 14.0f,
-    ),
-
-    MAPBOX_DARK(
-        displayName = "Mapbox Dark",
-        styleUri = "mapbox://styles/mapbox/dark-v11",
-        requiresToken = true,
-        tokenPlaceholder = null,
-        defaultZoom = 14.0f,
-    ),
-
     // OpenStreetMap raster tiles - no token required, but less interactive
     OSM_RASTER(
         displayName = "OpenStreetMap (Raster)",
@@ -99,7 +70,6 @@ enum class MapStyle(
 
     /**
      * Get the style URI with token replaced if needed.
-     * For Mapbox, token is configured separately via gradle.
      * For Stadia, replace the placeholder with your actual token.
      */
     fun getUriWithToken(token: String? = null): String {

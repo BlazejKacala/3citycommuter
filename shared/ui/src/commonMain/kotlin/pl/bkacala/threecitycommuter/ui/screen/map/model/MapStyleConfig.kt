@@ -13,11 +13,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map.model
  *    - Store it securely (e.g., in local.properties or BuildConfig)
  *    - Pass it to MapScreen: MapScreen(snackbarHostState, MapStyle.STADIA_SMOOTH, "your_token")
  *
- * 2. For Mapbox:
- *    - Add MAPBOX_DOWNLOADS_TOKEN to gradle.properties
- *    - Use any Mapbox style: MapStyle.MAPBOX_STREETS
- *
- * 3. For Demo/OSM:
+ * 2. For Demo/OSM:
  *    - No token needed: MapStyle.DEMO or MapStyle.OSM_RASTER
  */
 
@@ -58,8 +54,6 @@ fun getAvailableMapStyles(stadiaToken: String? = null): List<MapStyle> {
             !style.requiresToken -> true
             // Stadia styles need a token
             style.tokenPlaceholder != null && stadiaToken != null -> true
-            // Mapbox styles are configured via gradle.properties
-            style.tokenPlaceholder == null && style.requiresToken -> true
             else -> false
         }
     }
@@ -72,9 +66,6 @@ val recommendedStreetStyles = listOf(
     MapStyle.STADIA_OSM_BRIGHT,
     MapStyle.STADIA_SMOOTH,
     MapStyle.STADIA_SMOOTH_DARK,
-    MapStyle.MAPBOX_STREETS,
-    MapStyle.MAPBOX_LIGHT,
-    MapStyle.MAPBOX_DARK,
 )
 
 val recommendedFreeStyles = listOf(
@@ -90,7 +81,6 @@ fun MapStyle.isAvailable(stadiaToken: String? = null): Boolean {
     return when {
         !requiresToken -> true
         tokenPlaceholder != null && stadiaToken != null -> true
-        tokenPlaceholder == null && requiresToken -> true // Mapbox via gradle
         else -> false
     }
 }

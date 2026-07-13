@@ -4,12 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-    namespace = "pl.bkacala.threecitycommuter.ui"
-}
-
 kotlin {
-    androidTarget()
+    android {
+        namespace = "pl.bkacala.threecitycommuter.ui"
+    }
     jvm("jvm")
     iosX64()
     iosArm64()
