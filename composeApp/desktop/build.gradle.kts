@@ -11,7 +11,7 @@ dependencies {
     implementation(project(":shared:network"))
     implementation(project(":shared:database"))
 
-    implementation(libs.compose.desktop.current.os)
+    implementation(compose.desktop.currentOs)
     implementation(libs.compose.runtime)
     implementation(libs.compose.foundation)
     implementation(libs.compose.material3)
