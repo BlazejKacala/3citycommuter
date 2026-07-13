@@ -1,323 +1,104 @@
 # Detekt configuration for 3citycommuter
 # Kotlin Multiplatform project
+# Compatible with Detekt 1.23.6+
 
-# Global configuration
+# Build configuration
 build:
   maxIssues: 0
-  excludeCorrectable: false
-
-# Console output
-console:
-  reportPath: "build/reports/detekt/detekt.txt"
-  progressReport: true
-  failThreshold: 0
-
-# Processing configuration
-processing:
-  # Exclude generated code and build directories
-  excludes:
-    - "**/build/**"
-    - "**/.gradle/**"
-    - "**/generated/**"
-    - "**/schemas/**"
-  # Include all KMP source sets
-  includes:
-    - "**/src/commonMain/**"
-    - "**/src/commonTest/**"
-    - "**/src/androidMain/**"
-    - "**/src/androidTest/**"
-    - "**/src/iosMain/**"
-    - "**/src/iosTest/**"
-    - "**/src/jvmMain/**"
-    - "**/src/jvmTest/**"
-    - "**/src/main/**"
-    - "**/src/test/**"
-
-# Enable type resolution for better analysis
-# Note: Type resolution in KMP may have limitations depending on the Kotlin version
-# and multiplatform setup. If issues occur, consider disabling.
-type-resolution:
-  enabled: true
-  # Cache compilation results
-  cache:
-    enabled: true
-    path: "${java.io.tmpdir}/detekt-cache"
-
-# Formatting rules (also handled by Spotless/ktlint)
-formatting:
-  active: true
-  android: false
-  autoCorrect: false
-  
-  # Indentation
-  Indentation:
-    active: false  # Handled by Spotless
-  
-  # Spacing
-  MaximumLineLength:
-    active: false  # Handled by ktlint
-    maxLineLength: 120
-  
-  NoWildcardImports:
-    active: true
-  
-  PackageName:
-    active: true
-    pattern: '^[a-z][a-z0-9_]*$'
 
 # Complexity rules
 complexity:
-  active: true
-  
-  ComplexMethod:
+  CyclomaticComplexMethod:
     active: true
     threshold: 15
-    ignoreSingleWhen: false
-    ignoreNesting: false
-  
   LongMethod:
     active: true
     threshold: 60
-  
   LongParameterList:
     active: true
-    threshold: 6
-    ignoreDefaultValues: true
-    ignoreDataClasses: true
-  
-  ManyPrimaryConstructorParameters:
-    active: true
-    threshold: 6
-  
+    functionThreshold: 6
+    constructorThreshold: 6
   LargeClass:
     active: true
     threshold: 200
-  
   NestedBlockDepth:
     active: true
     threshold: 4
-  
   StringLiteralDuplication:
     active: true
     threshold: 3
-    ignoreAnnotation: true
     excludeStringsWithLessThan5Characters: true
-  
   TooManyFunctions:
     active: true
-    threshold: 11
+    thresholdInFiles: 11
+    thresholdInClasses: 11
     ignorePrivate: true
     ignoreOverridden: true
 
 # Performance rules
 performance:
-  active: true
-  
   ForEachOnRange:
     active: true
-  
   SpreadOperator:
     active: true
 
 # Potential bugs
 potential-bugs:
-  active: true
-  
   EqualsAlwaysReturnsTrueOrFalse:
     active: true
-  
   EqualsWithHashCodeExist:
     active: true
-  
   ExplicitGarbageCollectionCall:
     active: true
-  
   InvalidRange:
     active: true
-  
   IteratorHasNextCallsNextMethod:
     active: true
-  
-  IteratorNotThrowingNoSuchElementException:
-    active: true
-  
-  MissingWhenCase:
-    active: true
-  
-  RedundantElseInWhen:
-    active: true
-  
   UnconditionalJumpStatementInLoop:
     active: true
-  
   UnreachableCode:
     active: true
-  
   UnsafeCallOnNullableType:
     active: true
-  
   UnsafeCast:
-    active: true
-  
-  UselessPostfixExpression:
     active: true
 
 # Style rules
 style:
-  active: true
-  
-  CanBeNonNullable:
-    active: false  # Too many false positives in KMP
-  
-  ClassOrdering:
-    active: false  # Opinionated, can be noisy
-  
   CollapsibleIfStatements:
     active: true
-  
-  DataClassContainsFunctions:
-    active: false  # Common in domain models
-  
-  DataClassShouldBeImmutable:
-    active: false  # Too restrictive
-  
-  EmptyClassBlock:
-    active: false  # KMP often needs empty class blocks
-  
-  EmptyFunctionBlock:
-    active: true
-  
-  EnumNaming:
-    active: true
-    pattern: '^[A-Z][a-zA-Z0-9_]*$'
-  
-  FunctionOnlyReturningConstant:
-    active: false  # Common in KMP
-  
-  LoopWithTooManyJumpStatements:
-    active: true
-    threshold: 1
-  
-  MagicNumber:
-    active: false  # Too noisy, especially in UI code
-  
-  MemberNameEqualsClassName:
-    active: true
-  
   ModifierOrder:
     active: true
-  
-  NamingConventionViolation:
-    active: true
-  
-  NewLineAtEndOfFile:
-    active: false  # Handled by Spotless
-  
-  NoTabs:
-    active: false  # Handled by Spotless
-  
-  OptionalAbstractKeyword:
-    active: false  # Style preference
-  
-  OptionalUnit:
-    active: false  # Style preference
-  
-  OptionalWhenBraces:
-    active: false  # Style preference
-  
-  PreferToOverPairSyntax:
-    active: false  # Style preference
-  
   ProtectedMemberInFinalClass:
     active: true
-  
-  RedundantExplicitType:
-    active: false  # Too noisy
-  
   RedundantHigherOrderMapUsage:
     active: true
-  
-  RedundantVisibilityModifier:
-    active: true
-  
-  ReturnCount:
-    active: false  # Too restrictive
-  
   SafeCast:
     active: true
-  
-  SerialVersionUIDInSerializableClass:
-    active: false  # Not relevant for this project
-  
-  SpacingBetweenPackageAndImports:
-    active: false  # Handled by Spotless
-  
-  ThrowsCount:
-    active: false  # Too restrictive
-  
-  TrailingWhitespace:
-    active: false  # Handled by Spotless
-  
-  UnderscoresInNumericLiterals:
-    active: false  # Style preference
-  
   UnnecessaryAbstractClass:
     active: true
-  
-  UnnecessaryAnnotationUse:
-    active: true
-  
   UnnecessaryApply:
     active: true
-  
   UnnecessaryInheritance:
     active: true
-  
   UnnecessaryLet:
     active: true
-  
   UnnecessaryParentheses:
     active: true
-  
-  UntilInsteadOfRangeTo:
-    active: true
-  
   UseArrayLiteralsInAnnotations:
     active: true
-  
   UseCheckOrError:
     active: true
-  
   UseDataClass:
     active: true
-  
   UseEmptyCounterpart:
     active: true
-  
   UseIfInsteadOfWhen:
     active: true
-  
   UseIsNullOrEmpty:
     active: true
-  
-  UseOrEmpty:
-    active: true
-  
-  UselessCallOnNotNull:
-    active: true
-  
-  UtilityClassWithNonTrivialMembers:
-    active: true
 
-# Coroutines rules (if using coroutines)
+# Coroutines rules
 coroutines:
-  active: true
-  
   GlobalCoroutineUsage:
-    active: true
-  
-  SuspiciousCoroutineCancellation:
-    active: true
-  
-  SuspendFunWithFlowReturnType:
     active: true

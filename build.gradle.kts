@@ -14,7 +14,11 @@ plugins {
     alias(libs.plugins.room) apply false
     // Quality plugins - apply to root project
     alias(libs.plugins.spotless)
+    alias(libs.plugins.detekt)
 }
+
+// Store detekt version for use in subprojects
+val detektVersion = libs.versions.detekt.get()
 
 // Configure Spotless - simple DSL without excludes
 // (Spotless automatically skips build directories)
@@ -104,21 +108,63 @@ subprojects {
     }
 }
 
+// Configure Detekt
+detekt {
+    toolVersion = detektVersion
+    config.setFrom("$rootDir/config/detekt/detekt.yml")
+    ignoreFailures = false
+}
+
+// Configure Detekt reports on the task
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        sarif.required.set(true)
+    }
+}
+
+// Apply and configure Detekt for all subprojects
+subprojects {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    the<io.gitlab.arturbosch.detekt.extensions.DetektExtension>().apply {
+        toolVersion = detektVersion
+        config.setFrom("$rootDir/config/detekt/detekt.yml")
+        ignoreFailures = false
+    }
+}
+
+// Configure Detekt reports for subprojects
+subprojects {
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        reports {
+            html.required.set(true)
+            xml.required.set(true)
+            sarif.required.set(true)
+        }
+    }
+}
+
 // Common lint task that runs all quality checks
 tasks.register("lint") {
-    description = "Runs all code quality checks (Spotless)"
+    description = "Runs all code quality checks (Spotless and Detekt)"
     group = "verification"
 
     dependsOn(
         tasks.named("spotlessCheck"),
+        tasks.named("detekt"),
     )
 
     // Collect all subproject tasks
     val spotlessTasks = subprojects.mapNotNull { subproject ->
         subproject.tasks.findByName("spotlessCheck")
     }
+    val detektTasks = subprojects.mapNotNull { subproject ->
+        subproject.tasks.findByName("detekt")
+    }
 
-    spotlessTasks.forEach { task ->
+    (spotlessTasks + detektTasks).forEach { task ->
         dependsOn(task)
     }
 }
