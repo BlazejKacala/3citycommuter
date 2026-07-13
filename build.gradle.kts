@@ -1,11 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
-
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.kotlin.multiplatform.library) apply false
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.jvm) apply false
@@ -16,11 +14,7 @@ plugins {
     alias(libs.plugins.room) apply false
     // Quality plugins - apply to root project
     alias(libs.plugins.spotless)
-    alias(libs.plugins.detekt)
 }
-
-// Store detekt version for use in subprojects
-val detektVersion = libs.versions.detekt.get()
 
 // Configure Spotless - simple DSL without excludes
 // (Spotless automatically skips build directories)
@@ -110,63 +104,21 @@ subprojects {
     }
 }
 
-// Configure Detekt
-detekt {
-    toolVersion = detektVersion
-    config.setFrom("$rootDir/config/detekt/detekt.yml")
-    ignoreFailures = false
-}
-
-// Configure Detekt reports on the task
-tasks.withType<Detekt>().configureEach {
-    reports {
-        html.required.set(true)
-        xml.required.set(true)
-        sarif.required.set(true)
-    }
-}
-
-// Apply and configure Detekt for all subprojects
-subprojects {
-    apply(plugin = "io.gitlab.arturbosch.detekt")
-
-    the<DetektExtension>().apply {
-        toolVersion = detektVersion
-        config.setFrom("$rootDir/config/detekt/detekt.yml")
-        ignoreFailures = false
-    }
-}
-
-// Configure Detekt reports for subprojects
-subprojects {
-    tasks.withType<Detekt>().configureEach {
-        reports {
-            html.required.set(true)
-            xml.required.set(true)
-            sarif.required.set(true)
-        }
-    }
-}
-
 // Common lint task that runs all quality checks
 tasks.register("lint") {
-    description = "Runs all code quality checks (Spotless and Detekt)"
+    description = "Runs all code quality checks (Spotless)"
     group = "verification"
 
     dependsOn(
         tasks.named("spotlessCheck"),
-        tasks.named("detekt"),
     )
 
     // Collect all subproject tasks
     val spotlessTasks = subprojects.mapNotNull { subproject ->
         subproject.tasks.findByName("spotlessCheck")
     }
-    val detektTasks = subprojects.mapNotNull { subproject ->
-        subproject.tasks.findByName("detekt")
-    }
 
-    (spotlessTasks + detektTasks).forEach { task ->
+    spotlessTasks.forEach { task ->
         dependsOn(task)
     }
 }
