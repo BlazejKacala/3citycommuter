@@ -52,7 +52,7 @@ actual fun PlatformMapView(
     ) {
         Text(
             text = "iOS MapLibre Map — ${busStops.size} przystankow\n" +
-                    "(Requires MapLibre Native CocoaPods integration)",
+                "(Requires MapLibre Native CocoaPods integration)",
             modifier = Modifier.align(Alignment.Center).padding(16.dp),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,

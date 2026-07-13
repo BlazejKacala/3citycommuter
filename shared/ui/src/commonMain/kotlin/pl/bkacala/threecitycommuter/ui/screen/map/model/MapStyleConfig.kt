@@ -2,21 +2,21 @@ package pl.bkacala.threecitycommuter.ui.screen.map.model
 
 /**
  * Configuration for map styles with token management.
- * 
+ *
  * This file provides a centralized way to configure map styles and their tokens.
  * In the future, this can be integrated with user preferences/settings.
- * 
+ *
  * USAGE:
  * ------
  * 1. For Stadia Maps:
  *    - Get a free token from https://stadiamaps.com/
  *    - Store it securely (e.g., in local.properties or BuildConfig)
  *    - Pass it to MapScreen: MapScreen(snackbarHostState, MapStyle.STADIA_SMOOTH, "your_token")
- * 
+ *
  * 2. For Mapbox:
  *    - Add MAPBOX_DOWNLOADS_TOKEN to gradle.properties
  *    - Use any Mapbox style: MapStyle.MAPBOX_STREETS
- * 
+ *
  * 3. For Demo/OSM:
  *    - No token needed: MapStyle.DEMO or MapStyle.OSM_RASTER
  */
@@ -31,10 +31,10 @@ package pl.bkacala.threecitycommuter.ui.screen.map.model
 //     onStyleSelected: (MapStyle) -> Unit,
 //     stadiaToken: String?,
 // ) {
-//     val styles = MapStyle.entries.filter { 
+//     val styles = MapStyle.entries.filter {
 //         !it.requiresToken || stadiaToken != null || it.tokenPlaceholder == null
 //     }
-//     
+//
 //     Column {
 //         styles.forEach { style ->
 //             RadioButton(

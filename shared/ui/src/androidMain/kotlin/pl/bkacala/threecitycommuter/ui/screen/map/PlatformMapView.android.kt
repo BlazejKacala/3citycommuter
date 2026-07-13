@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.maplibre.compose.camera.CameraPosition
-import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.layers.CircleLayer
@@ -20,10 +19,6 @@ import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.ClickResult
-import org.maplibre.spatialk.geojson.Feature
-import org.maplibre.spatialk.geojson.FeatureCollection
-import org.maplibre.spatialk.geojson.LineString
-import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
@@ -56,12 +51,12 @@ actual fun PlatformMapView(
 ) {
     val center = cameraTarget ?: DEFAULT_CENTER
     val effectiveZoom = cameraZoom.coerceAtLeast(mapStyle.defaultZoom)
-    
+
     val cameraState = rememberCameraState(
         firstPosition = CameraPosition(
             target = Position(center.longitude, center.latitude),
-            zoom = effectiveZoom.toDouble()
-        )
+            zoom = effectiveZoom.toDouble(),
+        ),
     )
 
     // Update camera when target or zoom changes
@@ -70,10 +65,10 @@ actual fun PlatformMapView(
             finalPosition = CameraPosition(
                 target = Position(
                     (cameraTarget ?: DEFAULT_CENTER).longitude,
-                    (cameraTarget ?: DEFAULT_CENTER).latitude
+                    (cameraTarget ?: DEFAULT_CENTER).latitude,
                 ),
-                zoom = effectiveZoom.toDouble()
-            )
+                zoom = effectiveZoom.toDouble(),
+            ),
         )
     }
 
@@ -88,7 +83,7 @@ actual fun PlatformMapView(
             onMapClick = { _, _ ->
                 onMapClicked()
                 ClickResult.Pass
-            }
+            },
         ) {
             // Build bus stops GeoJSON as string to avoid serialization issues
             val busStopGeoJson = remember(busStops) {
@@ -102,7 +97,7 @@ actual fun PlatformMapView(
                 }
             }
             val busStopFeatures = rememberGeoJsonSource(
-                data = GeoJsonData.JsonString(busStopGeoJson)
+                data = GeoJsonData.JsonString(busStopGeoJson),
             )
 
             // Build route GeoJSON as string
@@ -118,7 +113,9 @@ actual fun PlatformMapView(
                         append("]},\"properties\":{}}")
                         append("]}")
                     }
-                } else null
+                } else {
+                    null
+                }
             }
             val routeFeature = routeGeoJson?.let { geoJson ->
                 rememberGeoJsonSource(data = GeoJsonData.JsonString(geoJson))
@@ -154,7 +151,7 @@ actual fun PlatformMapView(
                     id = "route-line",
                     source = source,
                     color = const(ROUTE_COLOR),
-                    width = const(3.0.dp)
+                    width = const(3.0.dp),
                 )
             }
 
@@ -173,7 +170,7 @@ actual fun PlatformMapView(
                         }
                     }
                     ClickResult.Consume
-                }
+                },
             )
 
             // Draw selected bus stop as larger circle
@@ -186,13 +183,13 @@ actual fun PlatformMapView(
                     }
                 }
                 val selectedSource = rememberGeoJsonSource(
-                    data = GeoJsonData.JsonString(selectedGeoJson)
+                    data = GeoJsonData.JsonString(selectedGeoJson),
                 )
                 CircleLayer(
                     id = "selected-bus-stop",
                     source = selectedSource,
                     color = const(SELECTED_STOP_COLOR),
-                    radius = const(8.0.dp)
+                    radius = const(8.0.dp),
                 )
             }
 
@@ -202,7 +199,7 @@ actual fun PlatformMapView(
                     id = "tracked-vehicle",
                     source = source,
                     color = const(VEHICLE_COLOR),
-                    radius = const(10.0.dp)
+                    radius = const(10.0.dp),
                 )
             }
 
@@ -212,16 +209,15 @@ actual fun PlatformMapView(
                     id = "user-location-outer",
                     source = source,
                     color = const(USER_LOCATION_COLOR),
-                    radius = const(8.0.dp)
+                    radius = const(8.0.dp),
                 )
                 CircleLayer(
                     id = "user-location-inner",
                     source = source,
                     color = const(Color.White),
-                    radius = const(5.0.dp)
+                    radius = const(5.0.dp),
                 )
             }
         }
     }
 }
-

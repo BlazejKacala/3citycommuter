@@ -8,11 +8,13 @@ This file provides guidance to Mistral Vibe when working with code in this repos
 It displays public transport stops on a map, real-time departures, vehicle tracking, and route visualization.
 
 **Targets:**
-- **Android** (production ready, min SDK 29 / Android 10, target SDK 35 / Android 15)
+- **Android** (production ready, min SDK 29 / Android 10, target SDK 35 / Android 15, compile SDK 36)
 - **Desktop (JVM)** (functional, Compose for Desktop)
 - **iOS** (configured via KMP targets `iosX64`, `iosArm64`, `iosSimulatorArm64` in convention plugins; `iosApp/` directory exists but is empty; platform-specific code in `shared/*/iosMain` via `expect/actual`)
 
 Data sources: Open data from [Otwarte Dane Gdanska](https://ckan.multimediagdansk.pl) — stops, routes, real-time departures, GPS positions.
+
+**Note:** Map provider migrated from Mapbox to **MapLibre** (open-source fork). Mapbox dependencies are deprecated and commented out.
 
 ## Directory Structure
 
@@ -42,6 +44,8 @@ Data sources: Open data from [Otwarte Dane Gdanska](https://ckan.multimediagdans
 ./gradlew :composeApp:android:assembleRelease        # Build release APK (requires signing config in secrets.properties)
 ./gradlew :composeApp:desktop:run                    # Run desktop app
 ```
+
+**Note:** Project uses **Gradle 9.4.1** and **Android Gradle Plugin (AGP) 9.2.1** with built-in Kotlin support.
 
 ### Testing
 ```bash
@@ -73,12 +77,14 @@ For linting:
 
 ### KMP Targets
 Configured via `KmpLibraryConventionPlugin` (build-logic/convention/):
-- **Android**: `androidTarget()` with min SDK 29, compile SDK 35
+- **Android**: `androidTarget()` with min SDK 29, compile SDK 36
 - **Desktop**: `jvm("jvm")`
 - **iOS**: `iosX64()`, `iosArm64()`, `iosSimulatorArm64()` (binaries as static frameworks)
 
+**Note:** AGP 9.0+ requires migration to new KMP plugin (`com.android.kotlin.multiplatform.library`) and removal of `android.newDsl=false` from gradle.properties.
+
 ### Convention Plugins
-- `threecitycommuter.kmp.library` — applies `kotlin-multiplatform` + `com.android.library`, configures Android, JVM, and iOS targets
+- `threecitycommuter.kmp.library` — currently applies `kotlin-multiplatform` + `com.android.library` (deprecated in AGP 9.0+). **Migration required**: use `com.android.kotlin.multiplatform.library` instead.
 - `threecitycommuter.kmp.compose` — applies Compose Multiplatform plugin + compiler plugin
 
 ### UI Architecture
@@ -143,7 +149,7 @@ Room KMP 2.7 with `@ConstructedBy(CommuterDatabaseConstructor::class)` pattern.
 
 | Interface | Android actual | Desktop actual | iOS actual |
 |---|---|---|---|
-| `PlatformMapView` | Canvas placeholder | Canvas placeholder | Stub placeholder |
+| `PlatformMapView` | Canvas placeholder (MapLibre; Mapbox deprecated) | Canvas placeholder with stop dots and route lines | Stub placeholder |
 | `getDatabaseBuilder()` | Room + Context | Room + File | Room + NSFileManager |
 | `platformNetworkModule` | Ktor Android engine | Ktor Java engine | Ktor Darwin engine |
 | `platformDataModule` | FusedLocation + PermissionChecker | Default location + always granted | Stub |
@@ -194,12 +200,16 @@ Dispatchers.resetMain()
 
 ## Configuration
 
-### Mapbox Token
-Required for Android map (add to `gradle.properties`):
+### Map Configuration
+**MapLibre** is now used instead of Mapbox (open-source fork).
+
+For MapLibre Android/Compose:
+- No token required for basic usage
+- Add to `gradle.properties` if using MapLibre cloud services:
 ```properties
-MAPBOX_DOWNLOADS_TOKEN=sk.eyJ1...
+MAPLIBRE_TOKEN=your_token_here
 ```
-Without token: Android and Desktop builds use Canvas placeholder map. Mapbox deps are commented out in `shared/ui/build.gradle.kts`.
+Canvas placeholder map is used by default. Mapbox dependencies are deprecated and commented out.
 
 ### Signing (Android)
 `secrets.properties` (gitignored):
@@ -214,13 +224,13 @@ Keystore file expected at `signing/key.jks`.
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Language | Kotlin + Kotlin Multiplatform | 2.1.10 |
+| Language | Kotlin + Kotlin Multiplatform | 2.3.21 |
 | UI | Compose Multiplatform + Material 3 | 1.7.3 |
-| Maps | Mapbox Maps SDK (Android, optional) / Canvas placeholder | 11.9.2 |
+| Maps | MapLibre Compose + Native SDK / Canvas placeholder | 0.13.0 / 10.0.0 |
 | Navigation | JetBrains Navigation Compose (KMP) | 2.9.0 |
 | DI | Koin | 4.0.2 |
 | Networking | Ktor Client | 3.1.1 |
-| Database | Room KMP | 2.7.1 |
+| Database | Room KMP | 2.7.2 |
 | Serialization | Kotlinx Serialization | 1.8.0 |
 | Async | Kotlin Coroutines + Flow | 1.10.1 |
 | Date/Time | Kotlinx DateTime | 0.6.2 |
@@ -229,12 +239,13 @@ Keystore file expected at `signing/key.jks`.
 
 ## Safety Notes for Mistral Vibe
 
-1. **Do NOT commit secrets** — `secrets.properties` and `MAPBOX_DOWNLOADS_TOKEN` are gitignored. Never add them to commits.
+1. **Do NOT commit secrets** — `secrets.properties` is gitignored. Never add it to commits.
 2. **Android signing** — release builds require `secrets.properties` and `signing/key.jks`. Do not attempt release builds without these.
 3. **iOS limitations** — `iosApp/` is empty. iOS target is configured in KMP but has no entry point. Do not attempt iOS builds.
-4. **Mapbox** — Without `MAPBOX_DOWNLOADS_TOKEN`, Android uses Canvas placeholder. Do not uncomment Mapbox dependencies without a valid token.
+4. **MapLibre** — Mapbox has been replaced with MapLibre (open-source fork). Mapbox dependencies are deprecated and commented out.
 5. **Gradle commands** — Always use `./gradlew` (not `gradlew.bat`) on Linux/macOS. Project uses Gradle version catalog (`gradle/libs.versions.toml`).
 6. **File modifications** — Respect existing code style: 4-space indentation, ktlint-compatible formatting.
+7. **AGP 9.0+ compatibility** — Project uses AGP 9.2.1 with deprecated settings. Migration to new KMP plugin (`com.android.kotlin.multiplatform.library`) is required to remove deprecation warnings.
 7. **Test execution** — Instrumented tests require Android device/emulator. Use `jvmTest` for fast feedback.
 8. **Blast radius** — Commands like `./gradlew clean`, `rm -rf`, or git force-push require explicit confirmation.
 

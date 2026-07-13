@@ -1,6 +1,6 @@
+import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.JavaVersion
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
@@ -24,7 +24,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                     targetCompatibility = JavaVersion.VERSION_17
                 }
             }
-            
+
             // W AGP 9.0+ z android.newDsl=false, trzeba jawnie opublikowac androidTarget
             // dla KMP modulow, aby byly dostepne w module Android
             extensions.configure<KotlinMultiplatformExtension> {

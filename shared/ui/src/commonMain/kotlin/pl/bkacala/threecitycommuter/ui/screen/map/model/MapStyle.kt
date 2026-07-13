@@ -21,7 +21,8 @@ enum class MapStyle(
         displayName = "Demo (Countries)",
         styleUri = "https://demotiles.maplibre.org/style.json",
         requiresToken = false,
-        defaultZoom = 6.0f,  // Demo tiles only work well at low zoom
+        // Demo tiles only work well at low zoom
+        defaultZoom = 6.0f,
     ),
 
     // Stadia Maps - requires token (free tier available)
@@ -58,7 +59,8 @@ enum class MapStyle(
         displayName = "Mapbox Streets",
         styleUri = "mapbox://styles/mapbox/streets-v12",
         requiresToken = true,
-        tokenPlaceholder = null,  // Configured via gradle.properties
+        // Configured via gradle.properties
+        tokenPlaceholder = null,
         defaultZoom = 14.0f,
     ),
 
@@ -66,6 +68,7 @@ enum class MapStyle(
         displayName = "Mapbox Light",
         styleUri = "mapbox://styles/mapbox/light-v11",
         requiresToken = true,
+        // Configured via gradle.properties
         tokenPlaceholder = null,
         defaultZoom = 14.0f,
     ),
@@ -91,7 +94,8 @@ enum class MapStyle(
         styleUri = "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         requiresToken = false,
         defaultZoom = 14.0f,
-    );
+    ),
+    ;
 
     /**
      * Get the style URI with token replaced if needed.
