@@ -1,5 +1,7 @@
 package pl.bkacala.threecitycommuter.ui.screen.map.model
 
+import org.maplibre.compose.style.BaseStyle
+
 /**
  * Available map styles for the application.
  * Each style has a display name and a URI that can be used with MaplibreMap.
@@ -78,5 +80,38 @@ enum class MapStyle(
         } else {
             styleUri
         }
+    }
+
+    fun toBaseStyle(token: String? = null): BaseStyle {
+        return if (this == OSM_RASTER) {
+            BaseStyle.Json(OSM_RASTER_STYLE_JSON)
+        } else {
+            BaseStyle.Uri(getUriWithToken(token))
+        }
+    }
+
+    private companion object {
+        const val OSM_RASTER_STYLE_JSON = """
+            {
+              "version": 8,
+              "sources": {
+                "openstreetmap": {
+                  "type": "raster",
+                  "tiles": ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                  "tileSize": 256,
+                  "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
+                }
+              },
+              "layers": [
+                {
+                  "id": "openstreetmap-raster",
+                  "type": "raster",
+                  "source": "openstreetmap",
+                  "minzoom": 0,
+                  "maxzoom": 19
+                }
+              ]
+            }
+        """
     }
 }

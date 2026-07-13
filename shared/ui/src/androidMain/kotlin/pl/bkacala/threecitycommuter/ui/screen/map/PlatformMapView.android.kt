@@ -17,7 +17,6 @@ import org.maplibre.compose.layers.LineLayer
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
-import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
@@ -79,7 +78,7 @@ actual fun PlatformMapView(
         MaplibreMap(
             modifier = Modifier.fillMaxSize(),
             cameraState = cameraState,
-            baseStyle = BaseStyle.Uri(mapStyle.getUriWithToken(stadiaToken)),
+            baseStyle = mapStyle.toBaseStyle(stadiaToken),
             onMapClick = { _, _ ->
                 onMapClicked()
                 ClickResult.Pass

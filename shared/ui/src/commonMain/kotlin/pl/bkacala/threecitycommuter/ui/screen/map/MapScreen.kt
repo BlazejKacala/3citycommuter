@@ -48,7 +48,7 @@ import pl.bkacala.threecitycommuter.ui.screen.map.search.BusSearchBar
 @Composable
 fun MapScreen(
     snackbarHostState: SnackbarHostState,
-    mapStyle: MapStyle = MapStyle.DEMO,
+    mapStyle: MapStyle = MapStyle.OSM_RASTER,
     stadiaToken: String? = null,
 ) {
     BoxWithConstraints {
@@ -89,7 +89,7 @@ fun MapScreen(
         PlatformMapView(
             modifier = Modifier.fillMaxSize(),
             cameraTarget = cameraTarget.value,
-            cameraZoom = 14.0f,
+            cameraZoom = 6.0f,
             busStops = busStopsState.value,
             selectedBusStop = viewModel.selectedBusStop.collectAsStateWithLifecycle().value,
             trackedVehicle = viewModel.trackedVehicle.collectAsStateWithLifecycle().value,
