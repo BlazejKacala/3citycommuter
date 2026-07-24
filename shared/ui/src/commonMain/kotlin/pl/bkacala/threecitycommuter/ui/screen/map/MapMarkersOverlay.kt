@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -35,6 +36,7 @@ import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.sphericalDistance
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.floor
@@ -232,13 +234,53 @@ internal fun MapMarkersOverlay(
             val location = projection.screenLocationFromPosition(animatedVehiclePosition.value.toLatLng().toPosition())
             val center = Offset(location.x.toPx(), location.y.toPx())
             if (center.isInside(size)) {
-                drawCircle(Color.White, radius = 22.dp.toPx(), center = center)
-                drawCircle(vehicleColor, radius = 18.dp.toPx(), center = center)
                 val text = textMeasurer.measure(vehicle.number, vehicleTextStyle)
+                val iconSize = VEHICLE_ICON_SIZE.toPx()
+                val contentWidth =
+                    VEHICLE_HORIZONTAL_PADDING.toPx() * 2 + iconSize + VEHICLE_CONTENT_GAP.toPx() + text.size.width
+                val markerHeight = VEHICLE_MARKER_HEIGHT.toPx()
+                val borderWidth = VEHICLE_BORDER_WIDTH.toPx()
+                val topLeft = Offset(
+                    x = center.x - (contentWidth + borderWidth * 2) / 2f,
+                    y = center.y - (markerHeight + borderWidth * 2) / 2f,
+                )
+                val outerSize = Size(contentWidth + borderWidth * 2, markerHeight + borderWidth * 2)
+
+                drawRoundRect(
+                    color = Color.White,
+                    topLeft = topLeft,
+                    size = outerSize,
+                    cornerRadius = CornerRadius(outerSize.height / 2f),
+                )
+                drawRoundRect(
+                    color = vehicleColor,
+                    topLeft = topLeft + Offset(borderWidth, borderWidth),
+                    size = Size(contentWidth, markerHeight),
+                    cornerRadius = CornerRadius(markerHeight / 2f),
+                )
+                val painter = when (vehicle.type) {
+                    VehicleType.Tram -> tramPainter
+                    VehicleType.Bus -> busPainter
+                }
+                translate(
+                    left = topLeft.x + borderWidth + VEHICLE_HORIZONTAL_PADDING.toPx(),
+                    top = center.y - iconSize / 2f,
+                ) {
+                    with(painter) {
+                        draw(
+                            size = Size(iconSize, iconSize),
+                            colorFilter = ColorFilter.tint(Color.White),
+                        )
+                    }
+                }
                 drawText(
                     textLayoutResult = text,
                     topLeft = Offset(
-                        center.x - text.size.width / 2f,
+                        topLeft.x +
+                            borderWidth +
+                            VEHICLE_HORIZONTAL_PADDING.toPx() +
+                            iconSize +
+                            VEHICLE_CONTENT_GAP.toPx(),
                         center.y - text.size.height / 2f,
                     ),
                 )
@@ -275,6 +317,11 @@ private val STOP_ICON_SIZE = 20.dp
 private val SELECTED_STOP_OUTER_RADIUS = 24.dp
 private val SELECTED_STOP_INNER_RADIUS = 19.dp
 private val SELECTED_STOP_ICON_SIZE = STOP_ICON_SIZE
+private val VEHICLE_MARKER_HEIGHT = 36.dp
+private val VEHICLE_ICON_SIZE = 20.dp
+private val VEHICLE_HORIZONTAL_PADDING = 10.dp
+private val VEHICLE_CONTENT_GAP = 4.dp
+private val VEHICLE_BORDER_WIDTH = 3.dp
 private const val MARKER_CLICK_RADIUS_DP = 56f
 private const val MIN_MARKER_CLICK_RADIUS_METERS = 15.0
 private const val MARKER_EDGE_MARGIN_PX = 64f
