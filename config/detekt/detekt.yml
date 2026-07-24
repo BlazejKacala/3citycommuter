@@ -1,0 +1,104 @@
+# Detekt configuration for 3citycommuter
+# Kotlin Multiplatform project
+# Compatible with Detekt 1.23.6+
+
+# Build configuration
+build:
+  maxIssues: 0
+
+# Complexity rules
+complexity:
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 15
+  LongMethod:
+    active: true
+    threshold: 60
+  LongParameterList:
+    active: true
+    functionThreshold: 6
+    constructorThreshold: 6
+  LargeClass:
+    active: true
+    threshold: 200
+  NestedBlockDepth:
+    active: true
+    threshold: 4
+  StringLiteralDuplication:
+    active: true
+    threshold: 3
+    excludeStringsWithLessThan5Characters: true
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 11
+    thresholdInClasses: 11
+    ignorePrivate: true
+    ignoreOverridden: true
+
+# Performance rules
+performance:
+  ForEachOnRange:
+    active: true
+  SpreadOperator:
+    active: true
+
+# Potential bugs
+potential-bugs:
+  EqualsAlwaysReturnsTrueOrFalse:
+    active: true
+  EqualsWithHashCodeExist:
+    active: true
+  ExplicitGarbageCollectionCall:
+    active: true
+  InvalidRange:
+    active: true
+  IteratorHasNextCallsNextMethod:
+    active: true
+  UnconditionalJumpStatementInLoop:
+    active: true
+  UnreachableCode:
+    active: true
+  UnsafeCallOnNullableType:
+    active: true
+  UnsafeCast:
+    active: true
+
+# Style rules
+style:
+  CollapsibleIfStatements:
+    active: true
+  ModifierOrder:
+    active: true
+  ProtectedMemberInFinalClass:
+    active: true
+  RedundantHigherOrderMapUsage:
+    active: true
+  SafeCast:
+    active: true
+  UnnecessaryAbstractClass:
+    active: true
+  UnnecessaryApply:
+    active: true
+  UnnecessaryInheritance:
+    active: true
+  UnnecessaryLet:
+    active: true
+  UnnecessaryParentheses:
+    active: true
+  UseArrayLiteralsInAnnotations:
+    active: true
+  UseCheckOrError:
+    active: true
+  UseDataClass:
+    active: true
+  UseEmptyCounterpart:
+    active: true
+  UseIfInsteadOfWhen:
+    active: true
+  UseIsNullOrEmpty:
+    active: true
+
+# Coroutines rules
+coroutines:
+  GlobalCoroutineUsage:
+    active: true

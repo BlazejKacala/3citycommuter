@@ -1,0 +1,38 @@
+root = true
+
+# Kotlin files - Compose support
+[*.{kt,kts}]
+# Allow Composable functions to start with uppercase letter (standard Compose convention)
+ktlint_function_naming = disabled
+ktlint_standard_function-naming = disabled
+
+# Match Spotless configuration from build.gradle.kts
+indent_size = 4
+indent_style = space
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Markdown files
+[*.md]
+indent_size = 2
+indent_style = space
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# YAML files
+[*.{yml,yaml}]
+indent_size = 2
+indent_style = space
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Git ignore
+[.gitignore]
+indent_size = 2
+indent_style = space
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true

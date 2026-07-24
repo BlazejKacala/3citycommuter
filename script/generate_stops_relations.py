@@ -35,10 +35,11 @@ url = "https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4dc2-a171-a23eec8f
 response = requests.get(url)
 json_data = response.json()
 
-# Deserializacja JSON do obiektu klasy StopData
+# Deserializacja najnowszej wersji danych do obiektu klasy StopData
+latest_version = max(json_data.values(), key=lambda version: version["lastUpdate"])
 source = StopData(
-    lastUpdate=json_data["2024-02-12"]["lastUpdate"],
-    stopsInTrip=[Stop(**stop) for stop in json_data["2024-02-12"]["stopsInTrip"]]
+    lastUpdate=latest_version["lastUpdate"],
+    stopsInTrip=[Stop(**stop) for stop in latest_version["stopsInTrip"]]
 ).stopsInTrip
 
 bus_stops_dict = {}

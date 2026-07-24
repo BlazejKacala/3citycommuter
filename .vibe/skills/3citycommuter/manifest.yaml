@@ -1,0 +1,23 @@
+name: 3citycommuter
+version: 1.0.0
+description: |
+  Skill for developing the 3citycommuter Kotlin Multiplatform app.
+  Provides project-specific knowledge, architecture guidelines, API reference,
+  and development workflows for the Tri-City (Gdańsk, Sopot, Gdynia) public transport app.
+
+author: Project Team
+license: CCA (for API reference content)
+
+bundled_resources:
+  - skill.md
+  - api_reference.md
+  - MEMORY.md
+
+load_when:
+  - "working on 3citycommuter project"
+  - "Kotlin Multiplatform app development"
+  - "ZTM Gdańsk API"
+  - "public transport app"
+  - "Compose Multiplatform"
+
+priority: high
