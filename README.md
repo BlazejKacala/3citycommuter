@@ -1,72 +1,77 @@
 # 3citycommuter
 
-Aplikacja **Kotlin Multiplatform** dla pasażerów komunikacji miejskiej w Gdańsku, Sopocie i Gdyni.
-Wyświetla przystanki na mapie, rozkłady jazdy w czasie rzeczywistym oraz śledzi pojazdy na żywo.
+Aplikacja Kotlin Multiplatform dla pasażerów komunikacji miejskiej w Gdańsku, Sopocie i Gdyni. Wyświetla przystanki na mapie, odjazdy w czasie rzeczywistym, pozycje pojazdów oraz przebieg tras.
 
 ## Funkcje
 
-- **Mapa przystanków** – wszystkie przystanki autobusowe i tramwajowe na interaktywnej mapie
-- **Odjazdy w czasie rzeczywistym** – lista najbliższych odjazdów z wybranego przystanku z uwzględnieniem opóźnień
-- **Śledzenie pojazdów** – pozycja pojazdu na mapie aktualizowana co kilka sekund, wskaźnik jakości sygnału GPS
-- **Wizualizacja trasy** – rysowanie linii trasy wybranego kursu na mapie
-- **Wyszukiwanie przystanków** – szybkie wyszukiwanie po nazwie przystanku
-- **Lokalizacja użytkownika** – centrowanie mapy na aktualnej pozycji
+- Interaktywna mapa przystanków autobusowych i tramwajowych.
+- Odjazdy w czasie rzeczywistym wraz z opóźnieniami.
+- Śledzenie pojazdów i prezentacja jakości sygnału GPS.
+- Wizualizacja trasy wybranego kursu.
+- Wyszukiwanie przystanków i centrowanie mapy na lokalizacji użytkownika.
 
 ## Platformy
 
 | Platforma | Status |
-|---|---|
-| Android | ✅ Produkcyjny |
-| Desktop (JVM) | ✅ Działa |
-| iOS | 🚧 Stub (wymaga Mapbox iOS SDK) |
+| --- | --- |
+| Android | Gotowa do użycia (min. SDK 29, target SDK 36) |
+| Desktop (JVM) | Obsługiwana |
+| iOS | Skonfigurowany target KMP; brak aplikacji startowej, widok mapy jest stubem |
 
 ## Dane
 
-Aplikacja korzysta z otwartego API [Otwarte Dane Gdańska](https://ckan.multimediagdansk.pl):
-- Dane o przystankach i liniach z `ckan.multimediagdansk.pl`
-- Odjazdy i pozycje GPS z `ckan2.multimediagdansk.pl`
-- Baza danych pojazdów z `files.cloudgdansk.pl`
+Aplikacja korzysta z otwartych danych [Otwarte Dane Gdańska](https://ckan.multimediagdansk.pl):
+
+- przystanki i linie: `ckan.multimediagdansk.pl`,
+- odjazdy i pozycje GPS: `ckan2.multimediagdansk.pl`,
+- dane pojazdów: `files.cloudgdansk.pl`.
 
 ## Stos technologiczny
 
 | Warstwa | Technologia |
-|---|---|
-| Język | Kotlin Multiplatform 2.1 |
-| UI | Compose Multiplatform 1.7 + Material 3 |
-| Mapy | Mapbox (Android) / Canvas placeholder (Desktop) |
-| DI | Koin 4.0 |
-| Sieć | Ktor Client (Android/Darwin/Java engines) |
-| Baza danych | Room KMP 2.7 |
-| Nawigacja | JetBrains Navigation Compose (KMP) |
-| Async | Kotlin Coroutines + Flow |
-| Lokalizacja | Google Play Services (Android) / stub (Desktop) |
-| Ustawienia | multiplatform-settings |
+| --- | --- |
+| Język | Kotlin Multiplatform 2.3.21 |
+| UI | Compose Multiplatform 1.10.3 + Material 3 |
+| Mapy | MapLibre Compose 0.13.0 + MapLibre Native 13.3.1 |
+| DI | Koin 4.0.2 |
+| Sieć | Ktor Client 3.1.1 |
+| Baza danych | Room KMP 2.7.2 |
+| Nawigacja | JetBrains Navigation Compose 2.9.2 |
+| Asynchroniczność | Kotlin Coroutines + Flow |
+| Lokalizacja | Google Play Services (Android) |
+| Ustawienia | multiplatform-settings 1.3.0 |
 
 ## Architektura
 
-Projekt wielomodułowy KMP z czystym podziałem warstw:
-
 ```
-shared/
-├── core/       – modele domenowe, LatLng, UiState, utilities
-├── network/    – Ktor client, DTOs, Koin modules per platform
-├── database/   – Room KMP, DAOs, encje, DatabaseModule
-├── data/       – repozytoria, mappery, use case'y, lokalizacja
-└── ui/         – Compose Multiplatform UI, ViewModels, nawigacja
-
-composeApp/
-├── android/    – MainActivity, CommuterApp (Koin init)
-└── desktop/    – main.kt (Window + Koin init)
+composeApp / iosApp
+        │
+        ▼
+   shared:ui
+        │
+        ▼
+  shared:data
+    ┌───┴────┐
+    ▼        ▼
+shared:network  shared:database
+    └───┬────┘
+        ▼
+   shared:core
 ```
 
-**Przepływ zależności:** `composeApp` → `shared:ui` → `shared:data` → `shared:network` + `shared:database` → `shared:core`
+`shared:core` zawiera modele domenowe i narzędzia. Pozostałe moduły odpowiadają odpowiednio za komunikację sieciową, bazę Room, repozytoria oraz interfejs Compose. Aplikacje Android i Desktop inicjalizują Koin i korzystają z `shared:ui`.
 
-## Budowanie
+## Wymagania
+
+- JDK 21,
+- Android SDK 36 do budowania aplikacji Android,
+- Gradle Wrapper dostarczony w repozytorium (Gradle 9.4.1).
+
+## Budowanie i uruchamianie
 
 ```bash
-# Android APK
+# Android: debug APK
 ./gradlew :composeApp:android:assembleDebug
-./gradlew :composeApp:android:assembleRelease   # wymaga konfiguracji podpisywania
 
 # Desktop JVM
 ./gradlew :composeApp:desktop:run
@@ -75,110 +80,42 @@ composeApp/
 ./gradlew build
 ```
 
+Wydanie Android wymaga pliku `secrets.properties` oraz klucza `signing/key.jks`; te pliki są lokalne i nie powinny trafiać do repozytorium.
+
 ## Testy
 
 ```bash
-./gradlew :shared:ui:jvmTest          # testy ViewModel (commonTest, JVM)
-./gradlew :shared:network:jvmTest     # testy serializacji
-./gradlew :composeApp:android:connectedDebugAndroidTest   # testy instrumentowane
+# Testy ViewModeli (commonTest uruchamiany na JVM)
+./gradlew :shared:ui:jvmTest
+
+# Testy serializacji i warstwy sieciowej
+./gradlew :shared:network:jvmTest
+
+# Testy instrumentowane Androida — wymagają urządzenia lub emulatora
+./gradlew :composeApp:android:connectedDebugAndroidTest
 ```
 
-## Mapbox
+## Mapy
 
-Mapbox wymaga tokenu pobierania. Dodaj do `gradle.properties`:
+Projekt używa MapLibre — nie wymaga tokenu do podstawowego działania. Aktualna implementacja mapy działa na Androidzie i Desktopie. Dostępne są również style Stadia Maps, które opcjonalnie wymagają tokenu przekazywanego do aplikacji; nie zapisuj go w repozytorium.
 
-```properties
-MAPBOX_DOWNLOADS_TOKEN=sk.eyJ1...
-```
+## Jakość kodu
 
-Bez tokenu Android używa uproszczonego placeholdera Canvas.
-
-## Narzędzia do kontroli jakości kodu
-
-### Spotless (Formatowanie kodu)
-
-Projekt używa **Spotless 6.25.0** z **ktlint** do automatycznego formatowania kodu Kotlin.
-
-**Dostępne komendy:**
 ```bash
-# Sprawdź formatowanie (nie modyfikuje plików)
+# Sprawdzenie formatowania
 ./gradlew spotlessCheck
 
-# Sformatuj kod
+# Formatowanie kodu
 ./gradlew spotlessApply
-```
 
-**Konfiguracja:**
-- Kotlin: 4 spacje, usuwanie białych znaków na końcu linii, nowa linia na końcu pliku
-- Kotlin Gradle (`.kts`): takie same reguły jak Kotlin
-- Markdown, YAML, `.gitignore`: 2 spacje, usuwanie białych znaków
-
-**Wykluczenia:** `**/build/**`, `**/.gradle/**`, `**/generated/**`
-
-### Detekt (Analiza statyczna kodu)
-
-Projekt używa **Detekt 1.23.6** do analizy statycznej kodu Kotlin z obsługą Kotlin Multiplatform.
-
-**Dostępne komendy:**
-```bash
-# Uruchom analizę Detekt
+# Analiza statyczna
 ./gradlew detekt
 
-# Generowanie raportów (HTML, XML, SARIF)
-./gradlew detektAll  # w wszystkich modułach
-```
-
-**Konfiguracja:** `config/detekt/detekt.yml`
-
-**Raporty generowane w:**
-- HTML: `build/reports/detekt/detekt.html`
-- XML: `build/reports/detekt/detekt.xml`
-- SARIF: `build/reports/detekt/detekt.sarif`
-
-**Ograniczenia z KMP:**
-Analiza typów (type resolution) jest włączona, ale może mieć ograniczenia w zależności od wersji Kotlin i konfiguracji multiplatform. Jeśli wystąpią problemy, można ją wyłączyć w pliku konfiguracyjnym.
-
-### Zadanie `lint`
-
-Połączone zadanie uruchamiające wszystkie narzędzia kontroli jakości:
-```bash
-# Uruchom wszystkie sprawdzenia (Spotless + Detekt)
+# Wszystkie kontrole jakości (Spotless + Detekt)
 ./gradlew lint
 
-# Zadanie `check` obejmuje również `lint`
+# Pełne sprawdzenie projektu, w tym lint
 ./gradlew check
 ```
 
-## Baseline Detekt
-
-Jeśli istniejący kod generuje dużo ostrzeżeń Detekt, użyj baseline zamiast masowego wyłączania reguł:
-
-1. Uruchom: `./gradlew detektGenerateConfig`
-2. Skopiuj wygenerowaną konfigurację do `config/detekt/detekt.yml`
-3. Dodaj plik baseline: `./gradlew detektBaseline`
-4. Skonfiguruj `baseline` w `detekt.yml`
-
-**Lokalizacja pliku baseline:** `config/detekt/baseline.yml`
-
-## Aktualizacja konfiguracji
-
-- **Spotless**: Konfiguracja w `build.gradle.kts` (root project)
-- **Detekt**: Konfiguracja w `config/detekt/detekt.yml`
-- **Wersje pluginów**: `gradle/libs.versions.toml`
-
-## Formatowanie kodu
-
-Zalecany workflow przed commitem:
-```bash
-# 1. Sformatuj kod
-./gradlew spotlessApply
-
-# 2. Sprawdź analize statyczną
-./gradlew detekt
-
-# 3. Uruchom wszystkie sprawdzenia
-./gradlew lint
-
-# 4. Zbuduj projekt
-./gradlew build
-```
+Konfiguracja Spotless i Detekt znajduje się w głównym `build.gradle.kts`, a reguły Detekt w `config/detekt/detekt.yml`.
