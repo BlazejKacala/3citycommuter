@@ -17,33 +17,6 @@ package pl.bkacala.threecitycommuter.ui.screen.map.model
  *    - No token needed: MapStyle.DEMO or MapStyle.OSM_RASTER
  */
 
-// ============================================================================
-// EXAMPLE USAGE IN FUTURE MENU
-// ============================================================================
-//
-// @Composable
-// fun MapStyleSelector(
-//     selectedStyle: MapStyle,
-//     onStyleSelected: (MapStyle) -> Unit,
-//     stadiaToken: String?,
-// ) {
-//     val styles = MapStyle.entries.filter {
-//         !it.requiresToken || stadiaToken != null || it.tokenPlaceholder == null
-//     }
-//
-//     Column {
-//         styles.forEach { style ->
-//             RadioButton(
-//                 selected = style == selectedStyle,
-//                 onClick = { onStyleSelected(style) },
-//                 label = style.displayName
-//             )
-//         }
-//     }
-// }
-//
-// ============================================================================
-
 /**
  * Helper to get all available styles that can be used with the current configuration.
  */
