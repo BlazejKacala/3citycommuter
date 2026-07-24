@@ -2,8 +2,6 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +9,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -20,10 +19,8 @@ import kotlinx.coroutines.launch
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
-import org.maplibre.compose.expressions.dsl.image
 import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.layers.LineLayer
-import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.GeoJsonOptions
@@ -76,6 +73,9 @@ actual fun PlatformMapView(
     val stopMarkers = remember(busStops, stopsZoom) {
         busStops.toStopMapMarkers(stopsZoom)
     }
+    val currentStopMarkers = rememberUpdatedState(stopMarkers)
+    val currentOnBusStopSelected = rememberUpdatedState(onBusStopSelected)
+    val currentOnMapClicked = rememberUpdatedState(onMapClicked)
 
     LaunchedEffect(cameraTarget, cameraZoom) {
         val target = cameraTarget ?: defaultCenter
@@ -99,13 +99,13 @@ actual fun PlatformMapView(
             },
             onMapClick = { position, _ ->
                 val marker = findStopMarkerAt(
-                    markers = stopMarkers,
+                    markers = currentStopMarkers.value,
                     click = position,
                     metersPerDp = cameraState.metersPerDpAtTarget,
                 )
                 when {
                     marker?.stop != null -> {
-                        onBusStopSelected(marker.stop)
+                        currentOnBusStopSelected.value(marker.stop)
                         ClickResult.Consume
                     }
                     marker != null -> {
@@ -123,14 +123,12 @@ actual fun PlatformMapView(
                         ClickResult.Consume
                     }
                     else -> {
-                        onMapClicked()
+                        currentOnMapClicked.value()
                         ClickResult.Pass
                     }
                 }
             },
         ) {
-            val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
-
             route?.takeIf { it.size >= 2 }?.let { routePoints ->
                 key("route-source") {
                     val routeSource = rememberGeoJsonSource(
@@ -140,7 +138,6 @@ actual fun PlatformMapView(
                     DrawRoute(routeSource, tertiary)
                 }
             }
-            DrawSelectedBusStop(selectedBusStop, tertiary, busPainter)
             userLocation?.takeIf { !it.isFixed }?.let { location ->
                 key("user-location-source") {
                     val locationSource = rememberGeoJsonSource(
@@ -156,8 +153,10 @@ actual fun PlatformMapView(
             cameraState = cameraState,
             renderTick = overlayRenderTick,
             stopMarkers = stopMarkers,
+            selectedBusStop = selectedBusStop,
             trackedVehicle = trackedVehicle,
             stopColor = primary,
+            selectedStopColor = tertiary,
             vehicleColor = MapVehicleColor,
         )
     }
@@ -168,28 +167,6 @@ actual fun PlatformMapView(
 private fun DrawRoute(source: GeoJsonSource, color: Color) {
     LineLayer("route-line-halo", source, color = const(Color.White), width = const(9.dp))
     LineLayer("route-line", source, color = const(color), width = const(5.dp))
-}
-
-@Composable
-@MaplibreComposable
-private fun DrawSelectedBusStop(
-    stop: BusStopMapItem?,
-    color: Color,
-    painter: androidx.compose.ui.graphics.painter.Painter,
-) {
-    stop?.let {
-        val source = rememberGeoJsonSource(GeoJsonData.JsonString(it.toSelectedStopGeoJson()))
-        CircleLayer("selected-bus-stop-halo", source, color = const(Color.White), radius = const(18.dp))
-        CircleLayer("selected-bus-stop", source, color = const(color), radius = const(14.dp))
-        SymbolLayer(
-            "selected-bus-stop-icon",
-            source,
-            "",
-            iconImage = image(painter, drawAsSdf = true),
-            iconColor = const(Color.White),
-            iconAllowOverlap = const(true),
-        )
-    }
 }
 
 @Composable
@@ -208,17 +185,8 @@ private fun List<LatLng>.toRouteGeoJson() = buildString {
     append("]},\"properties\":{}}")
 }
 
-private fun BusStopMapItem.toSelectedStopGeoJson() =
-    toPointGeoJson("\"type\":\"${markerLabel()}\"")
-
 private fun UserLocation.toLocationGeoJson() =
     "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[$longitude,$latitude]},\"properties\":{}}"
 
 private fun BusStopMapItem.toPointGeoJson(properties: String) =
     "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${position.longitude},${position.latitude}]},\"properties\":{$properties}}"
-
-private fun BusStopMapItem.markerLabel() = when (getStationType()) {
-    BusStopMapItem.Type.Bus -> "B"
-    BusStopMapItem.Type.Tram -> "T"
-    BusStopMapItem.Type.Both -> "B/T"
-}

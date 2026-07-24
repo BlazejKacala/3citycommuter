@@ -98,15 +98,17 @@ internal fun MapMarkersOverlay(
     cameraState: CameraState,
     renderTick: State<Int>,
     stopMarkers: List<StopMapMarker>,
+    selectedBusStop: BusStopMapItem?,
     trackedVehicle: TrackedVehicle?,
     stopColor: Color,
+    selectedStopColor: Color,
     vehicleColor: Color,
 ) {
     val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
     val tramPainter = rememberVectorPainter(Icons.Outlined.Tram)
     val textMeasurer = rememberTextMeasurer()
     val countTextStyle = remember {
-        TextStyle(color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
     val vehicleTextStyle = remember {
         TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
@@ -126,12 +128,12 @@ internal fun MapMarkersOverlay(
             val isCluster = marker.stop == null
             drawCircle(
                 color = Color.White,
-                radius = (if (isCluster) 18.dp else 13.dp).toPx(),
+                radius = (if (isCluster) CLUSTER_OUTER_RADIUS else STOP_OUTER_RADIUS).toPx(),
                 center = center,
             )
             drawCircle(
                 color = stopColor,
-                radius = (if (isCluster) 14.dp else 9.dp).toPx(),
+                radius = (if (isCluster) CLUSTER_INNER_RADIUS else STOP_INNER_RADIUS).toPx(),
                 center = center,
             )
 
@@ -150,7 +152,36 @@ internal fun MapMarkersOverlay(
                     BusStopMapItem.Type.Tram -> tramPainter
                     else -> busPainter
                 }
-                val iconSize = 14.dp.toPx()
+                val iconSize = STOP_ICON_SIZE.toPx()
+                translate(
+                    left = center.x - iconSize / 2f,
+                    top = center.y - iconSize / 2f,
+                ) {
+                    with(painter) {
+                        draw(
+                            size = Size(iconSize, iconSize),
+                            colorFilter = ColorFilter.tint(Color.White),
+                        )
+                    }
+                }
+            }
+        }
+
+        selectedBusStop?.let { stop ->
+            val location = projection.screenLocationFromPosition(stop.position.toPosition())
+            val center = Offset(location.x.toPx(), location.y.toPx())
+            if (center.isInside(size)) {
+                drawCircle(Color.White, radius = SELECTED_STOP_OUTER_RADIUS.toPx(), center = center)
+                drawCircle(
+                    color = selectedStopColor,
+                    radius = SELECTED_STOP_INNER_RADIUS.toPx(),
+                    center = center,
+                )
+                val painter = when (stop.getStationType()) {
+                    BusStopMapItem.Type.Tram -> tramPainter
+                    else -> busPainter
+                }
+                val iconSize = SELECTED_STOP_ICON_SIZE.toPx()
                 translate(
                     left = center.x - iconSize / 2f,
                     top = center.y - iconSize / 2f,
@@ -195,6 +226,14 @@ private fun Offset.isInside(canvasSize: Size): Boolean =
 private const val STOPS_UNCLUSTERED_ZOOM = 16
 private const val CLUSTER_RADIUS_TILE_FRACTION = 50.0 / 512.0
 private const val MAP_REFERENCE_LATITUDE = 54.352
-private const val MARKER_CLICK_RADIUS_DP = 48f
+private val CLUSTER_OUTER_RADIUS = 22.dp
+private val CLUSTER_INNER_RADIUS = 17.dp
+private val STOP_OUTER_RADIUS = 18.dp
+private val STOP_INNER_RADIUS = 13.dp
+private val STOP_ICON_SIZE = 20.dp
+private val SELECTED_STOP_OUTER_RADIUS = 24.dp
+private val SELECTED_STOP_INNER_RADIUS = 19.dp
+private val SELECTED_STOP_ICON_SIZE = 24.dp
+private const val MARKER_CLICK_RADIUS_DP = 56f
 private const val MIN_MARKER_CLICK_RADIUS_METERS = 15.0
 private const val MARKER_EDGE_MARGIN_PX = 64f
