@@ -11,6 +11,9 @@ val BackgroundDark = Color(0xFF212121)
 
 val Accent = Color(0xFFFFC107)
 
+// Map overlays need to remain distinguishable from route and stop colours on every base map.
+val MapVehicleColor = Color(0xFFE65100)
+
 val PrimaryTextLight = Color(0xFF212121)
 val SecondaryTextLight = Color(0x99212121)
 val PrimaryTextDark = Color(0xFFCCCCCC)

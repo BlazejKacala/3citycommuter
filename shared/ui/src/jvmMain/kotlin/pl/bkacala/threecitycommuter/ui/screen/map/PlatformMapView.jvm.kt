@@ -2,12 +2,13 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DirectionsBus
-import androidx.compose.material.icons.outlined.Tram
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -15,19 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
-import org.maplibre.compose.expressions.dsl.Feature
-import org.maplibre.compose.expressions.dsl.all
-import org.maplibre.compose.expressions.dsl.asString
 import org.maplibre.compose.expressions.dsl.const
-import org.maplibre.compose.expressions.dsl.convertToString
-import org.maplibre.compose.expressions.dsl.eq
-import org.maplibre.compose.expressions.dsl.format
 import org.maplibre.compose.expressions.dsl.image
-import org.maplibre.compose.expressions.dsl.not
-import org.maplibre.compose.expressions.dsl.span
 import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.layers.LineLayer
 import org.maplibre.compose.layers.SymbolLayer
@@ -37,14 +30,15 @@ import org.maplibre.compose.sources.GeoJsonOptions
 import org.maplibre.compose.sources.GeoJsonSource
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.util.ClickResult
-import org.maplibre.spatialk.geojson.Point
+import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.Position
-import kotlinx.coroutines.launch
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
+import pl.bkacala.threecitycommuter.ui.theme.MapVehicleColor
+import kotlin.math.roundToInt
 
 private val defaultCenter = LatLng(54.3520, 18.6466)
 
@@ -76,9 +70,12 @@ actual fun PlatformMapView(
     )
     val primary = MaterialTheme.colorScheme.primary
     val tertiary = MaterialTheme.colorScheme.tertiary
-    val surface = MaterialTheme.colorScheme.surface
-    val stopsByIndex = remember(busStops) { busStops }
     val coroutineScope = rememberCoroutineScope()
+    val overlayRenderTick = remember { mutableIntStateOf(0) }
+    val stopsZoom = cameraState.position.zoom.roundToInt()
+    val stopMarkers = remember(busStops, stopsZoom) {
+        busStops.toStopMapMarkers(stopsZoom)
+    }
 
     LaunchedEffect(cameraTarget, cameraZoom) {
         val target = cameraTarget ?: defaultCenter
@@ -95,191 +92,111 @@ actual fun PlatformMapView(
             modifier = Modifier.fillMaxSize(),
             cameraState = cameraState,
             baseStyle = mapStyle.toBaseStyle(stadiaToken),
-            onMapClick = { _, _ ->
-                onMapClicked()
-                ClickResult.Pass
+            onFrame = {
+                if (cameraState.isCameraMoving) {
+                    overlayRenderTick.intValue++
+                }
+            },
+            onMapClick = { position, _ ->
+                val marker = findStopMarkerAt(
+                    markers = stopMarkers,
+                    click = position,
+                    metersPerDp = cameraState.metersPerDpAtTarget,
+                )
+                when {
+                    marker?.stop != null -> {
+                        onBusStopSelected(marker.stop)
+                        ClickResult.Consume
+                    }
+                    marker != null -> {
+                        coroutineScope.launch {
+                            cameraState.animateTo(
+                                CameraPosition(
+                                    target = Position(
+                                        marker.position.longitude,
+                                        marker.position.latitude,
+                                    ),
+                                    zoom = cameraState.position.zoom + 1.0,
+                                ),
+                            )
+                        }
+                        ClickResult.Consume
+                    }
+                    else -> {
+                        onMapClicked()
+                        ClickResult.Pass
+                    }
+                }
             },
         ) {
-            val stopsSource = rememberGeoJsonSource(
-                data = GeoJsonData.JsonString(busStops.toStopsGeoJson()),
-                options = GeoJsonOptions(cluster = true, clusterRadius = 50, clusterMaxZoom = 15),
-            )
-            val routeSource = route?.takeIf { it.size >= 2 }?.let {
-                rememberGeoJsonSource(GeoJsonData.JsonString(it.toRouteGeoJson()))
-            }
-            val vehicleSource = trackedVehicle?.let {
-                rememberGeoJsonSource(GeoJsonData.JsonString(it.toVehicleGeoJson()))
-            }
-            val locationSource = userLocation?.takeIf { !it.isFixed }?.let {
-                rememberGeoJsonSource(GeoJsonData.JsonString(it.toLocationGeoJson()))
-            }
             val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
-            val tramPainter = rememberVectorPainter(Icons.Outlined.Tram)
 
-            drawRoute(routeSource, tertiary)
-            drawStops(stopsSource, stopsByIndex, primary, surface, busPainter, tramPainter, cameraState, coroutineScope, onBusStopSelected)
-            drawSelectedStop(selectedBusStop, tertiary, surface, busPainter)
-            drawVehicle(vehicleSource, tertiary, surface)
-            drawLocation(locationSource, tertiary)
-
-            /*
-            CircleLayer(
-                id = "stop-clusters",
-                source = stopsSource,
-                filter = Feature.has("cluster"),
-                color = const(surface),
-                radius = const(15.dp),
-                strokeColor = const(primary),
-                strokeWidth = const(2.dp),
-                onClick = { features ->
-                    features.firstOrNull()?.geometry.let { geometry ->
-                        (geometry as? Point)?.let { point ->
-                            coroutineScope.launch {
-                                cameraState.animateTo(
-                                    CameraPosition(
-                                        target = point.coordinates,
-                                        zoom = cameraState.position.zoom + 1.0,
-                                    ),
-                                )
-                            }
-                        }
-                    }
-                    ClickResult.Consume
-                },
-            )
-            SymbolLayer(
-                "stop-cluster-count",
-                stopsSource,
-                "",
-                filter = Feature.has("cluster"),
-                textField = format(span(Feature["point_count_abbreviated"].convertToString())),
-                textColor = const(primary),
-                textSize = const(13.sp),
-                textAllowOverlap = const(true),
-            )
-
-            CircleLayer(
-                id = "bus-stops",
-                source = stopsSource,
-                filter = !Feature.has("cluster"),
-                color = const(surface),
-                radius = const(11.dp),
-                strokeColor = const(primary),
-                strokeWidth = const(2.dp),
-                onClick = { features ->
-                    features.firstOrNull()?.properties?.get("index")?.toString()?.toIntOrNull()?.let { index ->
-                        stopsByIndex.getOrNull(index)?.let(onBusStopSelected)
-                    }
-                    ClickResult.Consume
-                },
-            )
-            SymbolLayer(
-                "bus-stop-icon",
-                stopsSource,
-                "",
-                filter = !Feature.has("cluster"),
-                iconImage = image(busPainter, drawAsSdf = true),
-                iconColor = const(primary),
-                iconAllowOverlap = const(true),
-            )
-            SymbolLayer(
-                "tram-stop-icon",
-                stopsSource,
-                "",
-                filter = all(
-                    !Feature.has("cluster"),
-                    Feature["type"].asString() eq const("T"),
-                ),
-                iconImage = image(tramPainter, drawAsSdf = true),
-                iconColor = const(primary),
-                iconAllowOverlap = const(true),
-            )
-
-            selectedBusStop?.let { stop ->
-                val source = rememberGeoJsonSource(GeoJsonData.JsonString(stop.toSelectedStopGeoJson()))
-                CircleLayer(
-                    id = "selected-bus-stop",
-                    source = source,
-                    color = const(surface),
-                    radius = const(14.dp),
-                    strokeColor = const(tertiary),
-                    strokeWidth = const(3.dp),
-                )
-                SymbolLayer(
-                    "selected-bus-stop-icon",
-                    source,
-                    "",
-                    iconImage = image(busPainter, drawAsSdf = true),
-                    iconColor = const(tertiary),
-                    iconAllowOverlap = const(true),
-                )
+            route?.takeIf { it.size >= 2 }?.let { routePoints ->
+                key("route-source") {
+                    val routeSource = rememberGeoJsonSource(
+                        data = GeoJsonData.JsonString(routePoints.toRouteGeoJson()),
+                        options = GeoJsonOptions(synchronousUpdate = true),
+                    )
+                    DrawRoute(routeSource, tertiary)
+                }
             }
-
-            vehicleSource?.let { source ->
-                CircleLayer(
-                    id = "tracked-vehicle",
-                    source = source,
-                    color = const(surface),
-                    radius = const(17.dp),
-                    strokeColor = const(tertiary),
-                    strokeWidth = const(2.dp),
-                )
-                SymbolLayer(
-                    "tracked-vehicle-number",
-                    source,
-                    "",
-                    textField = format(span(Feature["number"].asString())),
-                    textColor = const(tertiary),
-                    textSize = const(11.sp),
-                    textAllowOverlap = const(true),
-                )
+            DrawSelectedBusStop(selectedBusStop, tertiary, busPainter)
+            userLocation?.takeIf { !it.isFixed }?.let { location ->
+                key("user-location-source") {
+                    val locationSource = rememberGeoJsonSource(
+                        data = GeoJsonData.JsonString(location.toLocationGeoJson()),
+                        options = GeoJsonOptions(synchronousUpdate = true),
+                    )
+                    DrawUserLocation(locationSource, primary)
+                }
             }
-
-            locationSource?.let { source ->
-                CircleLayer(
-                    id = "user-location-outer",
-                    source = source,
-                    color = const(tertiary),
-                    radius = const(9.dp),
-                    strokeColor = const(Color.White),
-                    strokeWidth = const(2.dp),
-                )
-            }
-            */
         }
+        MapMarkersOverlay(
+            modifier = Modifier.fillMaxSize(),
+            cameraState = cameraState,
+            renderTick = overlayRenderTick,
+            stopMarkers = stopMarkers,
+            trackedVehicle = trackedVehicle,
+            stopColor = primary,
+            vehicleColor = MapVehicleColor,
+        )
     }
 }
 
 @Composable
-private fun drawRoute(source: GeoJsonSource?, color: Color) {
-    source?.let { LineLayer("route-line", it, color = const(color), width = const(4.dp)) }
+@MaplibreComposable
+private fun DrawRoute(source: GeoJsonSource, color: Color) {
+    LineLayer("route-line-halo", source, color = const(Color.White), width = const(9.dp))
+    LineLayer("route-line", source, color = const(color), width = const(5.dp))
 }
 
 @Composable
-private fun drawStops(source: GeoJsonSource, stops: List<BusStopMapItem>, primary: Color, surface: Color, bus: androidx.compose.ui.graphics.painter.Painter, tram: androidx.compose.ui.graphics.painter.Painter, camera: org.maplibre.compose.camera.CameraState, scope: kotlinx.coroutines.CoroutineScope, onSelected: (BusStopMapItem) -> Unit) {
-    CircleLayer("stop-clusters", source, filter = Feature.has("cluster"), color = const(surface), radius = const(15.dp), strokeColor = const(primary), strokeWidth = const(2.dp), onClick = { features -> (features.firstOrNull()?.geometry as? Point)?.let { point -> scope.launch { camera.animateTo(CameraPosition(target = point.coordinates, zoom = camera.position.zoom + 1.0)) } }; ClickResult.Consume })
-    SymbolLayer("stop-cluster-count", source, "", filter = Feature.has("cluster"), textField = format(span(Feature["point_count_abbreviated"].convertToString())), textColor = const(primary), textSize = const(13.sp), textAllowOverlap = const(true))
-    CircleLayer("bus-stops", source, filter = !Feature.has("cluster"), color = const(surface), radius = const(11.dp), strokeColor = const(primary), strokeWidth = const(2.dp), onClick = { features -> features.firstOrNull()?.properties?.get("index")?.toString()?.toIntOrNull()?.let { stops.getOrNull(it)?.let(onSelected) }; ClickResult.Consume })
-    SymbolLayer("bus-stop-icon", source, "", filter = !Feature.has("cluster"), iconImage = image(bus, drawAsSdf = true), iconColor = const(primary), iconAllowOverlap = const(true))
-    SymbolLayer("tram-stop-icon", source, "", filter = all(!Feature.has("cluster"), Feature["type"].asString() eq const("T")), iconImage = image(tram, drawAsSdf = true), iconColor = const(primary), iconAllowOverlap = const(true))
-}
-
-@Composable
-private fun drawSelectedStop(stop: BusStopMapItem?, color: Color, surface: Color, painter: androidx.compose.ui.graphics.painter.Painter) { stop?.let { val source = rememberGeoJsonSource(GeoJsonData.JsonString(it.toSelectedStopGeoJson())); CircleLayer("selected-bus-stop", source, color = const(surface), radius = const(14.dp), strokeColor = const(color), strokeWidth = const(3.dp)); SymbolLayer("selected-bus-stop-icon", source, "", iconImage = image(painter, drawAsSdf = true), iconColor = const(color), iconAllowOverlap = const(true)) } }
-
-@Composable
-private fun drawVehicle(source: GeoJsonSource?, color: Color, surface: Color) { source?.let { CircleLayer("tracked-vehicle", it, color = const(surface), radius = const(17.dp), strokeColor = const(color), strokeWidth = const(2.dp)); SymbolLayer("tracked-vehicle-number", it, "", textField = format(span(Feature["number"].asString())), textColor = const(color), textSize = const(11.sp), textAllowOverlap = const(true)) } }
-
-@Composable
-private fun drawLocation(source: GeoJsonSource?, color: Color) { source?.let { CircleLayer("user-location-outer", it, color = const(color), radius = const(9.dp), strokeColor = const(Color.White), strokeWidth = const(2.dp)) } }
-
-private fun List<BusStopMapItem>.toStopsGeoJson() = buildString {
-    append("{\"type\":\"FeatureCollection\",\"features\":[")
-    this@toStopsGeoJson.forEachIndexed { index, stop ->
-        if (index > 0) append(',')
-        append("{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${stop.position.longitude},${stop.position.latitude}]},\"properties\":{\"index\":$index,\"type\":\"${stop.markerLabel()}\"}}")
+@MaplibreComposable
+private fun DrawSelectedBusStop(
+    stop: BusStopMapItem?,
+    color: Color,
+    painter: androidx.compose.ui.graphics.painter.Painter,
+) {
+    stop?.let {
+        val source = rememberGeoJsonSource(GeoJsonData.JsonString(it.toSelectedStopGeoJson()))
+        CircleLayer("selected-bus-stop-halo", source, color = const(Color.White), radius = const(18.dp))
+        CircleLayer("selected-bus-stop", source, color = const(color), radius = const(14.dp))
+        SymbolLayer(
+            "selected-bus-stop-icon",
+            source,
+            "",
+            iconImage = image(painter, drawAsSdf = true),
+            iconColor = const(Color.White),
+            iconAllowOverlap = const(true),
+        )
     }
-    append("]}")
+}
+
+@Composable
+@MaplibreComposable
+private fun DrawUserLocation(source: GeoJsonSource, color: Color) {
+    CircleLayer("user-location-halo", source, color = const(Color.White), radius = const(12.dp))
+    CircleLayer("user-location", source, color = const(color), radius = const(8.dp))
 }
 
 private fun List<LatLng>.toRouteGeoJson() = buildString {
@@ -291,13 +208,11 @@ private fun List<LatLng>.toRouteGeoJson() = buildString {
     append("]},\"properties\":{}}")
 }
 
-private fun BusStopMapItem.toSelectedStopGeoJson() = this.toPointGeoJson("\"type\":\"${markerLabel()}\"")
-
-private fun TrackedVehicle.toVehicleGeoJson() =
-    "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${position.longitude},${position.latitude}]},\"properties\":{\"number\":\"${number.jsonEscaped()}\"}}"
+private fun BusStopMapItem.toSelectedStopGeoJson() =
+    toPointGeoJson("\"type\":\"${markerLabel()}\"")
 
 private fun UserLocation.toLocationGeoJson() =
-    "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${longitude},${latitude}]},\"properties\":{}}"
+    "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[$longitude,$latitude]},\"properties\":{}}"
 
 private fun BusStopMapItem.toPointGeoJson(properties: String) =
     "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${position.longitude},${position.latitude}]},\"properties\":{$properties}}"
@@ -307,5 +222,3 @@ private fun BusStopMapItem.markerLabel() = when (getStationType()) {
     BusStopMapItem.Type.Tram -> "T"
     BusStopMapItem.Type.Both -> "B/T"
 }
-
-private fun String.jsonEscaped() = replace("\\", "\\\\").replace("\"", "\\\"")
