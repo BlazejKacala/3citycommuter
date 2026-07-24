@@ -5,7 +5,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material.icons.outlined.Tram
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -96,7 +95,6 @@ internal fun findStopMarkerAt(
 internal fun MapMarkersOverlay(
     modifier: Modifier,
     cameraState: CameraState,
-    renderTick: State<Int>,
     stopMarkers: List<StopMapMarker>,
     selectedBusStop: BusStopMapItem?,
     trackedVehicle: TrackedVehicle?,
@@ -116,11 +114,13 @@ internal fun MapMarkersOverlay(
 
     Canvas(modifier.clipToBounds()) {
         // The projection changes inside the native map without changing its object identity.
-        // Observing the frame tick in the draw phase invalidates only this canvas during movement.
-        renderTick.value
+        // Reading the camera state here keeps every marker element in sync with the same camera move.
+        cameraState.position
         val projection = cameraState.projection ?: return@Canvas
 
         stopMarkers.forEach { marker ->
+            if (marker.stop?.id == selectedBusStop?.id) return@forEach
+
             val location = projection.screenLocationFromPosition(marker.position.toPosition())
             val center = Offset(location.x.toPx(), location.y.toPx())
             if (!center.isInside(size)) return@forEach
@@ -233,7 +233,7 @@ private val STOP_INNER_RADIUS = 13.dp
 private val STOP_ICON_SIZE = 20.dp
 private val SELECTED_STOP_OUTER_RADIUS = 24.dp
 private val SELECTED_STOP_INNER_RADIUS = 19.dp
-private val SELECTED_STOP_ICON_SIZE = 24.dp
+private val SELECTED_STOP_ICON_SIZE = STOP_ICON_SIZE
 private const val MARKER_CLICK_RADIUS_DP = 56f
 private const val MIN_MARKER_CLICK_RADIUS_METERS = 15.0
 private const val MARKER_EDGE_MARGIN_PX = 64f

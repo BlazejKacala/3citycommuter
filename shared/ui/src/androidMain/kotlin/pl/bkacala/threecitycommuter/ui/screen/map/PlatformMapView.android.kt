@@ -6,7 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -68,7 +67,6 @@ actual fun PlatformMapView(
     val primary = MaterialTheme.colorScheme.primary
     val tertiary = MaterialTheme.colorScheme.tertiary
     val coroutineScope = rememberCoroutineScope()
-    val overlayRenderTick = remember { mutableIntStateOf(0) }
     val stopsZoom = cameraState.position.zoom.roundToInt()
     val stopMarkers = remember(busStops, stopsZoom) {
         busStops.toStopMapMarkers(stopsZoom)
@@ -92,11 +90,6 @@ actual fun PlatformMapView(
             modifier = Modifier.fillMaxSize(),
             cameraState = cameraState,
             baseStyle = mapStyle.toBaseStyle(stadiaToken),
-            onFrame = {
-                if (cameraState.isCameraMoving) {
-                    overlayRenderTick.intValue++
-                }
-            },
             onMapClick = { position, _ ->
                 val marker = findStopMarkerAt(
                     markers = currentStopMarkers.value,
@@ -151,7 +144,6 @@ actual fun PlatformMapView(
         MapMarkersOverlay(
             modifier = Modifier.fillMaxSize(),
             cameraState = cameraState,
-            renderTick = overlayRenderTick,
             stopMarkers = stopMarkers,
             selectedBusStop = selectedBusStop,
             trackedVehicle = trackedVehicle,
