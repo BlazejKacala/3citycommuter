@@ -1,11 +1,20 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.TwoWayConverter
+import androidx.compose.animation.core.tween
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DirectionsBus
 import androidx.compose.material.icons.outlined.Tram
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
@@ -105,11 +114,34 @@ internal fun MapMarkersOverlay(
     val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
     val tramPainter = rememberVectorPainter(Icons.Outlined.Tram)
     val textMeasurer = rememberTextMeasurer()
+    val animatedVehiclePosition = remember { Animatable(Offset.Zero, OffsetVectorConverter) }
+    var animatedVehicleNumber by remember { mutableStateOf<String?>(null) }
     val countTextStyle = remember {
         TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
     val vehicleTextStyle = remember {
         TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    }
+
+    LaunchedEffect(trackedVehicle?.number, trackedVehicle?.position) {
+        val vehicle = trackedVehicle ?: run {
+            animatedVehicleNumber = null
+            return@LaunchedEffect
+        }
+        val target = vehicle.position.toOffset()
+
+        if (animatedVehicleNumber != vehicle.number) {
+            animatedVehiclePosition.snapTo(target)
+            animatedVehicleNumber = vehicle.number
+        } else {
+            animatedVehiclePosition.animateTo(
+                targetValue = target,
+                animationSpec = tween(
+                    durationMillis = VEHICLE_POSITION_ANIMATION_DURATION_MS,
+                    easing = LinearEasing,
+                ),
+            )
+        }
     }
 
     Canvas(modifier.clipToBounds()) {
@@ -197,7 +229,7 @@ internal fun MapMarkersOverlay(
         }
 
         trackedVehicle?.let { vehicle ->
-            val location = projection.screenLocationFromPosition(vehicle.position.toPosition())
+            val location = projection.screenLocationFromPosition(animatedVehiclePosition.value.toLatLng().toPosition())
             val center = Offset(location.x.toPx(), location.y.toPx())
             if (center.isInside(size)) {
                 drawCircle(Color.White, radius = 22.dp.toPx(), center = center)
@@ -216,6 +248,15 @@ internal fun MapMarkersOverlay(
 }
 
 private fun LatLng.toPosition() = Position(longitude, latitude)
+
+private fun LatLng.toOffset() = Offset(longitude.toFloat(), latitude.toFloat())
+
+private fun Offset.toLatLng() = LatLng(latitude = y.toDouble(), longitude = x.toDouble())
+
+private val OffsetVectorConverter = TwoWayConverter<Offset, AnimationVector2D>(
+    convertToVector = { offset -> AnimationVector2D(offset.x, offset.y) },
+    convertFromVector = { vector -> Offset(vector.v1, vector.v2) },
+)
 
 private fun Offset.isInside(canvasSize: Size): Boolean =
     x >= -MARKER_EDGE_MARGIN_PX &&
@@ -237,3 +278,4 @@ private val SELECTED_STOP_ICON_SIZE = STOP_ICON_SIZE
 private const val MARKER_CLICK_RADIUS_DP = 56f
 private const val MIN_MARKER_CLICK_RADIUS_METERS = 15.0
 private const val MARKER_EDGE_MARGIN_PX = 64f
+private const val VEHICLE_POSITION_ANIMATION_DURATION_MS = 9_000
