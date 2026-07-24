@@ -67,9 +67,9 @@ class SearchBarModel(
         }
     }
 
-    fun onSearchBarActiveChange() {
-        _isActive.value = !_isActive.value
-        if (_isActive.value) {
+    fun onSearchBarActiveChange(isActive: Boolean) {
+        _isActive.value = isActive
+        if (isActive) {
             updateResults(_query.value)
         }
     }
