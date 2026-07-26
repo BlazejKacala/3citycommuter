@@ -45,7 +45,6 @@ jobs:
   signed-release:
     name: Build Signed Release
     runs-on: ubuntu-latest
-    if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
 
     steps:
       - name: Checkout
@@ -60,13 +59,30 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Check signing secrets
+        id: signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ] && [ -n "$ANDROID_KEYSTORE_PASSWORD" ] && [ -n "$ANDROID_KEY_ALIAS" ] && [ -n "$ANDROID_KEY_PASSWORD" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Decode Android keystore
+        if: ${{ steps.signing.outputs.available == 'true' }}
         shell: bash
         run: |
           mkdir -p "$RUNNER_TEMP/android-signing"
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/android-signing/key.jks"
 
       - name: Build signed release APK
+        if: ${{ steps.signing.outputs.available == 'true' }}
         env:
           ANDROID_SIGNING_STORE_FILE: ${{ runner.temp }}/android-signing/key.jks
           ANDROID_SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -77,8 +93,13 @@ jobs:
         run: ./gradlew --no-daemon :composeApp:android:assembleRelease
 
       - name: Upload signed release APK
+        if: ${{ steps.signing.outputs.available == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: android-release-apk-pr-${{ github.event.pull_request.number }}
           path: composeApp/android/build/outputs/apk/release/*.apk
           if-no-files-found: error
+
+      - name: Skip signed release build
+        if: ${{ steps.signing.outputs.available != 'true' }}
+        run: echo "Signing secrets are not configured, skipping signed release APK build."
