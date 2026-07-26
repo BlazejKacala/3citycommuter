@@ -35,12 +35,14 @@ internal class RealBusStopsRepository(
                 busStopsDao.upsertBusStations(networkClient.getStops().stops.map { it.toEntity() })
                 lastUpdateRepository.storeLastUpdateCurrentTimeStamp(BUS_STOPS_KEY)
             }
-            val relations = busStopsTypesDao.getBusStopsTypes().map { it.toData() }
+            val relationsByStopId = busStopsTypesDao.getBusStopsTypes()
+                .associate { entity ->
+                    entity.busStopId to entity.toData()
+                }
             emit(
-                busStopsDao.getBusStations()
-                    .filter { it.virtual == 0 }
+                busStopsDao.getRealBusStations()
                     .mapNotNull { entity ->
-                        val relation = relations.firstOrNull { entity.stopId == it.stopId }
+                        val relation = relationsByStopId[entity.stopId]
                         relation?.let {
                             entity.toStopData(it.isForBuses, it.isForTrams)
                         }
