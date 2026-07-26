@@ -28,9 +28,9 @@ internal class KtorNetworkClient(
     override suspend fun getStops(): BusStopsNetworkData {
         val stops = withContext(Dispatchers.IO) {
             val rawBody = httpClient.get(
-                    "$BASE_URL/dataset/c24aa637-3619-4dc2-a171-a23eec8f2172/" +
-                        "resource/4c4025f0-01bf-41f7-a39f-d156d201b82b/download/stops.json",
-                )
+                "$BASE_URL/dataset/c24aa637-3619-4dc2-a171-a23eec8f2172/" +
+                    "resource/4c4025f0-01bf-41f7-a39f-d156d201b82b/download/stops.json",
+            )
                 .bodyAsText()
             val payloadByDate = json.decodeFromString<Map<String, BusStopsNetworkData>>(rawBody)
 

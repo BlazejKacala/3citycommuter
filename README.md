@@ -1,140 +1,150 @@
 # 3citycommuter
 
-Aplikacja Kotlin Multiplatform dla pasażerów komunikacji miejskiej w Gdańsku, Sopocie i Gdyni. Wyświetla przystanki na mapie, odjazdy w czasie rzeczywistym, pozycje pojazdów oraz przebieg tras.
+Kotlin Multiplatform app for public transport commuters in Gdansk, Sopot, and Gdynia. The app shows stops on a map, real-time departures, vehicle positions, and route shapes.
 
-## Funkcje
+## Platforms
 
-- Interaktywna mapa przystanków autobusowych i tramwajowych.
-- Odjazdy w czasie rzeczywistym wraz z opóźnieniami.
-- Śledzenie pojazdów i prezentacja jakości sygnału GPS.
-- Wizualizacja trasy wybranego kursu.
-- Wyszukiwanie przystanków i centrowanie mapy na lokalizacji użytkownika.
-
-## Platformy
-
-| Platforma | Status |
+| Platform | Status |
 | --- | --- |
-| Android | Gotowa do użycia (min. SDK 29, target SDK 36) |
-| Desktop (JVM) | Obsługiwana |
-| iOS | Skonfigurowany target KMP; brak aplikacji startowej, widok mapy jest stubem |
+| Android | Production-ready |
+| Desktop (JVM) | Supported |
+| iOS | KMP target configured, app entry point not implemented |
 
-## Dane
+Android target details:
+- Min SDK: 29
+- Target SDK: 37
+- Compile SDK: 37
 
-Aplikacja korzysta z otwartych danych [Otwarte Dane Gdańska](https://ckan.multimediagdansk.pl):
+## Data sources
 
-- przystanki i linie: `ckan.multimediagdansk.pl`,
-- odjazdy i pozycje GPS: `ckan2.multimediagdansk.pl`,
-- dane pojazdów: `files.cloudgdansk.pl`.
+The app uses open data from [Otwarte Dane Gdanska](https://ckan.multimediagdansk.pl):
 
-## Stos technologiczny
+- stops and routes: `ckan.multimediagdansk.pl`
+- real-time departures and GPS positions: `ckan2.multimediagdansk.pl`
+- vehicle-related files: `files.cloudgdansk.pl`
 
-| Warstwa | Technologia |
-| --- | --- |
-| Język | Kotlin Multiplatform 2.3.21 |
-| UI | Compose Multiplatform 1.10.3 + Material 3 |
-| Mapy | MapLibre Compose 0.13.0 + MapLibre Native 13.3.1 |
-| DI | Koin 4.0.2 |
-| Sieć | Ktor Client 3.1.1 |
-| Baza danych | Room KMP 2.7.2 |
-| Nawigacja | JetBrains Navigation Compose 2.9.2 |
-| Asynchroniczność | Kotlin Coroutines + Flow |
-| Lokalizacja | Google Play Services (Android) |
-| Ustawienia | multiplatform-settings 1.3.0 |
+## Tech stack
 
-## Architektura
+| Layer | Technology | Version |
+| --- | --- | --- |
+| Language | Kotlin Multiplatform | 2.3.21 |
+| Android Gradle Plugin | AGP | 9.2.1 |
+| UI | Compose Multiplatform | 1.10.3 |
+| UI | Material 3 | 1.10.0-alpha05 |
+| Maps | MapLibre Compose | 0.13.0 |
+| Maps | MapLibre Native Android SDK | 13.3.1 |
+| Navigation | JetBrains Navigation Compose | 2.9.2 |
+| DI | Koin | 4.0.2 |
+| Networking | Ktor Client | 3.1.1 |
+| Database | Room KMP | 2.7.2 |
+| Serialization | kotlinx-serialization | 1.8.0 |
+| Coroutines | kotlinx-coroutines | 1.10.1 |
+| Date/Time | kotlinx-datetime | 0.6.2 |
+| Settings | multiplatform-settings | 1.3.0 |
+| Quality | Spotless | 6.25.0 |
+| Quality | Detekt | 1.23.6 |
 
-```
+## Architecture
+
+```text
 composeApp / iosApp
-        │
-        ▼
+        |
+        v
    shared:ui
-        │
-        ▼
+        |
+        v
   shared:data
-    ┌───┴────┐
-    ▼        ▼
+    /       \
+   v         v
 shared:network  shared:database
-    └───┬────┘
-        ▼
+    \       /
+        v
    shared:core
 ```
 
-`shared:core` zawiera modele domenowe i narzędzia. Pozostałe moduły odpowiadają odpowiednio za komunikację sieciową, bazę Room, repozytoria oraz interfejs Compose. Aplikacje Android i Desktop inicjalizują Koin i korzystają z `shared:ui`.
+`shared:core` contains domain models and utilities. The remaining shared modules cover networking, database, repositories, and Compose UI. Android and Desktop bootstrap Koin and consume `shared:ui`.
 
-## Wymagania
+## Requirements
 
-- JDK 21,
-- Android SDK 36 do budowania aplikacji Android,
-- Gradle Wrapper dostarczony w repozytorium (Gradle 9.4.1).
+- JDK 21
+- Android SDK 37 for Android builds
+- Gradle Wrapper from this repository
 
-## Budowanie i uruchamianie
+## Build and run
 
 ```bash
-# Android: debug APK
-./gradlew :composeApp:android:assembleDebug
-
-# Desktop JVM
-./gradlew :composeApp:desktop:run
-
-# Wszystkie moduły
 ./gradlew build
+./gradlew :composeApp:android:assembleDebug
+./gradlew :composeApp:android:assembleRelease
+./gradlew :composeApp:desktop:run
 ```
 
-Wydanie Android wymaga pliku `secrets.properties` oraz klucza `signing/key.jks`; te pliki są lokalne i nie powinny trafiać do repozytorium.
-
-W CI można zamiast tego użyć zmiennych środowiskowych:
-`ANDROID_SIGNING_STORE_FILE`, `ANDROID_SIGNING_STORE_PASSWORD`, `ANDROID_SIGNING_KEY_ALIAS`, `ANDROID_SIGNING_KEY_PASSWORD`.
-Opcjonalnie można też nadpisać wersję przez `ANDROID_VERSION_CODE` i `ANDROID_VERSION_NAME`.
-
-## Testy
+## Testing
 
 ```bash
-# Testy ViewModeli (commonTest uruchamiany na JVM)
 ./gradlew :shared:ui:jvmTest
-
-# Testy serializacji i warstwy sieciowej
 ./gradlew :shared:network:jvmTest
-
-# Testy instrumentowane Androida — wymagają urządzenia lub emulatora
 ./gradlew :composeApp:android:connectedDebugAndroidTest
 ```
 
-## Mapy
-
-Projekt używa MapLibre — nie wymaga tokenu do podstawowego działania. Aktualna implementacja mapy działa na Androidzie i Desktopie. Dostępne są również style Stadia Maps, które opcjonalnie wymagają tokenu przekazywanego do aplikacji; nie zapisuj go w repozytorium.
-
-## Jakość kodu
+## Code quality
 
 ```bash
-# Sprawdzenie formatowania
 ./gradlew spotlessCheck
-
-# Formatowanie kodu
 ./gradlew spotlessApply
-
-# Analiza statyczna
 ./gradlew detekt
-
-# Wszystkie kontrole jakości (Spotless + Detekt)
 ./gradlew lint
-
-# Pełne sprawdzenie projektu, w tym lint
 ./gradlew check
 ```
 
-Konfiguracja Spotless i Detekt znajduje się w głównym `build.gradle.kts`, a reguły Detekt w `config/detekt/detekt.yml`.
+`lint` is the main local quality gate and runs Spotless plus Detekt. `check` also finalizes with `lint`.
+
+## Maps
+
+The project uses MapLibre. Basic usage does not require a token. Current platform implementations:
+
+- Android: Canvas placeholder map
+- Desktop: Canvas placeholder map with stop markers and route lines
+- iOS: placeholder stub
+
+Mapbox dependencies are deprecated and commented out.
+
+## Signing and release builds
+
+Local Android release builds use:
+
+- `secrets.properties`
+- `signing/key.jks`
+
+Expected keys in `secrets.properties`:
+
+```properties
+PASS=keystore_password
+ALIAS=key_alias
+ALIAS_PASS=key_password
+```
+
+CI can use environment variables instead:
+
+- `ANDROID_SIGNING_STORE_FILE`
+- `ANDROID_SIGNING_STORE_PASSWORD`
+- `ANDROID_SIGNING_KEY_ALIAS`
+- `ANDROID_SIGNING_KEY_PASSWORD`
+- optional: `ANDROID_VERSION_CODE`
+- optional: `ANDROID_VERSION_NAME`
 
 ## GitHub Actions
 
-Repo zawiera dwa workflowy:
+Two workflows are configured:
 
-- `Pull Request` uruchamia się dla PR do `main`, odpala `lint`, testy JVM i buduje debug APK. Jeśli ustawisz sekrety podpisu, zbuduje też podpisany `release` APK jako artifact.
-- `Main Release Build` uruchamia się po pushu do `main` oraz ręcznie i buduje podpisany `release` APK.
+- `Pull Request`: runs on PRs targeting `main`, executes `lint`, JVM tests, builds the debug APK, and optionally builds a signed release APK when signing secrets are configured
+- `Main Release Build`: runs on pushes to `main` and on manual dispatch, and optionally builds a signed release APK when signing secrets are configured
 
-Wymagane sekrety GitHub:
+Required GitHub secrets for signed CI builds:
 
-- `ANDROID_KEYSTORE_BASE64` — zawartość `signing/key.jks` zakodowana base64
+- `ANDROID_KEYSTORE_BASE64`
 - `ANDROID_KEYSTORE_PASSWORD`
 - `ANDROID_KEY_ALIAS`
 - `ANDROID_KEY_PASSWORD`
 
+On Linux runners, `gradlew` is tracked as executable and workflows also call `chmod +x ./gradlew` defensively.
