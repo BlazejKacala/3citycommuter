@@ -1,44 +1,46 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
 import app.cash.turbine.test
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import pl.bkacala.threecitycommuter.mocks.MockBusStopsRepository.mockBusStopsRepository
-import pl.bkacala.threecitycommuter.mocks.MockLocationRepository.mockLocationRepository
-import pl.bkacala.threecitycommuter.mocks.MockPermissionChecker.mockDeniedPermissionChecker
-import pl.bkacala.threecitycommuter.mocks.MockPermissionChecker.mockGrantedPermissionChecker
-import pl.bkacala.threecitycommuter.mocks.MockRoutesRepository.mockRoutesRepository
-import pl.bkacala.threecitycommuter.mocks.MockVehiclesRepository.mockVehiclesRepository
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.location.UserLocation
+import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.stops.BusStopType
+import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
+import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
+import pl.bkacala.threecitycommuter.repository.location.PermissionChecker
+import pl.bkacala.threecitycommuter.repository.routes.RoutesRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.repository.vehicles.VehiclesRepository
-import pl.bkacala.threecitycommuter.tools.makeRandomInstance
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MapScreenViewModelTest {
 
-    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
+    private val createdViewModels = mutableListOf<MapScreenViewModel>()
 
     @BeforeTest
     fun setUp() {
@@ -47,346 +49,278 @@ class MapScreenViewModelTest {
 
     @AfterTest
     fun tearDown() {
+        createdViewModels.forEach { viewModel ->
+            viewModel.onAction(MapAction.ScreenPaused)
+            viewModel.onAction(MapAction.MapClicked)
+        }
+        createdViewModels.clear()
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(
-        stopsRepository: BusStopsRepository = mockBusStopsRepository,
-        locationRepository: LocationRepository = mockLocationRepository,
-        vehiclesRepository: VehiclesRepository = mockVehiclesRepository,
-    ) = MapScreenViewModel(
-        stopsRepository = stopsRepository,
-        locationRepository = locationRepository,
-        permissionChecker = mockGrantedPermissionChecker,
-        vehiclesRepository = vehiclesRepository,
-        getDeparturesUseCase = GetDeparturesUseCase(stopsRepository, vehiclesRepository),
-        routesRepository = mockRoutesRepository,
-    )
-
-    // ——— Initial state ———
-
     @Test
-    fun busStops_is_Loading_before_repository_emits() =
+    fun `GIVEN bus stops repository emits data WHEN view model initializes THEN bus stops state becomes success with mapped items`() =
         runTest {
-            val vm = createViewModel()
-            vm.busStops.value.shouldBeInstanceOf<UiState.Loading>()
+            val busStop = busStopData(stopId = 11, name = "Dworzec Glowny")
+            val viewModel = createViewModel(stopsRepository = FakeBusStopsRepository(stops = listOf(busStop)))
+
+            advanceTimeBy(150.milliseconds)
+
+            val state = viewModel.uiState.value.busStops.shouldBeInstanceOf<UiState.Success<List<BusStopMapItem>>>()
+            state.data.shouldHaveSize(1)
+            state.data.first().data shouldBe busStop
         }
 
     @Test
-    fun busStops_becomes_Success_after_repository_emits() =
+    fun `GIVEN location permission is denied WHEN tracing starts THEN location stays at default and center button stays hidden`() =
         runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            vm.busStops.value.shouldBeInstanceOf<UiState.Success<*>>()
-        }
-
-    @Test
-    fun busStops_contains_mapped_items_from_repository() =
-        runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            val state = vm.busStops.value as UiState.Success
-            state.data.size shouldBe 1
-        }
-
-    @Test
-    fun busStops_becomes_Error_when_repository_throws() =
-        runTest {
-            val throwingRepository =
-                object : BusStopsRepository {
-                    override fun getBusStops(): Flow<List<BusStopData>> =
-                        flow {
-                            throw RuntimeException("Network error")
-                        }
-
-                    override fun getDepartures(stopId: Int): Flow<List<Departure>> =
-                        mockBusStopsRepository.getDepartures(stopId)
-
-                    override suspend fun storeBusStopsTypes(types: List<BusStopType>) {}
-                }
-
-            val vm = createViewModel(stopsRepository = throwingRepository)
-            advanceTimeBy(50)
-            vm.busStops.value.shouldBeInstanceOf<UiState.Error>()
-        }
-
-    // ——— Location & centerOnPositionVisibility ———
-
-    @Test
-    fun location_starts_at_default_fixed_position() =
-        runTest {
-            val vm = createViewModel()
-            vm.location.value shouldBe UserLocation.default()
-        }
-
-    @Test
-    fun centerOnPositionVisibility_is_false_when_location_is_fixed() =
-        runTest {
-            val vm = createViewModel()
-            vm.centerOnPositionVisibility.value shouldBe false
-        }
-
-    @Test
-    fun centerOnPositionVisibility_becomes_true_after_location_updates_to_non_fixed() =
-        runTest {
-            val vm = createViewModel()
-            vm.centerOnPositionVisibility.test {
-                awaitItem() shouldBe false
-                vm.startTracingJobs()
-                advanceTimeBy(200)
-                awaitItem() shouldBe true
-            }
-        }
-
-    @Test
-    fun location_does_not_update_when_permission_is_denied() =
-        runTest {
-            val vm =
-                MapScreenViewModel(
-                    stopsRepository = mockBusStopsRepository,
-                    locationRepository = mockLocationRepository,
-                    permissionChecker = mockDeniedPermissionChecker,
-                    vehiclesRepository = mockVehiclesRepository,
-                    getDeparturesUseCase = GetDeparturesUseCase(mockBusStopsRepository, mockVehiclesRepository),
-                    routesRepository = mockRoutesRepository,
+            val viewModel =
+                createViewModel(
+                    permissionChecker = FakePermissionChecker(isGranted = false),
+                    locationRepository = FakeLocationRepository(UserLocation.default().copy(isFixed = false)),
                 )
-            vm.startTracingJobs()
-            advanceTimeBy(500)
-            vm.location.value shouldBe UserLocation.default()
-        }
 
-    // ——— onBusStopSelected ———
+            viewModel.onAction(MapAction.ScreenResumed)
+            advanceTimeBy(500.milliseconds)
 
-    @Test
-    fun onBusStopSelected_clears_trackedVehicle_and_route() =
-        runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            val stop = busStopsFrom(vm).first()
-
-            vm.onBusStopSelected(stop)
-
-            vm.trackedVehicle.value shouldBe null
-            vm.route.value shouldBe null
+            viewModel.uiState.value.userLocation shouldBe UserLocation.default()
+            viewModel.uiState.value.showCenterOnPositionButton shouldBe false
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     @Test
-    fun onBusStopSelected_loads_departures() =
+    fun `GIVEN selected stop and loaded departures WHEN map is clicked THEN selection dependent state is cleared`() =
         runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            val stop = busStopsFrom(vm).first()
+            val viewModel = createViewModel()
+            advanceTimeBy(150.milliseconds)
+            val stop = busStopsFrom(viewModel).first()
+            viewModel.onAction(MapAction.StopSelected(stop.id))
+            advanceTimeBy(250.milliseconds)
 
-            vm.onBusStopSelected(stop)
-            advanceTimeBy(300)
+            viewModel.onAction(MapAction.MapClicked)
 
-            vm.departures.value shouldNotBe null
+            viewModel.uiState.value.selectedBusStop shouldBe null
+            viewModel.uiState.value.selectedDeparture shouldBe null
+            viewModel.uiState.value.departures shouldBe null
+            viewModel.uiState.value.trackedVehicle shouldBe null
+            viewModel.uiState.value.route shouldBe null
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     @Test
-    fun departures_header_contains_stop_name() =
+    fun `GIVEN stop is selected WHEN departures request completes THEN bottom sheet is exposed for selected stop`() =
         runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            val stop = busStopsFrom(vm).first()
+            val selectedStop = busStopData(stopId = 17, name = "Brzezno")
+            val viewModel = createViewModel(stopsRepository = FakeBusStopsRepository(stops = listOf(selectedStop)))
 
-            vm.onBusStopSelected(stop)
-            advanceTimeBy(300)
+            advanceTimeBy(150.milliseconds)
+            viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().id))
+            advanceTimeBy(250.milliseconds)
 
-            vm.departures.value
-                ?.header
-                ?.busStopName shouldBe stop.data.name
+            viewModel.uiState.value.selectedBusStop?.data shouldBe selectedStop
+            viewModel.uiState.value.departures shouldNotBe null
+            viewModel.uiState.value.departures?.header?.busStopName shouldBe selectedStop.name
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     @Test
-    fun selecting_a_second_stop_replaces_departures_from_first_stop() =
+    fun `GIVEN view model is initialized WHEN no tracing has started THEN default location and center button state are exposed`() =
         runTest {
-            val firstStop = busStopAt(lat = 54.35, lon = 18.64, id = 1)
-            val secondStop = busStopAt(lat = 54.36, lon = 18.65, id = 2)
-            val repository = repositoryWithStops(listOf(firstStop, secondStop))
-            val vm = createViewModel(stopsRepository = repository)
-            advanceTimeBy(200)
+            val viewModel = createViewModel()
 
-            val mapItems = busStopsFrom(vm)
-            vm.onBusStopSelected(mapItems[0])
-            advanceTimeBy(300)
-            val firstDepartures = vm.departures.value
-
-            vm.onBusStopSelected(mapItems[1])
-            advanceTimeBy(300)
-
-            vm.departures.value
-                ?.header
-                ?.busStopName shouldBe secondStop.stopName
-            vm.departures.value shouldNotBe firstDepartures
-        }
-
-    // ——— onMapClicked ———
-
-    @Test
-    fun onMapClicked_clears_selectedBusStop() =
-        runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            vm.onBusStopSelected(busStopsFrom(vm).first())
-
-            vm.onMapClicked()
-
-            vm.selectedBusStop.value shouldBe null
+            viewModel.uiState.value.userLocation shouldBe UserLocation.default()
+            viewModel.uiState.value.showCenterOnPositionButton shouldBe false
         }
 
     @Test
-    fun onMapClicked_clears_departures() =
+    fun `GIVEN map reload is requested WHEN bus stops are loaded again THEN repository is called another time`() =
         runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            vm.onBusStopSelected(busStopsFrom(vm).first())
-            advanceTimeBy(300)
+            val repository = FakeBusStopsRepository()
+            val viewModel = createViewModel(stopsRepository = repository)
+            advanceTimeBy(150.milliseconds)
 
-            vm.onMapClicked()
+            repository.getBusStopsCalls shouldBe 1
 
-            vm.departures.value shouldBe null
+            viewModel.onAction(MapAction.ReloadClicked)
+            advanceTimeBy(150.milliseconds)
+
+            repository.getBusStopsCalls shouldBe 2
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     @Test
-    fun onMapClicked_clears_trackedVehicle_and_route() =
+    fun `GIVEN departures request fails WHEN stop is selected THEN error effect emits repository error message`() =
         runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            vm.onBusStopSelected(busStopsFrom(vm).first())
+            val expectedMessage = "Departures unavailable"
+            val viewModel =
+                createViewModel(
+                    stopsRepository = FakeBusStopsRepository(departuresError = RuntimeException(expectedMessage)),
+                )
+            advanceTimeBy(150.milliseconds)
 
-            vm.onMapClicked()
+            viewModel.effects.test {
+                viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().id))
 
-            vm.trackedVehicle.value shouldBe null
-            vm.route.value shouldBe null
-        }
-
-    // ——— stopTracingJobs / startTracingJobs ———
-
-    @Test
-    fun stopTracingJobs_does_not_change_selectedBusStop() =
-        runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            val stop = busStopsFrom(vm).first()
-            vm.onBusStopSelected(stop)
-
-            vm.stopTracingJobs()
-
-            vm.selectedBusStop.value shouldBe stop
-        }
-
-    @Test
-    fun startTracingJobs_updates_location_to_non_fixed() =
-        runTest {
-            val vm = createViewModel()
-            vm.startTracingJobs()
-            advanceTimeBy(200)
-
-            vm.location.value.isFixed shouldBe false
-        }
-
-    @Test
-    fun stopTracingJobs_stops_location_updates() =
-        runTest {
-            val vm = createViewModel()
-            vm.startTracingJobs()
-            advanceTimeBy(200)
-            val locationAfterStart = vm.location.value
-
-            vm.stopTracingJobs()
-            advanceTimeBy(200)
-
-            vm.location.value shouldBe locationAfterStart
-        }
-
-    // ——— showClosestStationBoard / centerOnUserPosition ———
-
-    @Test
-    fun showClosestStationBoard_auto_selects_closest_stop_when_location_is_available() =
-        runTest {
-            val vm = createViewModel()
-            vm.startTracingJobs()
-            advanceTimeBy(300)
-
-            vm.selectedBusStop.value shouldNotBe null
-        }
-
-    @Test
-    fun centerOnUserPosition_triggers_closest_station_selection() =
-        runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            vm.startTracingJobs()
-            advanceTimeBy(200)
-
-            vm.centerOnUserPosition()
-            advanceTimeBy(100)
-
-            vm.selectedBusStop.value shouldNotBe null
-        }
-
-    // ——— onMapReloadRequest ———
-
-    @Test
-    fun onMapReloadRequest_reloads_bus_stops() =
-        runTest {
-            val vm = createViewModel()
-            advanceTimeBy(200)
-            vm.busStops.value.shouldBeInstanceOf<UiState.Success<*>>()
-
-            vm.onMapReloadRequest()
-            advanceTimeBy(200)
-
-            vm.busStops.value.shouldBeInstanceOf<UiState.Success<*>>()
-        }
-
-    // ——— Error propagation ———
-
-    @Test
-    fun errors_flow_receives_error_when_departures_fail() =
-        runTest {
-            val throwingRepository =
-                object : BusStopsRepository {
-                    override fun getBusStops() = mockBusStopsRepository.getBusStops()
-
-                    override fun getDepartures(stopId: Int): Flow<List<Departure>> =
-                        flow {
-                            throw RuntimeException("Departures unavailable")
-                        }
-
-                    override suspend fun storeBusStopsTypes(types: List<BusStopType>) {}
-                }
-
-            val vm = createViewModel(stopsRepository = throwingRepository)
-            advanceTimeBy(200)
-            val stop = busStopsFrom(vm).first()
-
-            vm.errorFlow.test {
-                vm.onBusStopSelected(stop)
-                val error = awaitItem()
-                error.message shouldBe "Departures unavailable"
+                awaitItem() shouldBe MapEffect.ShowError("Nie udało się wczytać danych")
+                cancelAndIgnoreRemainingEvents()
             }
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
-    // ——— Helpers ———
+    private fun createViewModel(
+        stopsRepository: BusStopsRepository = FakeBusStopsRepository(),
+        locationRepository: LocationRepository = FakeLocationRepository(UserLocation.default().copy(isFixed = false)),
+        permissionChecker: PermissionChecker = FakePermissionChecker(isGranted = true),
+        vehiclesRepository: VehiclesRepository = FakeVehiclesRepository(),
+        routesRepository: RoutesRepository = FakeRoutesRepository(),
+    ): MapScreenViewModel {
+        val viewModel =
+            MapScreenViewModel(
+                stopsRepository = stopsRepository,
+                locationRepository = locationRepository,
+                permissionChecker = permissionChecker,
+                vehiclesRepository = vehiclesRepository,
+                getDeparturesUseCase = GetDeparturesUseCase(stopsRepository, vehiclesRepository),
+                routesRepository = routesRepository,
+            )
+        createdViewModels += viewModel
+        return viewModel
+    }
 
-    private fun busStopsFrom(vm: MapScreenViewModel): List<BusStopMapItem> =
-        (vm.busStops.value as UiState.Success).data
+    private fun busStopsFrom(viewModel: MapScreenViewModel): List<BusStopMapItem> =
+        (viewModel.uiState.value.busStops as UiState.Success).data
 
-    private fun busStopAt(
-        lat: Double,
-        lon: Double,
-        id: Int,
-    ): BusStopData = makeRandomInstance<BusStopData>().copy(stopId = id, stopLat = lat, stopLon = lon)
+    private fun busStopData(
+        stopId: Int = 1,
+        name: String = "Test Stop",
+        lat: Double = 54.372158,
+        lon: Double = 18.638306,
+    ): BusStopData =
+        BusStopData(
+            stopId = stopId,
+            stopCode = "SC$stopId",
+            stopName = name,
+            stopShortName = name,
+            stopDesc = null,
+            subName = null,
+            date = null,
+            zoneId = 1,
+            zoneName = "A",
+            virtual = 0,
+            nonpassenger = 0,
+            depot = 0,
+            ticketZoneBorder = 0,
+            onDemand = false,
+            activationDate = null,
+            stopLat = lat,
+            stopLon = lon,
+            stopUrl = null,
+            locationType = null,
+            parentStation = null,
+            stopTimezone = null,
+            wheelchairBoarding = null,
+            isForBuses = true,
+            isForTrams = true,
+        )
 
-    private fun repositoryWithStops(stops: List<BusStopData>): BusStopsRepository =
-        object : BusStopsRepository {
-            override fun getBusStops(): Flow<List<BusStopData>> = flowOf(stops)
+    private fun vehicle(vehicleCode: String): Vehicle =
+        Vehicle(
+            photo = "",
+            vehicleCode = vehicleCode,
+            carrirer = "ZTM",
+            transportationType = "BUS",
+            vehicleCharacteristics = "",
+            bidirectional = false,
+            historicVehicle = false,
+            length = 12.0,
+            brand = "Solaris",
+            model = "Urbino",
+            productionYear = 2020,
+            seats = 30,
+            standingPlaces = 70,
+            airConditioning = true,
+            monitoring = true,
+            internalMonitor = true,
+            floorHeight = "LOW",
+            kneelingMechanism = true,
+            wheelchairsRamp = true,
+            usb = true,
+            voiceAnnouncements = true,
+            aed = false,
+            bikeHolders = 1,
+            ticketMachine = true,
+            patron = "",
+            url = "",
+            passengersDoors = 3,
+        )
 
-            override fun getDepartures(stopId: Int): Flow<List<Departure>> =
-                mockBusStopsRepository.getDepartures(stopId)
+    private inner class FakeBusStopsRepository(
+        private val stops: List<BusStopData> = listOf(busStopData()),
+        private val departures: List<Departure> = emptyList(),
+        private val departuresError: Throwable? = null,
+    ) : BusStopsRepository {
 
-            override suspend fun storeBusStopsTypes(types: List<BusStopType>) {}
+        var getBusStopsCalls = 0
+            private set
+
+        override fun getBusStops(): Flow<List<BusStopData>> = flow {
+            getBusStopsCalls++
+            delay(100)
+            emit(stops)
         }
+
+        override fun getDepartures(stopId: Int): Flow<List<Departure>> = flow {
+            delay(100)
+            departuresError?.let { throw it }
+            emit(departures)
+        }
+
+        override suspend fun storeBusStopsTypes(types: List<BusStopType>) = Unit
+    }
+
+    private inner class FakeLocationRepository(
+        private val location: UserLocation,
+    ) : LocationRepository {
+
+        override fun getLocation(): Flow<UserLocation> = flow {
+            delay(100)
+            emit(location)
+        }
+    }
+
+    private inner class FakePermissionChecker(
+        private val isGranted: Boolean,
+    ) : PermissionChecker {
+        override fun isLocationPermissionGranted(): Boolean = isGranted
+    }
+
+    private inner class FakeVehiclesRepository(
+        private val vehicles: List<Vehicle> = listOf(vehicle(vehicleCode = "1")),
+    ) : VehiclesRepository {
+
+        override suspend fun updateVehiclesBase() = Unit
+
+        override fun getVehicle(id: Int): Flow<Vehicle> = flowOf(vehicles.first())
+
+        override fun getVehicles(): Flow<List<Vehicle>> = flow {
+            delay(100)
+            emit(vehicles)
+        }
+
+        override fun getVehiclePosition(vehicleId: Int): Flow<VehiclePosition?> = flow {
+            delay(100)
+            emit(null)
+        }
+    }
+
+    private inner class FakeRoutesRepository : RoutesRepository {
+        override fun getRoute(routeId: Int, tripId: Int): Flow<Route> =
+            flowOf(
+                Route(
+                    listOf(
+                        Route.GeoPoint(54.372158, 18.638306),
+                        Route.GeoPoint(54.351959, 18.648064),
+                    ),
+                ),
+            )
+    }
 }

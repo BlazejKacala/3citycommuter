@@ -19,19 +19,19 @@ import androidx.compose.ui.Modifier
 import pl.bkacala.threecitycommuter.ui.theme.Padding
 
 data class SearchResultRowModel(
+    val stopId: Int,
     val station: String,
     val distance: String,
     val isForBuses: Boolean,
     val isForTrams: Boolean,
-    val onClicked: () -> Unit,
 )
 
 @Composable
-fun SearchResultRowModel.Widget() {
+fun SearchResultRowModel.Widget(onClicked: (Int) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClicked() }
+            .clickable { onClicked(stopId) }
             .padding(horizontal = Padding.big, vertical = Padding.normal),
         verticalAlignment = Alignment.CenterVertically,
     ) {

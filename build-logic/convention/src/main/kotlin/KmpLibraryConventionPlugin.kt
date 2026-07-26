@@ -14,7 +14,7 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<KotlinMultiplatformExtension> {
                 targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java).configureEach {
-                    compileSdk = 36
+                    compileSdk = 37
                     minSdk = 29
                     withHostTestBuilder {}
                 }

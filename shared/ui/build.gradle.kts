@@ -4,6 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+configurations.configureEach {
+    resolutionStrategy.force("org.jetbrains.kotlinx:kotlinx-datetime:${libs.versions.kotlinxDatetime.get()}")
+}
+
 kotlin {
     android {
         namespace = "pl.bkacala.threecitycommuter.ui"
@@ -49,6 +53,7 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(libs.kotest.assertions.core)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.kotlinx.datetime)
             implementation(libs.turbine)
         }
     }

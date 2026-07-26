@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "pl.bkacala.threecitycommuter"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "pl.bkacala.threecitycommuter"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 5
         versionName = "2.1"
 

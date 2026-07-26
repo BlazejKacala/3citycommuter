@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,26 +43,23 @@ data class DepartureRowModel(
     val disabledFriendly: Boolean,
     val bikesAllowed: Boolean,
     val gpsPosition: Boolean,
-    val isSelected: MutableState<Boolean>,
+    val isSelected: Boolean,
     val vehicleId: Long?,
     val routeId: Int,
     val tripId: Int,
-    val onSelected: (id: Long) -> Unit,
 )
 
 @Composable
-fun DepartureRowModel.Widget() {
+fun DepartureRowModel.Widget(onSelected: (Long?) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .height(58.dp)
             .clickable {
-                vehicleId?.let {
-                    onSelected(it)
-                }
+                onSelected(vehicleId)
             },
     ) {
-        Selection(isSelected.value)
+        Selection(isSelected)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
