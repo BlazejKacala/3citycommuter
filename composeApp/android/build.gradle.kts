@@ -11,12 +11,15 @@ android {
     namespace = "pl.bkacala.threecitycommuter"
     compileSdk = 37
 
+    val ciVersionCode = providers.environmentVariable("ANDROID_VERSION_CODE").orNull?.toIntOrNull()
+    val ciVersionName = providers.environmentVariable("ANDROID_VERSION_NAME").orNull
+
     defaultConfig {
         applicationId = "pl.bkacala.threecitycommuter"
         minSdk = 29
         targetSdk = 37
-        versionCode = 5
-        versionName = "2.1"
+        versionCode = ciVersionCode ?: 5
+        versionName = ciVersionName ?: "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -24,17 +27,37 @@ android {
         }
     }
 
+    val secretProperties = Properties()
     val secretPropertiesFile = rootProject.file("secrets.properties")
     if (secretPropertiesFile.exists()) {
-        val secretProperties = Properties()
         secretProperties.load(FileInputStream(secretPropertiesFile))
+    }
 
+    val signingStoreFilePath =
+        providers.environmentVariable("ANDROID_SIGNING_STORE_FILE").orNull
+            ?: rootProject.file("signing/key.jks").takeIf { it.exists() }?.absolutePath
+    val signingStorePassword =
+        providers.environmentVariable("ANDROID_SIGNING_STORE_PASSWORD").orNull
+            ?: secretProperties.getProperty("PASS")
+    val signingKeyAlias =
+        providers.environmentVariable("ANDROID_SIGNING_KEY_ALIAS").orNull
+            ?: secretProperties.getProperty("ALIAS")
+    val signingKeyPassword =
+        providers.environmentVariable("ANDROID_SIGNING_KEY_PASSWORD").orNull
+            ?: secretProperties.getProperty("ALIAS_PASS")
+
+    if (
+        !signingStoreFilePath.isNullOrBlank() &&
+        !signingStorePassword.isNullOrBlank() &&
+        !signingKeyAlias.isNullOrBlank() &&
+        !signingKeyPassword.isNullOrBlank()
+    ) {
         signingConfigs {
             create("release") {
-                storeFile = rootProject.file("signing/key.jks")
-                storePassword = secretProperties.getProperty("PASS") ?: ""
-                keyAlias = secretProperties.getProperty("ALIAS") ?: ""
-                keyPassword = secretProperties.getProperty("ALIAS_PASS") ?: ""
+                storeFile = file(signingStoreFilePath)
+                storePassword = signingStorePassword
+                keyAlias = signingKeyAlias
+                keyPassword = signingKeyPassword
             }
         }
     }

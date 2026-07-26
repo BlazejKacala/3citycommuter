@@ -82,6 +82,10 @@ shared:network  shared:database
 
 Wydanie Android wymaga pliku `secrets.properties` oraz klucza `signing/key.jks`; te pliki są lokalne i nie powinny trafiać do repozytorium.
 
+W CI można zamiast tego użyć zmiennych środowiskowych:
+`ANDROID_SIGNING_STORE_FILE`, `ANDROID_SIGNING_STORE_PASSWORD`, `ANDROID_SIGNING_KEY_ALIAS`, `ANDROID_SIGNING_KEY_PASSWORD`.
+Opcjonalnie można też nadpisać wersję przez `ANDROID_VERSION_CODE` i `ANDROID_VERSION_NAME`.
+
 ## Testy
 
 ```bash
@@ -119,3 +123,18 @@ Projekt używa MapLibre — nie wymaga tokenu do podstawowego działania. Aktual
 ```
 
 Konfiguracja Spotless i Detekt znajduje się w głównym `build.gradle.kts`, a reguły Detekt w `config/detekt/detekt.yml`.
+
+## GitHub Actions
+
+Repo zawiera dwa workflowy:
+
+- `Pull Request` uruchamia się dla PR do `main`, odpala `lint`, testy JVM i buduje debug APK. Jeśli ustawisz sekrety podpisu, zbuduje też podpisany `release` APK jako artifact.
+- `Main Release Build` uruchamia się po pushu do `main` oraz ręcznie i buduje podpisany `release` APK.
+
+Wymagane sekrety GitHub:
+
+- `ANDROID_KEYSTORE_BASE64` — zawartość `signing/key.jks` zakodowana base64
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
+
