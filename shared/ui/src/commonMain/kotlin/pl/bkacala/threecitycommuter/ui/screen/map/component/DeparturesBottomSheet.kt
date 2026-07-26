@@ -23,6 +23,7 @@ data class DeparturesBottomSheetModel(
 @Composable
 fun DeparturesBottomSheet(
     model: DeparturesBottomSheetModel,
+    onDepartureSelected: (Long?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -35,7 +36,7 @@ fun DeparturesBottomSheet(
         ) {
             model.header.Widget()
             model.departures.fastForEachIndexed { index, it ->
-                it.Widget()
+                it.Widget(onSelected = onDepartureSelected)
                 if (index != model.departures.size - 1) {
                     HorizontalDivider()
                 }

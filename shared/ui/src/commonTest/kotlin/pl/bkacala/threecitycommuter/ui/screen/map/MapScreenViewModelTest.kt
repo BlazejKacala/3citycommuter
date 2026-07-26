@@ -50,8 +50,8 @@ class MapScreenViewModelTest {
     @AfterTest
     fun tearDown() {
         createdViewModels.forEach { viewModel ->
-            viewModel.stopTracingJobs()
-            viewModel.onMapClicked()
+            viewModel.onAction(MapAction.ScreenPaused)
+            viewModel.onAction(MapAction.MapClicked)
         }
         createdViewModels.clear()
         Dispatchers.resetMain()
@@ -65,7 +65,7 @@ class MapScreenViewModelTest {
 
             advanceTimeBy(150.milliseconds)
 
-            val state = viewModel.busStops.value.shouldBeInstanceOf<UiState.Success<List<BusStopMapItem>>>()
+            val state = viewModel.uiState.value.busStops.shouldBeInstanceOf<UiState.Success<List<BusStopMapItem>>>()
             state.data.shouldHaveSize(1)
             state.data.first().data shouldBe busStop
         }
@@ -79,12 +79,12 @@ class MapScreenViewModelTest {
                     locationRepository = FakeLocationRepository(UserLocation.default().copy(isFixed = false)),
                 )
 
-            viewModel.startTracingJobs()
+            viewModel.onAction(MapAction.ScreenResumed)
             advanceTimeBy(500.milliseconds)
 
-            viewModel.location.value shouldBe UserLocation.default()
-            viewModel.centerOnPositionVisibility.value shouldBe false
-            viewModel.stopTracingJobs()
+            viewModel.uiState.value.userLocation shouldBe UserLocation.default()
+            viewModel.uiState.value.showCenterOnPositionButton shouldBe false
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     @Test
@@ -93,17 +93,17 @@ class MapScreenViewModelTest {
             val viewModel = createViewModel()
             advanceTimeBy(150.milliseconds)
             val stop = busStopsFrom(viewModel).first()
-            viewModel.onBusStopSelected(stop)
+            viewModel.onAction(MapAction.StopSelected(stop.id))
             advanceTimeBy(250.milliseconds)
 
-            viewModel.onMapClicked()
+            viewModel.onAction(MapAction.MapClicked)
 
-            viewModel.selectedBusStop.value shouldBe null
-            viewModel.selectedDeparture.value shouldBe null
-            viewModel.departures.value shouldBe null
-            viewModel.trackedVehicle.value shouldBe null
-            viewModel.route.value shouldBe null
-            viewModel.stopTracingJobs()
+            viewModel.uiState.value.selectedBusStop shouldBe null
+            viewModel.uiState.value.selectedDeparture shouldBe null
+            viewModel.uiState.value.departures shouldBe null
+            viewModel.uiState.value.trackedVehicle shouldBe null
+            viewModel.uiState.value.route shouldBe null
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     @Test
@@ -113,13 +113,13 @@ class MapScreenViewModelTest {
             val viewModel = createViewModel(stopsRepository = FakeBusStopsRepository(stops = listOf(selectedStop)))
 
             advanceTimeBy(150.milliseconds)
-            viewModel.onBusStopSelected(busStopsFrom(viewModel).first())
+            viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().id))
             advanceTimeBy(250.milliseconds)
 
-            viewModel.selectedBusStop.value?.data shouldBe selectedStop
-            viewModel.departures.value shouldNotBe null
-            viewModel.departures.value?.header?.busStopName shouldBe selectedStop.name
-            viewModel.stopTracingJobs()
+            viewModel.uiState.value.selectedBusStop?.data shouldBe selectedStop
+            viewModel.uiState.value.departures shouldNotBe null
+            viewModel.uiState.value.departures?.header?.busStopName shouldBe selectedStop.name
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     @Test
@@ -127,8 +127,8 @@ class MapScreenViewModelTest {
         runTest {
             val viewModel = createViewModel()
 
-            viewModel.location.value shouldBe UserLocation.default()
-            viewModel.centerOnPositionVisibility.value shouldBe false
+            viewModel.uiState.value.userLocation shouldBe UserLocation.default()
+            viewModel.uiState.value.showCenterOnPositionButton shouldBe false
         }
 
     @Test
@@ -140,15 +140,15 @@ class MapScreenViewModelTest {
 
             repository.getBusStopsCalls shouldBe 1
 
-            viewModel.onMapReloadRequest()
+            viewModel.onAction(MapAction.ReloadClicked)
             advanceTimeBy(150.milliseconds)
 
             repository.getBusStopsCalls shouldBe 2
-            viewModel.stopTracingJobs()
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     @Test
-    fun `GIVEN departures request fails WHEN stop is selected THEN error flow emits repository error`() =
+    fun `GIVEN departures request fails WHEN stop is selected THEN error effect emits repository error message`() =
         runTest {
             val expectedMessage = "Departures unavailable"
             val viewModel =
@@ -157,13 +157,13 @@ class MapScreenViewModelTest {
                 )
             advanceTimeBy(150.milliseconds)
 
-            viewModel.errorFlow.test {
-                viewModel.onBusStopSelected(busStopsFrom(viewModel).first())
+            viewModel.effects.test {
+                viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().id))
 
-                awaitItem().message shouldBe expectedMessage
+                awaitItem() shouldBe MapEffect.ShowError("Nie udało się wczytać danych")
                 cancelAndIgnoreRemainingEvents()
             }
-            viewModel.stopTracingJobs()
+            viewModel.onAction(MapAction.ScreenPaused)
         }
 
     private fun createViewModel(
@@ -187,7 +187,7 @@ class MapScreenViewModelTest {
     }
 
     private fun busStopsFrom(viewModel: MapScreenViewModel): List<BusStopMapItem> =
-        (viewModel.busStops.value as UiState.Success).data
+        (viewModel.uiState.value.busStops as UiState.Success).data
 
     private fun busStopData(
         stopId: Int = 1,

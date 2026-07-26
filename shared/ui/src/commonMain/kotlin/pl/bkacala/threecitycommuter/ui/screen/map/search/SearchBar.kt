@@ -19,30 +19,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoxScope.BusSearchBar(
-    searchBarModel: SearchBarModel,
+    query: String,
+    isActive: Boolean,
+    results: List<SearchResultRowModel>,
+    onQueryChange: (String) -> Unit,
+    onExpandedChange: (Boolean) -> Unit,
+    onResultClick: (Int) -> Unit,
 ) {
-    val query = searchBarModel.query.collectAsStateWithLifecycle().value
-    val isActive = searchBarModel.isActive.collectAsStateWithLifecycle().value
     SearchBar(
         inputField = {
             SearchBarDefaults.InputField(
                 query = query,
-                onQueryChange = searchBarModel::onQueryChanged,
+                onQueryChange = onQueryChange,
                 onSearch = {},
                 expanded = isActive,
-                onExpandedChange = searchBarModel::onSearchBarActiveChange,
+                onExpandedChange = onExpandedChange,
                 trailingIcon = {
                     if (isActive && query.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.Outlined.Clear,
                             contentDescription = "kasowajka",
                             modifier = Modifier.clickable {
-                                searchBarModel.onQueryChanged("")
+                                onQueryChange("")
                             },
                         )
                     }
@@ -57,17 +59,16 @@ fun BoxScope.BusSearchBar(
             )
         },
         expanded = isActive,
-        onExpandedChange = searchBarModel::onSearchBarActiveChange,
+        onExpandedChange = onExpandedChange,
         modifier = Modifier
             .align(Alignment.TopCenter)
             .padding(horizontal = 16.dp)
             .fillMaxWidth(),
         colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.background),
     ) {
-        val searchResult = searchBarModel.results.collectAsStateWithLifecycle().value
         LazyColumn {
-            items(searchResult) {
-                it.Widget()
+            items(results) {
+                it.Widget(onClicked = onResultClick)
             }
         }
     }

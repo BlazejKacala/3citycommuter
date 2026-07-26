@@ -1,6 +1,5 @@
 package pl.bkacala.threecitycommuter.ui.screen.map.mapper
 
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.model.departures.Departure
@@ -26,8 +25,7 @@ object DeparturesMapper {
     fun mapToBottomSheetModel(
         busStopData: BusStopData,
         departures: List<Pair<Departure, Vehicle?>>,
-        selectedDeparture: DepartureRowModel?,
-        onSelected: (vehicleId: Long) -> Unit,
+        selectedVehicleId: Long?,
     ): DeparturesBottomSheetModel {
         return DeparturesBottomSheetModel(
             header = DeparturesHeaderModel(
@@ -36,15 +34,14 @@ object DeparturesMapper {
             ),
             departures = departures.map {
                 val (departure, vehicle) = it
-                departure.mapToUiRow(vehicle, selectedDeparture, onSelected)
+                departure.mapToUiRow(vehicle, selectedVehicleId)
             },
         )
     }
 
     private fun Departure.mapToUiRow(
         vehicle: Vehicle?,
-        selectedDeparture: DepartureRowModel?,
-        onSelected: (vehicleId: Long) -> Unit,
+        selectedVehicleId: Long?,
     ): DepartureRowModel {
         val now = Clock.System.now().epochSeconds
         val minutesToArrival = minutesToArrival(this.estimatedTime, now)
@@ -57,11 +54,10 @@ object DeparturesMapper {
             disabledFriendly = vehicle?.wheelchairsRamp ?: false,
             bikesAllowed = vehicle?.bikeHolders == 1,
             gpsPosition = this.delayInSeconds != null,
-            isSelected = mutableStateOf(this.vehicleId == selectedDeparture?.vehicleId && this.vehicleId != null),
+            isSelected = this.vehicleId == selectedVehicleId && this.vehicleId != null,
             vehicleId = this.vehicleId,
             routeId = this.routeId,
             tripId = this.tripId,
-            onSelected = onSelected,
         )
     }
 

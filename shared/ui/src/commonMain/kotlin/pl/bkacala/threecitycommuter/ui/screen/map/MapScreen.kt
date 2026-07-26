@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,8 +37,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import org.koin.compose.viewmodel.koinViewModel
+import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
@@ -53,73 +54,61 @@ fun MapScreen(
 ) {
     BoxWithConstraints {
         val viewModel = koinViewModel<MapScreenViewModel>()
+        val state = viewModel.uiState.collectAsStateWithLifecycle().value
+        val mapBottomPadding = remember(viewModel) { mutableStateOf(0.dp) }
+        val cameraTarget = remember { mutableStateOf<LatLng?>(null) }
 
         TraceLifecycleEvents(viewModel)
-        HandleErrorFlow(viewModel, snackbarHostState)
+        HandleEffects(viewModel, snackbarHostState, cameraTarget)
 
-        val busStopsState = remember(viewModel) { mutableStateOf(emptyList<BusStopMapItem>()) }
-        val displayLoader = remember(viewModel) { mutableStateOf(false) }
-
-        val busStops = viewModel.busStops.collectAsStateWithLifecycle().value
-        when (busStops) {
-            is UiState.Error -> {
-                displayLoader.value = false
-                ErrorSnackbar(busStops, snackbarHostState, viewModel)
-            }
-            UiState.Loading -> {
-                displayLoader.value = true
-            }
-            is UiState.Success -> {
-                displayLoader.value = false
-                busStopsState.value = busStops.data
-            }
+        when (val busStops = state.busStops) {
+            is UiState.Error -> ErrorSnackbar(busStops, snackbarHostState, viewModel)
+            UiState.Loading -> Unit
+            is UiState.Success -> Unit
         }
 
-        val userLocation = viewModel.location.collectAsStateWithLifecycle().value
-        val departuresModel = viewModel.departures.collectAsStateWithLifecycle().value
-        val mapBottomPadding = remember(viewModel) { mutableStateOf(0.dp) }
-
-        val cameraTarget = remember { mutableStateOf<pl.bkacala.threecitycommuter.model.LatLng?>(null) }
-        LaunchedEffect(viewModel) {
-            viewModel.cameraPosition.filterNotNull().collectLatest {
-                cameraTarget.value = it
-            }
-        }
+        val busStops = if (state.busStops is UiState.Success) state.busStops.data else emptyList()
 
         PlatformMapView(
             modifier = Modifier.fillMaxSize(),
             cameraTarget = cameraTarget.value,
             cameraZoom = 6.0f,
-            busStops = busStopsState.value,
-            selectedBusStop = viewModel.selectedBusStop.collectAsStateWithLifecycle().value,
-            trackedVehicle = viewModel.trackedVehicle.collectAsStateWithLifecycle().value,
-            userLocation = userLocation,
-            onBusStopSelected = { viewModel.onBusStopSelected(it) },
-            onMapClicked = { viewModel.onMapClicked() },
-            route = viewModel.route.collectAsStateWithLifecycle().value,
-            mapBottomPadding = if (departuresModel == null) 0.dp else mapBottomPadding.value,
+            busStops = busStops,
+            selectedBusStop = state.selectedBusStop,
+            trackedVehicle = state.trackedVehicle,
+            userLocation = state.userLocation,
+            onBusStopSelected = { viewModel.onAction(MapAction.StopSelected(it.id)) },
+            onMapClicked = { viewModel.onAction(MapAction.MapClicked) },
+            route = state.route,
+            mapBottomPadding = if (state.departures == null) 0.dp else mapBottomPadding.value,
             mapStyle = mapStyle,
             stadiaToken = stadiaToken,
         )
 
-        val displayCenterOnLocationButton =
-            viewModel.centerOnPositionVisibility.collectAsStateWithLifecycle().value
-        if (displayCenterOnLocationButton) {
+        if (state.showCenterOnPositionButton) {
             CenterOnLocationButton(
-                onClicked = { viewModel.centerOnUserPosition() },
+                onClicked = { viewModel.onAction(MapAction.CenterOnUserClicked) },
             )
         }
 
-        BusSearchBar(searchBarModel = viewModel.searchBarModel)
+        BusSearchBar(
+            query = state.searchQuery,
+            isActive = state.isSearchActive,
+            results = state.searchResults,
+            onQueryChange = { viewModel.onAction(MapAction.SearchQueryChanged(it)) },
+            onExpandedChange = { viewModel.onAction(MapAction.SearchActiveChanged(it)) },
+            onResultClick = { viewModel.onAction(MapAction.SearchResultClicked(it)) },
+        )
 
-        if (busStops is UiState.Loading) {
+        if (state.busStops is UiState.Loading) {
             LinearProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter),
             )
         }
-        DeparturesSheet(departuresModel) {
+
+        DeparturesSheet(state.departures, viewModel) {
             mapBottomPadding.value = it
         }
     }
@@ -133,24 +122,30 @@ private fun ErrorSnackbar(
 ) {
     LaunchedEffect(busStops) {
         val result = snackbarHostState.showSnackbar(
-            message = "Nie udało się wczytać przystanków",
-            actionLabel = "Spróbuj ponownie",
+            message = STOPS_LOADING_ERROR_MESSAGE,
+            actionLabel = RETRY_ACTION_LABEL,
         )
         when (result) {
             SnackbarResult.Dismissed -> {}
             SnackbarResult.ActionPerformed -> {
-                viewModel.onMapReloadRequest()
+                viewModel.onAction(MapAction.ReloadClicked)
             }
         }
     }
 }
 
 @Composable
-fun HandleErrorFlow(viewModel: MapScreenViewModel, snackbarHostState: SnackbarHostState) {
+private fun HandleEffects(
+    viewModel: MapScreenViewModel,
+    snackbarHostState: SnackbarHostState,
+    cameraTarget: MutableState<LatLng?>,
+) {
     LaunchedEffect(viewModel) {
-        viewModel.errorFlow.collectLatest {
-            it.printStackTrace()
-            snackbarHostState.showSnackbar("Nie udało się wczytać danych")
+        viewModel.effects.collectLatest { effect ->
+            when (effect) {
+                is MapEffect.FocusCamera -> cameraTarget.value = effect.target
+                is MapEffect.ShowError -> snackbarHostState.showSnackbar(effect.message)
+            }
         }
     }
 }
@@ -184,12 +179,8 @@ private fun TraceLifecycleEvents(viewModel: MapScreenViewModel) {
     DisposableEffect(viewModel) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_RESUME -> {
-                    viewModel.startTracingJobs()
-                }
-                Lifecycle.Event.ON_PAUSE -> {
-                    viewModel.stopTracingJobs()
-                }
+                Lifecycle.Event.ON_RESUME -> viewModel.onAction(MapAction.ScreenResumed)
+                Lifecycle.Event.ON_PAUSE -> viewModel.onAction(MapAction.ScreenPaused)
                 else -> {}
             }
         }
@@ -204,6 +195,7 @@ private fun TraceLifecycleEvents(viewModel: MapScreenViewModel) {
 @Composable
 private fun BoxWithConstraintsScope.DeparturesSheet(
     departuresModel: DeparturesBottomSheetModel?,
+    viewModel: MapScreenViewModel,
     maxSizeListener: (maxSize: Dp) -> Unit,
 ) {
     val density = LocalDensity.current
@@ -223,7 +215,11 @@ private fun BoxWithConstraintsScope.DeparturesSheet(
         departuresModel?.let {
             DeparturesBottomSheet(
                 model = departuresModel,
+                onDepartureSelected = { viewModel.onAction(MapAction.DepartureSelected(it)) },
             )
         }
     }
 }
+
+private const val STOPS_LOADING_ERROR_MESSAGE = "Nie udało się wczytać przystanków"
+private const val RETRY_ACTION_LABEL = "Spróbuj ponownie"

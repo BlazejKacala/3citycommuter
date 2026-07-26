@@ -1,6 +1,5 @@
 package pl.bkacala.threecitycommuter.ui.screen.map
 
-import androidx.compose.ui.util.fastForEach
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -10,15 +9,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -34,13 +30,11 @@ import pl.bkacala.threecitycommuter.ui.common.UiState
 import pl.bkacala.threecitycommuter.ui.common.asUiState
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
-import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
-import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.mapper.DeparturesMapper
 import pl.bkacala.threecitycommuter.ui.screen.map.mapper.TrackedVehicleMapper.mapToTrackedVehicle
-import pl.bkacala.threecitycommuter.ui.screen.map.search.SearchBarModel
+import pl.bkacala.threecitycommuter.ui.screen.map.search.SearchResultRowModel
 import pl.bkacala.threecitycommuter.usecase.GetDeparturesUseCase
-import pl.bkacala.threecitycommuter.utils.stateInViewModelScope
+import kotlin.time.Duration.Companion.seconds
 
 class MapScreenViewModel(
     private val stopsRepository: BusStopsRepository,
@@ -51,147 +45,130 @@ class MapScreenViewModel(
     private val routesRepository: RoutesRepository,
 ) : ViewModel() {
 
+    private var loadBusStopsJob: Job? = null
     private var updateDeparturesJob: Job? = null
     private var traceUserLocationJob: Job? = null
     private var traceVehicleJob: Job? = null
+    private var tracingStarted = false
 
-    private val _location = MutableStateFlow(UserLocation.default())
-    private val _departures = MutableStateFlow<DeparturesBottomSheetModel?>(null)
-    private val _busStops = MutableStateFlow<UiState<List<BusStopMapItem>>>(UiState.Loading)
-    private val _selectedBusStop = MutableStateFlow<BusStopMapItem?>(null)
-    private val _route = MutableStateFlow<List<LatLng>?>(null)
-    private val _selectedDeparture = MutableStateFlow<DepartureRowModel?>(null)
-    private val _cameraFocusFlow = MutableSharedFlow<LatLng?>(replay = 1)
-    private val _trackedVehicle = MutableStateFlow<TrackedVehicle?>(null)
-    private val _errorFlow = MutableSharedFlow<Throwable>()
+    private val _uiState = MutableStateFlow(MapScreenUiState())
+    private val _effects = MutableSharedFlow<MapEffect>()
 
-    val location: StateFlow<UserLocation> = _location
-    val departures: StateFlow<DeparturesBottomSheetModel?> = _departures
-    val busStops: StateFlow<UiState<List<BusStopMapItem>>> = _busStops
-    val selectedBusStop: StateFlow<BusStopMapItem?> = _selectedBusStop
-    val selectedDeparture: StateFlow<DepartureRowModel?> = _selectedDeparture
-    val route: StateFlow<List<LatLng>?> = _route
-    val trackedVehicle: StateFlow<TrackedVehicle?> = _trackedVehicle
-    val cameraFocusFlow: SharedFlow<LatLng?> = _cameraFocusFlow
-    val errorFlow: SharedFlow<Throwable> = _errorFlow
-
-    val centerOnPositionVisibility = _location
-        .map { !it.isFixed }
-        .stateInViewModelScope(this, initialValue = false)
-
-    val cameraPosition = merge(_cameraFocusFlow, location.take(2).map { LatLng(it.latitude, it.longitude) })
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
-
-    val searchBarModel = SearchBarModel(
-        _isActive = MutableStateFlow(false),
-        _query = MutableStateFlow(""),
-        _results = MutableStateFlow(listOf()),
-        busStops = _busStops,
-        userLocation = _location,
-        scope = viewModelScope,
-        onResultClicked = { id ->
-            if (_busStops.value is UiState.Success) {
-                (_busStops.value as UiState.Success<List<BusStopMapItem>>)
-                    .data.find { it.id == id }?.let { station ->
-                        onBusStopSelected(station)
-                        viewModelScope.launch {
-                            _cameraFocusFlow.emit(station.position)
-                        }
-                    }
-            }
-        },
-    )
+    val uiState: StateFlow<MapScreenUiState> = _uiState
+    val effects: SharedFlow<MapEffect> = _effects
 
     init {
         loadBusStops()
         showClosestStationBoard()
     }
 
-    fun stopTracingJobs() {
+    fun onAction(action: MapAction) {
+        when (action) {
+            MapAction.ScreenResumed -> startTracingJobs()
+            MapAction.ScreenPaused -> stopTracingJobs()
+            MapAction.MapClicked -> clearSelection()
+            MapAction.ReloadClicked -> onMapReloadRequest()
+            MapAction.CenterOnUserClicked -> centerOnUserPosition()
+            is MapAction.StopSelected -> selectBusStop(action.stopId)
+            is MapAction.DepartureSelected -> onSelectDeparture(action.vehicleId)
+            is MapAction.SearchQueryChanged -> updateSearchQuery(action.query)
+            is MapAction.SearchActiveChanged -> updateSearchActive(action.isActive)
+            is MapAction.SearchResultClicked -> selectStopFromSearch(action.stopId)
+        }
+    }
+
+    private fun startTracingJobs() {
+        if (tracingStarted) {
+            return
+        }
+        tracingStarted = true
+        traceUserLocation()
+
+        _uiState.value.selectedDeparture?.vehicleId?.let { trackVehicle(it) }
+        _uiState.value.selectedBusStop?.let { updateDepartures(it) }
+    }
+
+    private fun stopTracingJobs() {
+        tracingStarted = false
         traceUserLocationJob?.cancel()
         traceVehicleJob?.cancel()
         updateDeparturesJob?.cancel()
-    }
-
-    fun startTracingJobs() {
-        traceUserLocation()
-
-        val selectedDeparture = _selectedDeparture.value
-        if (selectedDeparture?.vehicleId != null) {
-            trackVehicle(selectedDeparture.vehicleId)
-        }
-
-        val selectedBusStop = _selectedBusStop.value
-        if (selectedBusStop != null) {
-            updateDepartures(selectedBusStop)
-        }
     }
 
     private fun traceUserLocation() {
         traceUserLocationJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 if (permissionChecker.isLocationPermissionGranted()) {
-                    locationRepository.getLocation().collect {
-                        _location.emit(it)
+                    locationRepository.getLocation().collect { location ->
+                        _uiState.value = _uiState.value.copy(userLocation = location)
+                        refreshSearchResults()
                     }
                 }
-                delay(1000 * 10)
+                delay(USER_LOCATION_REFRESH_INTERVAL)
             }
         }
     }
 
     private fun showClosestStationBoard() {
         viewModelScope.launch {
-            busStops.filter { it is UiState.Success }
-                .combine(location.filter { !it.isFixed }, ::Pair)
+            uiState.map { it.busStops }
+                .filter { it is UiState.Success }
+                .combine(uiState.map { it.userLocation }.filter { !it.isFixed }, ::Pair)
                 .take(1)
-                .catch { _errorFlow.emit(it) }
-                .collect { pair ->
-                    val (busStops, userLocation) = pair
+                .catch { emitError() }
+                .collect { (busStops, userLocation) ->
                     if (busStops is UiState.Success) {
                         val userLocationLatLng = LatLng(userLocation.latitude, userLocation.longitude)
                         val closestBusStop =
                             busStops.data.minByOrNull { it.position.sphericalDistance(userLocationLatLng) }
-                        closestBusStop?.let {
-                            onBusStopSelected(it)
-                        }
+                        closestBusStop?.let { onBusStopSelected(it) }
                     }
                 }
         }
     }
 
     private fun loadBusStops() {
-        viewModelScope.launch {
-            stopsRepository.getBusStops().map {
-                it.map { busStopData -> BusStopMapItem(busStopData) }
-            }.asUiState()
-                .collect {
-                    _busStops.value = it
+        loadBusStopsJob?.cancel()
+        loadBusStopsJob = viewModelScope.launch {
+            stopsRepository.getBusStops()
+                .map { stops -> stops.map(::BusStopMapItem) }
+                .asUiState()
+                .collect { state ->
+                    _uiState.value = _uiState.value.copy(busStops = state)
+                    refreshSearchResults()
                 }
         }
     }
 
-    fun onBusStopSelected(selected: BusStopMapItem) {
-        _trackedVehicle.value = null
-        _selectedDeparture.value = null
-        _route.value = null
+    private fun selectBusStop(stopId: Int) {
+        currentBusStops().firstOrNull { it.id == stopId }?.let { onBusStopSelected(it) }
+    }
+
+    private fun onBusStopSelected(selected: BusStopMapItem) {
         updateDeparturesJob?.cancel()
         traceVehicleJob?.cancel()
-        _selectedBusStop.value = selected
+        _uiState.value = _uiState.value.copy(
+            selectedBusStop = selected,
+            selectedDeparture = null,
+            departures = null,
+            route = null,
+            trackedVehicle = null,
+        )
         updateDepartures(selected)
     }
 
     private fun loadRoute() {
         viewModelScope.launch {
-            _selectedDeparture.value?.let { departureRowModel ->
+            _uiState.value.selectedDeparture?.let { departure ->
                 routesRepository.getRoute(
-                    routeId = departureRowModel.routeId,
-                    tripId = departureRowModel.tripId,
-                ).catch { _errorFlow.emit(it) }.collectLatest {
-                    _route.value = it.shape.map { geoPoint ->
-                        LatLng(geoPoint.latitude, geoPoint.longitude)
+                    routeId = departure.routeId,
+                    tripId = departure.tripId,
+                ).catch { emitError() }
+                    .collectLatest { route ->
+                        _uiState.value = _uiState.value.copy(
+                            route = route.shape.map { LatLng(it.latitude, it.longitude) },
+                        )
                     }
-                }
             }
         }
     }
@@ -201,32 +178,37 @@ class MapScreenViewModel(
             while (isActive) {
                 getDeparturesUseCase.getDepartures(selected.id)
                     .take(1)
-                    .catch { _errorFlow.emit(it) }
+                    .catch { emitError() }
                     .collect { departures ->
-                        _departures.value =
-                            DeparturesMapper.mapToBottomSheetModel(
+                        _uiState.value = _uiState.value.copy(
+                            departures = DeparturesMapper.mapToBottomSheetModel(
                                 busStopData = selected.data,
                                 departures = departures.distinctBy { it.first.vehicleId },
-                                selectedDeparture = _selectedDeparture.value,
-                                onSelected = { onSelectDeparture(it) },
-                            )
+                                selectedVehicleId = _uiState.value.selectedDeparture?.vehicleId,
+                            ),
+                        )
                     }
-                delay(1000 * 30)
+                delay(DEPARTURES_REFRESH_INTERVAL)
             }
         }
     }
 
     private fun onSelectDeparture(vehicleId: Long?) {
         traceVehicleJob?.cancel()
-        _trackedVehicle.value = null
-        _route.value = null
-        _selectedDeparture.value = departures.value?.departures?.find {
+        val state = _uiState.value
+        val selectedDeparture = state.departures?.departures?.find {
             vehicleId != null && it.vehicleId == vehicleId
         }
-        departures.value?.departures?.fastForEach {
-            it.isSelected.value = false
-        }
-        _selectedDeparture.value?.isSelected?.value = true
+        _uiState.value = state.copy(
+            selectedDeparture = selectedDeparture,
+            trackedVehicle = null,
+            route = null,
+            departures = state.departures?.copy(
+                departures = state.departures.departures.map {
+                    it.copy(isSelected = it.vehicleId == vehicleId && it.vehicleId != null)
+                },
+            ),
+        )
 
         loadRoute()
         vehicleId?.let { trackVehicle(it) }
@@ -238,55 +220,129 @@ class MapScreenViewModel(
                 val vehicleIdInt = vehicleId.toInt()
                 while (isActive) {
                     vehiclesRepository.getVehiclePosition(vehicleIdInt)
-                        .catch { _errorFlow.emit(it) }
-                        .collect {
-                            it?.let { vehiclePosition ->
-                                if (_trackedVehicle.value == null) {
-                                    _cameraFocusFlow.emit(
-                                        LatLng(
-                                            vehiclePosition.lat,
-                                            vehiclePosition.lon,
+                        .catch { emitError() }
+                        .collect { vehiclePosition ->
+                            vehiclePosition?.let { position ->
+                                if (_uiState.value.trackedVehicle == null) {
+                                    _effects.emit(
+                                        MapEffect.FocusCamera(
+                                            LatLng(position.lat, position.lon),
                                         ),
                                     )
                                 }
-                                if (_selectedDeparture.value != null) {
-                                    _trackedVehicle.emit(
-                                        mapToTrackedVehicle(vehiclePosition, _selectedDeparture.value!!),
+
+                                _uiState.value.selectedDeparture?.let { departure ->
+                                    _uiState.value = _uiState.value.copy(
+                                        trackedVehicle = mapToTrackedVehicle(position, departure),
                                     )
                                 }
                             }
                         }
-                    delay(1000 * 10)
+                    delay(VEHICLE_REFRESH_INTERVAL)
                 }
-            } catch (e: NumberFormatException) {
-                _errorFlow.emit(IllegalArgumentException("Nieprawidłowy identyfikator pojazdu"))
+            } catch (_: NumberFormatException) {
+                emitError(INVALID_VEHICLE_ID_ERROR_MESSAGE)
             }
         }
     }
 
-    fun onMapClicked() {
-        _trackedVehicle.value = null
-        _selectedBusStop.value = null
-        _selectedDeparture.value = null
-        _departures.value = null
-        _route.value = null
+    private fun clearSelection() {
         updateDeparturesJob?.cancel()
         traceVehicleJob?.cancel()
+        _uiState.value = _uiState.value.copy(
+            selectedBusStop = null,
+            selectedDeparture = null,
+            departures = null,
+            route = null,
+            trackedVehicle = null,
+        )
     }
 
-    fun onMapReloadRequest() {
+    private fun onMapReloadRequest() {
         updateDeparturesJob?.cancel()
-        viewModelScope.launch {
-            loadBusStops()
-        }
+        loadBusStops()
     }
 
-    fun centerOnUserPosition() {
+    private fun centerOnUserPosition() {
         viewModelScope.launch {
-            if (!_location.value.isFixed) {
-                _cameraFocusFlow.emit(LatLng(_location.value.latitude, _location.value.longitude))
+            if (!_uiState.value.userLocation.isFixed) {
+                _effects.emit(
+                    MapEffect.FocusCamera(
+                        LatLng(_uiState.value.userLocation.latitude, _uiState.value.userLocation.longitude),
+                    ),
+                )
             }
         }
         showClosestStationBoard()
     }
+
+    private fun selectStopFromSearch(stopId: Int) {
+        val station = currentBusStops().firstOrNull { it.id == stopId } ?: return
+        _uiState.value = _uiState.value.copy(isSearchActive = false)
+        onBusStopSelected(station)
+        viewModelScope.launch {
+            _effects.emit(MapEffect.FocusCamera(station.position))
+        }
+    }
+
+    private fun updateSearchQuery(query: String) {
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+        refreshSearchResults()
+    }
+
+    private fun updateSearchActive(isActive: Boolean) {
+        _uiState.value = _uiState.value.copy(isSearchActive = isActive)
+        if (isActive) {
+            refreshSearchResults()
+        }
+    }
+
+    private fun refreshSearchResults() {
+        val state = _uiState.value
+        val busStops = (state.busStops as? UiState.Success)?.data ?: emptyList()
+        val location = state.userLocation
+        val query = state.searchQuery.lowercase()
+
+        _uiState.value = state.copy(
+            searchResults = busStops
+                .filter { it.data.name.lowercase().contains(query) }
+                .map { stop ->
+                    stop to stop.position.sphericalDistance(LatLng(location.latitude, location.longitude)).toInt()
+                }
+                .sortedBy { it.second }
+                .map { (item, distance) ->
+                    SearchResultRowModel(
+                        stopId = item.id,
+                        station = item.data.name,
+                        distance = getDistanceString(distance, location),
+                        isForBuses = item.data.isForBuses,
+                        isForTrams = item.data.isForTrams,
+                    )
+                },
+        )
+    }
+
+    private fun currentBusStops(): List<BusStopMapItem> =
+        (uiState.value.busStops as? UiState.Success)?.data.orEmpty()
+
+    private fun getDistanceString(distance: Int, userLocation: UserLocation): String {
+        return if (userLocation.isFixed) {
+            UNKNOWN_DISTANCE_LABEL
+        } else {
+            "$DISTANCE_LABEL_PREFIX ${distance}m"
+        }
+    }
+
+    private suspend fun emitError(message: String = GENERIC_ERROR_MESSAGE) {
+        _effects.emit(MapEffect.ShowError(message))
+    }
 }
+
+private val USER_LOCATION_REFRESH_INTERVAL = 10.seconds
+private val DEPARTURES_REFRESH_INTERVAL = 30.seconds
+private val VEHICLE_REFRESH_INTERVAL = 10.seconds
+
+private const val GENERIC_ERROR_MESSAGE = "Nie udało się wczytać danych"
+private const val INVALID_VEHICLE_ID_ERROR_MESSAGE = "Nieprawidłowy identyfikator pojazdu"
+private const val UNKNOWN_DISTANCE_LABEL = "Odległość od przystanka nieznana, brak Twojej lokalizacji"
+private const val DISTANCE_LABEL_PREFIX = "Przystanek odległy o"
