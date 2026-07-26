@@ -10,6 +10,7 @@ plugins {
 android {
     namespace = "pl.bkacala.threecitycommuter"
     compileSdk = 37
+    val repoParentDir = rootProject.rootDir.parentFile
 
     val ciVersionCode = providers.environmentVariable("ANDROID_VERSION_CODE").orNull?.toIntOrNull()
     val ciVersionName = providers.environmentVariable("ANDROID_VERSION_NAME").orNull
@@ -28,14 +29,14 @@ android {
     }
 
     val secretProperties = Properties()
-    val secretPropertiesFile = rootProject.file("secrets.properties")
+    val secretPropertiesFile = repoParentDir.resolve("secrets.properties")
     if (secretPropertiesFile.exists()) {
         secretProperties.load(FileInputStream(secretPropertiesFile))
     }
 
     val signingStoreFilePath =
         providers.environmentVariable("ANDROID_SIGNING_STORE_FILE").orNull
-            ?: rootProject.file("signing/key.jks").takeIf { it.exists() }?.absolutePath
+            ?: repoParentDir.resolve("signing/key.jks").takeIf { it.exists() }?.absolutePath
     val signingStorePassword =
         providers.environmentVariable("ANDROID_SIGNING_STORE_PASSWORD").orNull
             ?: secretProperties.getProperty("PASS")
