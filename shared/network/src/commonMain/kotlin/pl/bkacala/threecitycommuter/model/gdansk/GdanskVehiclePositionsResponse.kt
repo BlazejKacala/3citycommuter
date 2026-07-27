@@ -1,16 +1,16 @@
-package pl.bkacala.threecitycommuter.model
+package pl.bkacala.threecitycommuter.model.gdansk
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class VehiclePositionsNetworkData(
-    @SerialName("vehicles") val vehiclePositions: List<VehiclePositionNetworkData>,
+data class GdanskVehiclePositionsResponse(
+    @SerialName("vehicles") val vehiclePositions: List<GdanskVehiclePositionResponse>,
 )
 
 @Serializable
-data class VehiclePositionNetworkData(
+data class GdanskVehiclePositionResponse(
     @SerialName("generated") val generated: Instant,
     @SerialName("routeShortName") val routeShortName: String?,
     @SerialName("tripId") val tripId: Int?,

@@ -1,9 +1,9 @@
 package pl.bkacala.threecitycommuter.model.vehicles
 
-import pl.bkacala.threecitycommuter.model.VehicleNetworkData
-import pl.bkacala.threecitycommuter.model.VehiclePositionNetworkData
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehicleResponse
 
-fun VehicleNetworkData.toVehicleEntity(): VehicleEntity {
+fun GdanskVehicleResponse.toVehicleEntity(): VehicleEntity {
     return VehicleEntity(
         photo = this.photo,
         vehicleCode = this.vehicleCode,
@@ -99,7 +99,7 @@ fun VehicleEntity.toVehicle(): Vehicle {
     )
 }
 
-fun VehiclePositionNetworkData.toVehiclePosition(): VehiclePosition {
+fun GdanskVehiclePositionResponse.toVehiclePosition(): VehiclePosition {
     return VehiclePosition(
         generated = generated,
         routeShortName = routeShortName,

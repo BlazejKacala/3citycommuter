@@ -10,12 +10,13 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
-import pl.bkacala.threecitycommuter.model.DepartureList
-import pl.bkacala.threecitycommuter.model.DepartureNetworkData
-import pl.bkacala.threecitycommuter.model.RouteNetworkData
-import pl.bkacala.threecitycommuter.model.VehiclePositionsNetworkData
-import pl.bkacala.threecitycommuter.model.VehiclesNetworkData
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskDeparturesResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteShapeResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionsResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclesResponse
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -64,7 +65,7 @@ class TransitDataSourceTest {
 
     @Test
     fun `Gdansk and Gdynia providers expose a consistent domain model for UI fields`() = runTest {
-        val gdanskDataSource = GdanskTransitDataSource(fakeGdanskNetworkClient())
+        val gdanskDataSource = GdanskTransitDataSource(fakeGdanskApiClient())
         val gdyniaHttpClient = mockHttpClient(
             "http://api.zdiz.gdynia.pl/pt/stops" to MockResponse.Text(gdyniaStopsBody),
             "http://api.zdiz.gdynia.pl/pt/delays?stopId=1015" to MockResponse.Text(gdyniaDelaysBody),
@@ -98,13 +99,13 @@ class TransitDataSourceTest {
         assertTrue(gdyniaDeparture.tripId > 0)
     }
 
-    private fun fakeGdanskNetworkClient(): NetworkClient =
-        object : NetworkClient {
-            override suspend fun getStops(): BusStopsNetworkData =
-                BusStopsNetworkData(
+    private fun fakeGdanskApiClient(): GdanskApiClient =
+        object : GdanskApiClient {
+            override suspend fun getStops(): GdanskStopsResponse =
+                GdanskStopsResponse(
                     lastUpdate = "2026-07-27 10:00:00",
                     stops = listOf(
-                        BusStopsNetworkData.BusStopNetworkData(
+                        GdanskStopResponse(
                             stopId = 8227,
                             stopCode = "04",
                             stopName = "Dabrowa Centrum",
@@ -131,10 +132,10 @@ class TransitDataSourceTest {
                     ),
                 )
 
-            override suspend fun getDepartures(stopId: Int): DepartureList =
-                DepartureList(
+            override suspend fun getDepartures(stopId: Int): GdanskDeparturesResponse =
+                GdanskDeparturesResponse(
                     departures = listOf(
-                        DepartureNetworkData(
+                        GdanskDepartureResponse(
                             id = "1",
                             delayInSeconds = 0,
                             estimatedTime = kotlinx.datetime.Instant.parse("2026-07-27T10:22:00Z"),
@@ -153,13 +154,16 @@ class TransitDataSourceTest {
                     ),
                 )
 
-            override suspend fun getVehicles(): VehiclesNetworkData = VehiclesNetworkData(emptyList())
+            override suspend fun getVehicles(): GdanskVehiclesResponse = GdanskVehiclesResponse(emptyList())
 
-            override suspend fun getVehiclesPositions(): VehiclePositionsNetworkData =
-                VehiclePositionsNetworkData(emptyList())
+            override suspend fun getVehiclePositions(): GdanskVehiclePositionsResponse =
+                GdanskVehiclePositionsResponse(emptyList())
 
-            override suspend fun getRoute(date: String, routeId: Int, tripId: Int): RouteNetworkData =
-                RouteNetworkData(emptyList())
+            override suspend fun getRouteShape(
+                date: String,
+                routeId: Int,
+                tripId: Int,
+            ): GdanskRouteShapeResponse = GdanskRouteShapeResponse(emptyList())
         }
 
     private fun mockHttpClient(vararg responses: Pair<String, MockResponse>): HttpClient {

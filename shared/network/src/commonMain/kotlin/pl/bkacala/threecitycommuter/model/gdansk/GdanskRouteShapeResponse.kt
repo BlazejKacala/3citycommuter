@@ -1,10 +1,10 @@
-package pl.bkacala.threecitycommuter.model
+package pl.bkacala.threecitycommuter.model.gdansk
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RouteNetworkData(
+data class GdanskRouteShapeResponse(
     @SerialName("coordinates")
     val coordinates: List<List<Double>>,
 )

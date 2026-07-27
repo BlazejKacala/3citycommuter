@@ -10,7 +10,7 @@ import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import pl.bkacala.threecitycommuter.client.KtorNetworkClient
+import pl.bkacala.threecitycommuter.client.KtorGdanskApiClient
 import kotlin.test.Test
 
 class SerializationTest {
@@ -35,7 +35,7 @@ class SerializationTest {
             }
         }
 
-        val apiClient = KtorNetworkClient(httpClient, json)
+        val apiClient = KtorGdanskApiClient(httpClient, json)
         apiClient.getStops()
     }
 }

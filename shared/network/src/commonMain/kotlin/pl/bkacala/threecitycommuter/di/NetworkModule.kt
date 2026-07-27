@@ -9,12 +9,12 @@ import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import pl.bkacala.threecitycommuter.client.CombinedTransitDataSource
+import pl.bkacala.threecitycommuter.client.GdanskApiClient
 import pl.bkacala.threecitycommuter.client.GdanskTransitDataSource
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsPreloader
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsStore
 import pl.bkacala.threecitycommuter.client.GdyniaTransitDataSource
-import pl.bkacala.threecitycommuter.client.KtorNetworkClient
-import pl.bkacala.threecitycommuter.client.NetworkClient
+import pl.bkacala.threecitycommuter.client.KtorGdanskApiClient
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.client.ZipEntryReader
 
@@ -41,8 +41,8 @@ val networkModule = module {
         }
     }
 
-    single<NetworkClient> {
-        KtorNetworkClient(get(), get())
+    single<GdanskApiClient> {
+        KtorGdanskApiClient(get(), get())
     }
 
     single { ZipEntryReader() }

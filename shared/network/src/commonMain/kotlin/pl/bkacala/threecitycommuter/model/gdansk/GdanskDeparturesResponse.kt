@@ -1,11 +1,11 @@
-package pl.bkacala.threecitycommuter.model
+package pl.bkacala.threecitycommuter.model.gdansk
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DepartureNetworkData(
+data class GdanskDepartureResponse(
     val id: String,
     val delayInSeconds: Int?,
     @SerialName("estimatedTime")
@@ -27,6 +27,6 @@ data class DepartureNetworkData(
 )
 
 @Serializable
-data class DepartureList(
-    val departures: List<DepartureNetworkData>,
+data class GdanskDeparturesResponse(
+    val departures: List<GdanskDepartureResponse>,
 )

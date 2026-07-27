@@ -1,8 +1,8 @@
 package pl.bkacala.threecitycommuter.model.route
 
-import pl.bkacala.threecitycommuter.model.RouteNetworkData
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteShapeResponse
 
-fun RouteNetworkData.mapToRoute(): Route {
+fun GdanskRouteShapeResponse.mapToRoute(): Route {
     return Route(
         shape = this.coordinates.mapNotNull {
             if (it.size == 2) {

@@ -1,15 +1,15 @@
-package pl.bkacala.threecitycommuter.model
+package pl.bkacala.threecitycommuter.model.gdansk
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class VehiclesNetworkData(
-    val results: List<VehicleNetworkData>,
+data class GdanskVehiclesResponse(
+    val results: List<GdanskVehicleResponse>,
 )
 
 @Serializable
-data class VehicleNetworkData(
+data class GdanskVehicleResponse(
     val photo: String,
     @SerialName("vehicleCode") val vehicleCode: String,
     val carrirer: String,

@@ -4,11 +4,11 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
-import pl.bkacala.threecitycommuter.model.DepartureNetworkData
-import pl.bkacala.threecitycommuter.model.RouteNetworkData
-import pl.bkacala.threecitycommuter.model.VehicleNetworkData
-import pl.bkacala.threecitycommuter.model.VehiclePositionNetworkData
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteShapeResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehicleResponse
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
@@ -23,7 +23,7 @@ import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.utils.toddMMyyyyString
 
 internal class GdanskTransitDataSource(
-    private val networkClient: NetworkClient,
+    private val gdanskApiClient: GdanskApiClient,
 ) : TransitDataSource {
 
     override fun features(provider: TransitProvider): TransitFeatures =
@@ -35,27 +35,27 @@ internal class GdanskTransitDataSource(
         )
 
     override suspend fun getStops(): List<BusStopData> =
-        networkClient.getStops().stops.map { it.toBusStopData(isForBuses = true, isForTrams = true) }
+        gdanskApiClient.getStops().stops.map { it.toBusStopData(isForBuses = true, isForTrams = true) }
 
     override suspend fun getDepartures(stopId: Int): List<Departure> =
-        networkClient.getDepartures(stopId).departures.map { it.toDepartureData() }
+        gdanskApiClient.getDepartures(stopId).departures.map { it.toDepartureData() }
 
     override suspend fun getRouteShape(provider: TransitProvider, routeId: Int, tripId: Int): Route {
         val dateString =
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toddMMyyyyString()
-        return networkClient.getRoute(dateString, routeId, tripId).mapToRoute()
+        return gdanskApiClient.getRouteShape(dateString, routeId, tripId).mapToRoute()
     }
 
     override suspend fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): VehiclePosition? =
-        networkClient.getVehiclesPositions().vehiclePositions
+        gdanskApiClient.getVehiclePositions().vehiclePositions
             .firstOrNull { it.vehicleId == vehicleId }
             ?.toVehiclePosition()
 
     override suspend fun getVehicles(provider: TransitProvider): List<Vehicle> =
-        networkClient.getVehicles().results.map { it.toVehicle() }
+        gdanskApiClient.getVehicles().results.map { it.toVehicle() }
 }
 
-private fun BusStopsNetworkData.BusStopNetworkData.toBusStopData(
+private fun GdanskStopResponse.toBusStopData(
     isForBuses: Boolean,
     isForTrams: Boolean,
 ): BusStopData {
@@ -87,7 +87,7 @@ private fun BusStopsNetworkData.BusStopNetworkData.toBusStopData(
     )
 }
 
-private fun DepartureNetworkData.toDepartureData(): Departure {
+private fun GdanskDepartureResponse.toDepartureData(): Departure {
     return Departure(
         id = id,
         delayInSeconds = delayInSeconds,
@@ -107,7 +107,7 @@ private fun DepartureNetworkData.toDepartureData(): Departure {
     )
 }
 
-private fun RouteNetworkData.mapToRoute(): Route {
+private fun GdanskRouteShapeResponse.mapToRoute(): Route {
     return Route(
         shape = coordinates.mapNotNull { coordinate ->
             if (coordinate.size == 2) {
@@ -119,7 +119,7 @@ private fun RouteNetworkData.mapToRoute(): Route {
     )
 }
 
-private fun VehicleNetworkData.toVehicle(): Vehicle {
+private fun GdanskVehicleResponse.toVehicle(): Vehicle {
     return Vehicle(
         photo = photo,
         vehicleCode = vehicleCode,
@@ -151,7 +151,7 @@ private fun VehicleNetworkData.toVehicle(): Vehicle {
     )
 }
 
-private fun VehiclePositionNetworkData.toVehiclePosition(): VehiclePosition {
+private fun GdanskVehiclePositionResponse.toVehiclePosition(): VehiclePosition {
     return VehiclePosition(
         generated = generated,
         routeShortName = routeShortName,
