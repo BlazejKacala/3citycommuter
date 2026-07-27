@@ -5,23 +5,25 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import pl.bkacala.threecitycommuter.client.NetworkClient
+import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.dao.BusStopsDao
 import pl.bkacala.threecitycommuter.dao.BusStopsTypesDao
 import pl.bkacala.threecitycommuter.model.departures.Departure
-import pl.bkacala.threecitycommuter.model.departures.toDepartureData
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.stops.BusStopType
 import pl.bkacala.threecitycommuter.model.stops.toData
 import pl.bkacala.threecitycommuter.model.stops.toEntity
 import pl.bkacala.threecitycommuter.model.stops.toStopData
+import pl.bkacala.threecitycommuter.model.stops.toType
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopId
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
 import pl.bkacala.threecitycommuter.utils.isOlderThenOneDay
 
 private const val BUS_STOPS_KEY = "bus_stops"
 
 internal class RealBusStopsRepository(
-    private val networkClient: NetworkClient,
+    private val transitDataSource: TransitDataSource,
     private val busStopsDao: BusStopsDao,
     private val busStopsTypesDao: BusStopsTypesDao,
     private val lastUpdateRepository: LastUpdateRepository,
@@ -32,7 +34,11 @@ internal class RealBusStopsRepository(
             val lastUpdateTimestamp = lastUpdateRepository.getLastUpdateTimeStamp(BUS_STOPS_KEY)
 
             if (lastUpdateTimestamp.isOlderThenOneDay()) {
-                busStopsDao.upsertBusStations(networkClient.getStops().stops.map { it.toEntity() })
+                val stops = transitDataSource.getStops()
+                busStopsDao.upsertBusStations(stops.map { it.toEntity() })
+                busStopsTypesDao.upsertBusStopsTypes(
+                    stops.filter { it.provider == TransitProvider.GDYNIA }.map { it.toType().toEntity() },
+                )
                 lastUpdateRepository.storeLastUpdateCurrentTimeStamp(BUS_STOPS_KEY)
             }
             val relationsByStopId = busStopsTypesDao.getBusStopsTypes()
@@ -53,11 +59,15 @@ internal class RealBusStopsRepository(
 
     override fun getDepartures(stopId: Int): Flow<List<Departure>> {
         return flow {
-            emit(networkClient.getDepartures(stopId).departures.map { it.toDepartureData() })
+            emit(transitDataSource.getDepartures(stopId))
         }
     }
 
     override suspend fun storeBusStopsTypes(types: List<BusStopType>) {
-        busStopsTypesDao.upsertBusStopsTypes(types.map { it.toEntity() })
+        busStopsTypesDao.upsertBusStopsTypes(
+            types.map { type ->
+                type.copy(stopId = TransitStopId.toAppId(TransitProvider.GDANSK, type.stopId)).toEntity()
+            },
+        )
     }
 }

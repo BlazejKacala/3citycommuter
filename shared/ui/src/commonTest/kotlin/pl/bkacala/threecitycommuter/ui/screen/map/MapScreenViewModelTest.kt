@@ -21,6 +21,8 @@ import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.stops.BusStopType
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopId
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
@@ -196,7 +198,7 @@ class MapScreenViewModelTest {
         lon: Double = 18.638306,
     ): BusStopData =
         BusStopData(
-            stopId = stopId,
+            stopId = TransitStopId.toAppId(TransitProvider.GDANSK, stopId),
             stopCode = "SC$stopId",
             stopName = name,
             stopShortName = name,
@@ -301,19 +303,19 @@ class MapScreenViewModelTest {
 
         override fun getVehicle(id: Int): Flow<Vehicle> = flowOf(vehicles.first())
 
-        override fun getVehicles(): Flow<List<Vehicle>> = flow {
+        override fun getVehicles(provider: TransitProvider): Flow<List<Vehicle>> = flow {
             delay(100)
             emit(vehicles)
         }
 
-        override fun getVehiclePosition(vehicleId: Int): Flow<VehiclePosition?> = flow {
+        override fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): Flow<VehiclePosition?> = flow {
             delay(100)
             emit(null)
         }
     }
 
     private inner class FakeRoutesRepository : RoutesRepository {
-        override fun getRoute(routeId: Int, tripId: Int): Flow<Route> =
+        override fun getRoute(provider: TransitProvider, routeId: Int, tripId: Int): Flow<Route> =
             flowOf(
                 Route(
                     listOf(

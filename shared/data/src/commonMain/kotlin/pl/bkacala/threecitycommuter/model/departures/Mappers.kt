@@ -8,6 +8,7 @@ fun DepartureNetworkData.toDepartureData(): Departure {
         delayInSeconds = this.delayInSeconds,
         estimatedTime = this.estimatedTime,
         headsign = this.headsign,
+        lineNumber = this.routeId.toString(),
         routeId = this.routeId,
         scheduledTripStartTime = this.scheduledTripStartTime,
         tripId = this.tripId,

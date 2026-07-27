@@ -23,7 +23,7 @@ data class DeparturesBottomSheetModel(
 @Composable
 fun DeparturesBottomSheet(
     model: DeparturesBottomSheetModel,
-    onDepartureSelected: (Long?) -> Unit,
+    onDepartureSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(

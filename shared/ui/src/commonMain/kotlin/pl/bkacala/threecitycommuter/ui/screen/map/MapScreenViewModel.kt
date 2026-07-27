@@ -18,9 +18,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.model.sphericalDistance
+import pl.bkacala.threecitycommuter.model.transit.supportsLiveVehicleTracking
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
 import pl.bkacala.threecitycommuter.repository.location.PermissionChecker
 import pl.bkacala.threecitycommuter.repository.routes.RoutesRepository
@@ -69,7 +71,7 @@ class MapScreenViewModel(
             MapAction.ReloadClicked -> onMapReloadRequest()
             MapAction.CenterOnUserClicked -> centerOnUserPosition()
             is MapAction.StopSelected -> selectBusStop(action.stopId)
-            is MapAction.DepartureSelected -> onSelectDeparture(action.vehicleId)
+            is MapAction.DepartureSelected -> onSelectDeparture(action.departureKey)
             is MapAction.SearchQueryChanged -> updateSearchQuery(action.query)
             is MapAction.SearchActiveChanged -> updateSearchActive(action.isActive)
             is MapAction.SearchResultClicked -> selectStopFromSearch(action.stopId)
@@ -83,7 +85,9 @@ class MapScreenViewModel(
         tracingStarted = true
         traceUserLocation()
 
-        _uiState.value.selectedDeparture?.vehicleId?.let { trackVehicle(it) }
+        if (_uiState.value.selectedBusStop?.data?.provider?.supportsLiveVehicleTracking == true) {
+            _uiState.value.selectedDeparture?.vehicleId?.let { trackVehicle(it) }
+        }
         _uiState.value.selectedBusStop?.let { updateDepartures(it) }
     }
 
@@ -114,7 +118,10 @@ class MapScreenViewModel(
                 .filter { it is UiState.Success }
                 .combine(uiState.map { it.userLocation }.filter { !it.isFixed }, ::Pair)
                 .take(1)
-                .catch { emitError() }
+                .catch { throwable ->
+                    logError(LOG_TAG, "Failed while resolving the closest stop", throwable)
+                    emitError()
+                }
                 .collect { (busStops, userLocation) ->
                     if (busStops is UiState.Success) {
                         val userLocationLatLng = LatLng(userLocation.latitude, userLocation.longitude)
@@ -133,6 +140,9 @@ class MapScreenViewModel(
                 .map { stops -> stops.map(::BusStopMapItem) }
                 .asUiState()
                 .collect { state ->
+                    if (state is UiState.Error) {
+                        logError(LOG_TAG, "Failed to load bus stops", state.exception)
+                    }
                     _uiState.value = _uiState.value.copy(busStops = state)
                     refreshSearchResults()
                 }
@@ -159,10 +169,19 @@ class MapScreenViewModel(
     private fun loadRoute() {
         viewModelScope.launch {
             _uiState.value.selectedDeparture?.let { departure ->
+                val provider = _uiState.value.selectedBusStop?.data?.provider ?: return@launch
                 routesRepository.getRoute(
+                    provider = provider,
                     routeId = departure.routeId,
                     tripId = departure.tripId,
-                ).catch { emitError() }
+                ).catch { throwable ->
+                    logError(
+                        LOG_TAG,
+                        "Failed to load route for provider=$provider routeId=${departure.routeId} tripId=${departure.tripId}",
+                        throwable,
+                    )
+                    emitError()
+                }
                     .collectLatest { route ->
                         _uiState.value = _uiState.value.copy(
                             route = route.shape.map { LatLng(it.latitude, it.longitude) },
@@ -177,13 +196,20 @@ class MapScreenViewModel(
             while (isActive) {
                 getDeparturesUseCase.getDepartures(selected.id)
                     .take(1)
-                    .catch { emitError() }
+                    .catch { throwable ->
+                        logError(
+                            LOG_TAG,
+                            "Failed to load departures for stopId=${selected.id} stopName=${selected.data.name}",
+                            throwable,
+                        )
+                        emitError()
+                    }
                     .collect { departures ->
                         _uiState.value = _uiState.value.copy(
                             departures = DeparturesMapper.mapToBottomSheetModel(
                                 busStopData = selected.data,
-                                departures = departures.distinctBy { it.first.vehicleId },
-                                selectedVehicleId = _uiState.value.selectedDeparture?.vehicleId,
+                                departures = departures.distinctBy { departureIdentity(it.first) },
+                                selectedDepartureKey = _uiState.value.selectedDeparture?.departureKey,
                             ),
                         )
                     }
@@ -192,11 +218,11 @@ class MapScreenViewModel(
         }
     }
 
-    private fun onSelectDeparture(vehicleId: Long?) {
+    private fun onSelectDeparture(departureKey: String) {
         traceVehicleJob?.cancel()
         val state = _uiState.value
         val selectedDeparture = state.departures?.departures?.find {
-            vehicleId != null && it.vehicleId == vehicleId
+            it.departureKey == departureKey
         }
         _uiState.value = state.copy(
             selectedDeparture = selectedDeparture,
@@ -204,22 +230,32 @@ class MapScreenViewModel(
             route = null,
             departures = state.departures?.copy(
                 departures = state.departures.departures.map {
-                    it.copy(isSelected = it.vehicleId == vehicleId && it.vehicleId != null)
+                    it.copy(isSelected = it.departureKey == departureKey)
                 },
             ),
         )
 
         loadRoute()
-        vehicleId?.let { trackVehicle(it) }
+        if (state.selectedBusStop?.data?.provider?.supportsLiveVehicleTracking == true) {
+            selectedDeparture?.vehicleId?.let { trackVehicle(it) }
+        }
     }
 
     private fun trackVehicle(vehicleId: Long) {
         traceVehicleJob = viewModelScope.launch(Dispatchers.IO) {
             try {
                 val vehicleIdInt = vehicleId.toInt()
+                val provider = _uiState.value.selectedBusStop?.data?.provider ?: return@launch
                 while (isActive) {
-                    vehiclesRepository.getVehiclePosition(vehicleIdInt)
-                        .catch { emitError() }
+                    vehiclesRepository.getVehiclePosition(provider, vehicleIdInt)
+                        .catch { throwable ->
+                            logError(
+                                LOG_TAG,
+                                "Failed to load vehicle position for provider=$provider vehicleId=$vehicleIdInt",
+                                throwable,
+                            )
+                            emitError()
+                        }
                         .collect { vehiclePosition ->
                             vehiclePosition?.let { position ->
                                 if (_uiState.value.trackedVehicle == null) {
@@ -335,8 +371,20 @@ class MapScreenViewModel(
     private suspend fun emitError(message: String = GENERIC_ERROR_MESSAGE) {
         _effects.emit(MapEffect.ShowError(message))
     }
+
+    private fun departureIdentity(departure: pl.bkacala.threecitycommuter.model.departures.Departure): String =
+        listOf(
+            departure.id,
+            departure.routeId.toString(),
+            departure.tripId.toString(),
+            departure.vehicleId?.toString().orEmpty(),
+            departure.theoreticalTime?.toString().orEmpty(),
+            departure.estimatedTime?.toString().orEmpty(),
+            departure.headsign.orEmpty(),
+        ).joinToString("|")
 }
 
+private const val LOG_TAG = "MapScreenViewModel"
 private val USER_LOCATION_REFRESH_INTERVAL = 10.seconds
 private val DEPARTURES_REFRESH_INTERVAL = 30.seconds
 private val VEHICLE_REFRESH_INTERVAL = 10.seconds

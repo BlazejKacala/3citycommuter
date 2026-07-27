@@ -35,6 +35,7 @@ import pl.bkacala.threecitycommuter.ui.theme.Padding
 
 @Stable
 data class DepartureRowModel(
+    val departureKey: String,
     val isNear: Boolean,
     val vehicleType: VehicleType,
     val lineNumber: String,
@@ -42,6 +43,7 @@ data class DepartureRowModel(
     val departureTime: String,
     val disabledFriendly: Boolean,
     val bikesAllowed: Boolean,
+    val showGpsIndicator: Boolean,
     val gpsPosition: Boolean,
     val isSelected: Boolean,
     val vehicleId: Long?,
@@ -50,13 +52,13 @@ data class DepartureRowModel(
 )
 
 @Composable
-fun DepartureRowModel.Widget(onSelected: (Long?) -> Unit) {
+fun DepartureRowModel.Widget(onSelected: (String) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .height(58.dp)
             .clickable {
-                onSelected(vehicleId)
+                onSelected(departureKey)
             },
     ) {
         Selection(isSelected)
@@ -86,7 +88,7 @@ fun DepartureRowModel.Widget(onSelected: (Long?) -> Unit) {
             Spacer(modifier = Modifier.width(Padding.big))
             Spacer(modifier = Modifier.width(Padding.normal))
             DepartureTime(this@Widget)
-            GPSIcon(gpsPosition = gpsPosition)
+            GPSIcon(showGpsIndicator = showGpsIndicator, gpsPosition = gpsPosition)
         }
     }
 }
@@ -125,7 +127,11 @@ private fun DepartureTime(model: DepartureRowModel) {
 }
 
 @Composable
-private fun GPSIcon(gpsPosition: Boolean) {
+private fun GPSIcon(showGpsIndicator: Boolean, gpsPosition: Boolean) {
+    if (!showGpsIndicator) {
+        return
+    }
+
     Icon(
         imageVector = if (gpsPosition) Icons.Outlined.GpsFixed else Icons.Rounded.GpsNotFixed,
         contentDescription = "Czy pozycja pojazdu jest dostępna",

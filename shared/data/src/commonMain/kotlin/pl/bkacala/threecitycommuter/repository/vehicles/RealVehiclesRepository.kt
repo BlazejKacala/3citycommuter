@@ -5,13 +5,13 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import pl.bkacala.threecitycommuter.client.NetworkClient
+import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.dao.VehiclesDao
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.model.vehicles.toVehicle
 import pl.bkacala.threecitycommuter.model.vehicles.toVehicleEntity
-import pl.bkacala.threecitycommuter.model.vehicles.toVehiclePosition
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
 import pl.bkacala.threecitycommuter.utils.isOlderThenOneDay
 
@@ -19,13 +19,13 @@ private const val VEHICLES = "vehicles_key"
 
 internal class RealVehiclesRepository(
     private val vehiclesDao: VehiclesDao,
-    private val networkClient: NetworkClient,
+    private val transitDataSource: TransitDataSource,
     private val lastUpdateRepository: LastUpdateRepository,
 ) : VehiclesRepository {
 
     override suspend fun updateVehiclesBase() {
-        val networkVehicles = networkClient.getVehicles()
-        vehiclesDao.upsertVehicles(networkVehicles.results.map { it.toVehicleEntity() })
+        val vehicles = transitDataSource.getVehicles(TransitProvider.GDANSK)
+        vehiclesDao.upsertVehicles(vehicles.map { it.toVehicleEntity() })
     }
 
     override fun getVehicle(id: Int): Flow<Vehicle> {
@@ -35,20 +35,20 @@ internal class RealVehiclesRepository(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun getVehicles(): Flow<List<Vehicle>> {
+    override fun getVehicles(provider: TransitProvider): Flow<List<Vehicle>> {
         return flow {
-            ensureUpToDate()
-            emit(vehiclesDao.getVehicles().map { it.toVehicle() })
+            if (provider == TransitProvider.GDANSK) {
+                ensureUpToDate()
+                emit(vehiclesDao.getVehicles().map { it.toVehicle() })
+            } else {
+                emit(emptyList())
+            }
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun getVehiclePosition(vehicleId: Int): Flow<VehiclePosition?> {
+    override fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): Flow<VehiclePosition?> {
         return flow {
-            emit(
-                networkClient.getVehiclesPositions().vehiclePositions
-                    .firstOrNull { it.vehicleId == vehicleId }
-                    ?.toVehiclePosition(),
-            )
+            emit(transitDataSource.getVehiclePosition(provider, vehicleId))
         }
     }
 
@@ -56,7 +56,9 @@ internal class RealVehiclesRepository(
         val lastUpdateTimestamp = lastUpdateRepository.getLastUpdateTimeStamp(VEHICLES)
 
         if (lastUpdateTimestamp.isOlderThenOneDay()) {
-            vehiclesDao.upsertVehicles(networkClient.getVehicles().results.map { it.toVehicleEntity() })
+            vehiclesDao.upsertVehicles(
+                transitDataSource.getVehicles(TransitProvider.GDANSK).map { it.toVehicleEntity() },
+            )
             lastUpdateRepository.storeLastUpdateCurrentTimeStamp(VEHICLES)
         }
     }

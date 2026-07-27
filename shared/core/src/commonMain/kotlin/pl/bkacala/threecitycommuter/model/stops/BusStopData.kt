@@ -1,5 +1,8 @@
 package pl.bkacala.threecitycommuter.model.stops
 
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopId
+
 data class BusStopData(
     val stopId: Int,
     val stopCode: String?,
@@ -26,4 +29,10 @@ data class BusStopData(
     val isForBuses: Boolean,
     val isForTrams: Boolean,
     val name: String = stopName ?: stopShortName ?: stopDesc ?: "",
-)
+) {
+    val provider: TransitProvider
+        get() = TransitStopId.providerOf(stopId)
+
+    val sourceStopId: Int
+        get() = TransitStopId.sourceIdOf(stopId)
+}

@@ -34,6 +34,7 @@ Run a single test class:
 
 ```bash
 ./gradlew :shared:ui:jvmTest --tests "pl.bkacala.threecitycommuter.ui.screen.map.MapScreenViewModelTest"
+./gradlew :shared:network:jvmTest --tests "pl.bkacala.threecitycommuter.client.TransitDataSourceTest"
 ```
 
 ### Code quality
@@ -143,7 +144,30 @@ Android starts Koin in `composeApp/android`. Desktop starts Koin in `composeApp/
 
 ### Network layer
 
-`KtorNetworkClient` implements `NetworkClient`.
+`KtorNetworkClient` implements the legacy Gdańsk-specific `NetworkClient`.
+
+Transport provider architecture:
+- `GdanskTransitDataSource` adapts the legacy Gdańsk feeds
+- `GdyniaTransitDataSource` adapts the Gdynia API
+- `CombinedTransitDataSource` merges both into one application-facing source
+
+Data normalization rules:
+- app-level stop IDs are globally unique via `TransitStopId`
+- `BusStopData.provider` and `BusStopData.sourceStopId` are derived from the app-level ID
+- `Departure.lineNumber` is the display label used by UI
+- `Departure.routeId` remains the provider-internal route identifier for route lookup
+- Gdynia line labels must come from `/pt/routes.routeShortName`, not from raw `routeId`
+- Gdynia route shapes come from `gtfs.zip`
+  - `/pt/trips` provides `tripId -> shapeId`
+  - `shapes.txt` provides `shapeId -> ordered coordinates`
+  - `GdyniaGtfsStore` caches the parsed result in memory with a 1-day TTL
+  - Android preloads the cache during startup in `MainActivity`
+- Gdynia does not support live GPS tracking in the same way as Gdańsk
+
+Debugging notes:
+- stop/departure/route/vehicle-loading failures are logged from `MapScreenViewModel`
+- GTFS download and parse failures are logged from `GdyniaGtfsStore`
+- Android cleartext HTTP is enabled specifically for `api.zdiz.gdynia.pl`
 
 Platform engines:
 - Android: `HttpClient(Android)`
