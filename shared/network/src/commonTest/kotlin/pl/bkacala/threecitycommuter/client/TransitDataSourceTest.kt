@@ -68,7 +68,10 @@ class TransitDataSourceTest {
             json = testJson,
             zipEntryReader = ZipEntryReader(),
             snapshotStorage = snapshotStorage,
-            seedSource = InMemoryGdyniaGtfsSeedSource(),
+            seedSource = InMemoryGdyniaGtfsSeedSource(
+                departureMatchIndex = gdyniaDepartureMatchIndexBody,
+                shapeIndex = gdyniaShapeIndexBody,
+            ),
         )
 
         store.preload()
@@ -80,18 +83,15 @@ class TransitDataSourceTest {
     }
 
     @Test
-    fun `Gdynia GTFS store falls back to bundled seed when persisted snapshot is missing`() = runTest {
+    fun `Gdynia GTFS store falls back to bundled indices when persisted snapshot is missing`() = runTest {
         val store = GdyniaGtfsStore(
             httpClient = mockHttpClient(),
             json = testJson,
             zipEntryReader = ZipEntryReader(),
             snapshotStorage = InMemoryGdyniaGtfsSnapshotStorage(),
             seedSource = InMemoryGdyniaGtfsSeedSource(
-                GdyniaGtfsSnapshot(
-                    tripsBody = gdyniaTripsBody,
-                    gtfsZip = gdyniaGtfsZipBytes,
-                    downloadedAtEpochMilliseconds = null,
-                ),
+                departureMatchIndex = gdyniaDepartureMatchIndexBody,
+                shapeIndex = gdyniaShapeIndexBody,
             ),
         )
 
@@ -100,6 +100,33 @@ class TransitDataSourceTest {
 
         assertNotNull(route)
         assertEquals(2, route.shape.size)
+    }
+
+    @Test
+    fun `Gdynia GTFS store loads bundled route index without parsing GTFS zip`() = runTest {
+        val store = GdyniaGtfsStore(
+            httpClient = mockHttpClient(),
+            json = testJson,
+            zipEntryReader = ZipEntryReader(),
+            snapshotStorage = InMemoryGdyniaGtfsSnapshotStorage(),
+            seedSource = InMemoryGdyniaGtfsSeedSource(
+                departureMatchIndex = gdyniaDepartureMatchIndexBody,
+                shapeIndex = gdyniaShapeIndexBody,
+            ),
+        )
+
+        store.preload()
+        val route = store.getRouteForTrip(201)
+        val resolvedTripId = store.resolveTripId(
+            stopId = 1015,
+            departureTime = "10:22",
+            headsign = "Kacze Buki",
+            fallbackTripId = 999,
+        )
+
+        assertNotNull(route)
+        assertEquals(2, route.shape.size)
+        assertEquals(201, resolvedTripId)
     }
 
     @Test
@@ -117,11 +144,8 @@ class TransitDataSourceTest {
                 ZipEntryReader(),
                 InMemoryGdyniaGtfsSnapshotStorage(),
                 InMemoryGdyniaGtfsSeedSource(
-                    GdyniaGtfsSnapshot(
-                        tripsBody = gdyniaTripsBody,
-                        gtfsZip = gdyniaGtfsZipBytes,
-                        downloadedAtEpochMilliseconds = null,
-                    ),
+                    departureMatchIndex = gdyniaDepartureMatchIndexBody,
+                    shapeIndex = gdyniaShapeIndexBody,
                 ),
             ),
         )
@@ -151,11 +175,8 @@ class TransitDataSourceTest {
                 ZipEntryReader(),
                 InMemoryGdyniaGtfsSnapshotStorage(),
                 InMemoryGdyniaGtfsSeedSource(
-                    GdyniaGtfsSnapshot(
-                        tripsBody = gdyniaTripsBody,
-                        gtfsZip = gdyniaGtfsZipBytes,
-                        downloadedAtEpochMilliseconds = null,
-                    ),
+                    departureMatchIndex = gdyniaDepartureMatchIndexBody,
+                    shapeIndex = gdyniaShapeIndexBody,
                 ),
             ),
         )
@@ -287,9 +308,12 @@ private class InMemoryGdyniaGtfsSnapshotStorage(
 }
 
 private class InMemoryGdyniaGtfsSeedSource(
-    private val snapshot: GdyniaGtfsSnapshot? = null,
+    private val departureMatchIndex: String? = null,
+    private val shapeIndex: String? = null,
 ) : GdyniaGtfsSeedSource {
-    override suspend fun readSeedSnapshot(): GdyniaGtfsSnapshot? = snapshot
+    override suspend fun readSeedDepartureMatchIndex(): String? = departureMatchIndex
+
+    override suspend fun readSeedShapeIndex(): String? = shapeIndex
 }
 
 private sealed interface MockResponse {
@@ -355,6 +379,41 @@ private val gdyniaStopsBody = """
         "ticketZoneBorder": null
       }
     ]
+""".trimIndent()
+
+private val gdyniaDepartureMatchIndexBody = """
+    {
+      "generatedAtUtc":"2026-07-27T10:00:00Z",
+      "sourceGtfs":"test",
+      "stopTimeIndex":[
+        {
+          "stopId": 1015,
+          "departures": [
+            { "time": "10:22", "tripId": 201, "headsign": "Kacze Buki" }
+          ]
+        }
+      ]
+    }
+""".trimIndent()
+
+private val gdyniaShapeIndexBody = """
+    {
+      "generatedAtUtc":"2026-07-27T10:00:00Z",
+      "sourceTrips":"test",
+      "sourceGtfs":"test",
+      "tripShapes":[
+        { "tripId": 201, "shapeId": 1 }
+      ],
+      "shapeRoutes":[
+        {
+          "shapeId": 1,
+          "points": [
+            { "latitude": 54.0, "longitude": 18.0 },
+            { "latitude": 54.1, "longitude": 18.1 }
+          ]
+        }
+      ]
+    }
 """.trimIndent()
 
 private val gdyniaGtfsZipBytes = byteArrayOf(

@@ -1,17 +1,25 @@
 package pl.bkacala.threecitycommuter.client
 
 import android.content.Context
+import java.util.zip.GZIPInputStream
 
 internal class AssetBackedGdyniaGtfsSeedSource(
     private val context: Context,
 ) : GdyniaGtfsSeedSource {
-    override suspend fun readSeedSnapshot(): GdyniaGtfsSnapshot =
-        GdyniaGtfsSnapshot(
-            tripsBody = context.assets.open(TRIPS_ASSET_PATH).bufferedReader().use { it.readText() },
-            gtfsZip = context.assets.open(GTFS_ASSET_PATH).use { it.readBytes() },
-            downloadedAtEpochMilliseconds = null,
-        )
+    override suspend fun readSeedDepartureMatchIndex(): String? =
+        runCatching {
+            context.assets.open(DEPARTURE_MATCH_INDEX_ASSET_PATH).use { input ->
+                GZIPInputStream(input).bufferedReader().use { it.readText() }
+            }
+        }.getOrNull()
+
+    override suspend fun readSeedShapeIndex(): String? =
+        runCatching {
+            context.assets.open(SHAPE_INDEX_ASSET_PATH).use { input ->
+                GZIPInputStream(input).bufferedReader().use { it.readText() }
+            }
+        }.getOrNull()
 }
 
-private const val TRIPS_ASSET_PATH = "gdynia/trips.json"
-private const val GTFS_ASSET_PATH = "gdynia/gtfs.zip"
+private const val DEPARTURE_MATCH_INDEX_ASSET_PATH = "gdynia/departure_match_index.json.gz"
+private const val SHAPE_INDEX_ASSET_PATH = "gdynia/shape_index.json.gz"

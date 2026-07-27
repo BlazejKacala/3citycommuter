@@ -10,11 +10,16 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.logging.logInfo
+import pl.bkacala.threecitycommuter.model.gdynia.GdyniaDepartureMatchIndex
+import pl.bkacala.threecitycommuter.model.gdynia.GdyniaShapeIndex
+import pl.bkacala.threecitycommuter.model.gdynia.GdyniaShapeRouteIndexEntry
+import pl.bkacala.threecitycommuter.model.gdynia.GdyniaStopTimeIndexEntry
 import pl.bkacala.threecitycommuter.model.gdynia.GdyniaTripNetworkData
+import pl.bkacala.threecitycommuter.model.gdynia.GdyniaTripShapeIndexEntry
 import pl.bkacala.threecitycommuter.model.route.Route
-import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.days
 
 internal class GdyniaGtfsStore(
@@ -24,13 +29,17 @@ internal class GdyniaGtfsStore(
     private val snapshotStorage: GdyniaGtfsSnapshotStorage,
     private val seedSource: GdyniaGtfsSeedSource,
 ) : GdyniaGtfsPreloader {
-    private val cacheMutex = Mutex()
+    private val departureCacheMutex = Mutex()
+    private val shapeCacheMutex = Mutex()
     private val refreshMutex = Mutex()
-    private var cache: Cache? = null
+
+    private var departureCache: DepartureCache? = null
+    private var shapeCache: ShapeCache? = null
+    private var downloadedAt: Instant? = null
 
     suspend fun getRouteForTrip(tripId: Int): Route? =
         withContext(Dispatchers.IO) {
-            val currentCache = ensureCacheLoaded()
+            val currentCache = ensureShapeCacheLoaded()
             val shapeId = currentCache.shapeIdByTripId[tripId] ?: return@withContext null
             currentCache.routeByShapeId[shapeId]
         }
@@ -42,7 +51,7 @@ internal class GdyniaGtfsStore(
         fallbackTripId: Int,
     ): Int = withContext(Dispatchers.IO) {
         val normalizedDepartureTime = departureTime?.shortTime() ?: return@withContext fallbackTripId
-        val currentCache = ensureCacheLoaded()
+        val currentCache = ensureDepartureCacheLoaded()
         val stopTimes = currentCache.stopTimesByStopId[stopId].orEmpty()
         if (stopTimes.isEmpty()) {
             return@withContext fallbackTripId
@@ -68,7 +77,7 @@ internal class GdyniaGtfsStore(
 
     override suspend fun preload() {
         withContext(Dispatchers.IO) {
-            ensureCacheLoaded()
+            ensureDepartureCacheLoaded()
         }
     }
 
@@ -78,63 +87,74 @@ internal class GdyniaGtfsStore(
         }
     }
 
-    private suspend fun ensureCacheLoaded(): Cache =
-        cacheMutex.withLock {
-            val current = cache
-            if (current != null) {
-                return current
-            }
+    private suspend fun ensureDepartureCacheLoaded(): DepartureCache =
+        departureCacheMutex.withLock {
+            departureCache?.let { return it }
 
-            loadPersistedCache()
+            loadBundledDepartureCache()
                 ?.also { loaded ->
-                    logInfo(LOG_TAG, "Loaded Gdynia GTFS cache from persisted snapshot")
-                    cache = loaded
+                    logInfo(LOG_TAG, "Loaded Gdynia departure cache from bundled departure index")
+                    departureCache = loaded
                 }
-                ?: loadBundledCache()
+                ?: loadPersistedCache()
                     ?.also { loaded ->
-                        logInfo(LOG_TAG, "Loaded Gdynia GTFS cache from bundled asset seed")
-                        cache = loaded
+                        logInfo(LOG_TAG, "Loaded Gdynia departure cache from persisted snapshot")
+                        applyFullCache(loaded)
                     }
+                    ?.departure
                 ?: loadNetworkCache().also { loaded ->
-                    cache = loaded
+                    applyFullCache(loaded)
+                }.departure
+        }
+
+    private suspend fun ensureShapeCacheLoaded(): ShapeCache =
+        shapeCacheMutex.withLock {
+            shapeCache?.let { return it }
+
+            loadBundledShapeCache()
+                ?.also { loaded ->
+                    logInfo(LOG_TAG, "Loaded Gdynia shape cache from bundled shape index")
+                    shapeCache = loaded
                 }
+                ?: loadPersistedCache()
+                    ?.also { loaded ->
+                        logInfo(LOG_TAG, "Loaded Gdynia shape cache from persisted snapshot")
+                        applyFullCache(loaded)
+                    }
+                    ?.shape
+                ?: loadNetworkCache().also { loaded ->
+                    applyFullCache(loaded)
+                }.shape
         }
 
     private suspend fun refreshFromNetworkIfStale() {
         refreshMutex.withLock {
-            val current = ensureCacheLoaded()
-            val downloadedAt = current.downloadedAt
-            if (downloadedAt != null && downloadedAt.plus(CACHE_TTL) > Clock.System.now()) {
+            if (downloadedAt?.plus(CACHE_TTL)?.let { it > Clock.System.now() } == true) {
                 return
             }
 
-            refreshCacheFromNetwork()
-        }
-    }
-
-    private suspend fun refreshCacheFromNetwork(): Cache {
-        val previousCache = cacheMutex.withLock { cache }
-        val networkCache = loadNetworkCacheOrNull()
-        if (networkCache != null) {
-            cacheMutex.withLock {
-                cache = networkCache
+            val networkCache = loadNetworkCacheOrNull()
+            if (networkCache != null) {
+                departureCacheMutex.withLock { departureCache = networkCache.departure }
+                shapeCacheMutex.withLock { shapeCache = networkCache.shape }
+                downloadedAt = networkCache.downloadedAt
+                return
             }
-            return networkCache
-        }
 
-        if (previousCache != null) {
-            logInfo(LOG_TAG, "Keeping previously loaded Gdynia GTFS cache after refresh failure")
-            return previousCache
-        }
+            if (departureCache != null || shapeCache != null) {
+                logInfo(LOG_TAG, "Keeping previously loaded Gdynia caches after refresh failure")
+                return
+            }
 
-        error("Gdynia GTFS data unavailable: no local seed and network refresh failed")
+            error("Gdynia GTFS data unavailable: no local seed and network refresh failed")
+        }
     }
 
-    private suspend fun loadNetworkCache(): Cache =
+    private suspend fun loadNetworkCache(): FullCache =
         loadNetworkCacheOrNull()
             ?: error("Gdynia GTFS data unavailable: no local seed and network refresh failed")
 
-    private suspend fun loadNetworkCacheOrNull(): Cache? {
+    private suspend fun loadNetworkCacheOrNull(): FullCache? {
         val networkSnapshot = try {
             downloadSnapshot().also { snapshot ->
                 persistSnapshot(snapshot)
@@ -145,10 +165,10 @@ internal class GdyniaGtfsStore(
             null
         }
 
-        return networkSnapshot?.let(::buildCache)
+        return networkSnapshot?.let(::buildFullCache)
     }
 
-    private suspend fun loadPersistedCache(): Cache? {
+    private suspend fun loadPersistedCache(): FullCache? {
         val storedSnapshot = try {
             snapshotStorage.readSnapshot()
         } catch (throwable: Throwable) {
@@ -156,14 +176,26 @@ internal class GdyniaGtfsStore(
             null
         }
 
-        return storedSnapshot?.let(::buildCache)
+        return storedSnapshot?.let(::buildFullCache)
     }
 
-    private suspend fun loadBundledCache(): Cache? =
+    private suspend fun loadBundledDepartureCache(): DepartureCache? =
         try {
-            seedSource.readSeedSnapshot()?.let(::buildCache)
+            seedSource.readSeedDepartureMatchIndex()
+                ?.let { body -> json.decodeFromString<GdyniaDepartureMatchIndex>(body) }
+                ?.let(::buildDepartureCache)
         } catch (throwable: Throwable) {
-            logError(LOG_TAG, "Failed to read bundled Gdynia GTFS asset seed", throwable)
+            logError(LOG_TAG, "Failed to read bundled Gdynia departure match index", throwable)
+            null
+        }
+
+    private suspend fun loadBundledShapeCache(): ShapeCache? =
+        try {
+            seedSource.readSeedShapeIndex()
+                ?.let { body -> json.decodeFromString<GdyniaShapeIndex>(body) }
+                ?.let(::buildShapeCache)
+        } catch (throwable: Throwable) {
+            logError(LOG_TAG, "Failed to read bundled Gdynia shape index", throwable)
             null
         }
 
@@ -185,19 +217,40 @@ internal class GdyniaGtfsStore(
         }
     }
 
-    private fun buildCache(snapshot: GdyniaGtfsSnapshot): Cache {
+    private fun buildFullCache(snapshot: GdyniaGtfsSnapshot): FullCache {
         val trips = json.decodeFromString<List<GdyniaTripNetworkData>>(snapshot.tripsBody)
         val shapesText = zipEntryReader.readEntry(snapshot.gtfsZip, SHAPES_ENTRY_NAME)
             ?: error("Missing $SHAPES_ENTRY_NAME in Gdynia GTFS archive")
         val stopTimesText = zipEntryReader.readEntry(snapshot.gtfsZip, STOP_TIMES_ENTRY_NAME)
             ?: error("Missing $STOP_TIMES_ENTRY_NAME in Gdynia GTFS archive")
 
-        return Cache(
+        return FullCache(
             downloadedAt = snapshot.downloadedAtEpochMilliseconds?.let(Instant::fromEpochMilliseconds),
-            shapeIdByTripId = trips.associate { it.tripId to it.shapeId },
-            routeByShapeId = parseShapes(shapesText),
-            stopTimesByStopId = parseStopTimes(stopTimesText),
+            departure = DepartureCache(
+                stopTimesByStopId = parseStopTimes(stopTimesText),
+            ),
+            shape = ShapeCache(
+                shapeIdByTripId = trips.associate { it.tripId to it.shapeId },
+                routeByShapeId = parseShapes(shapesText),
+            ),
         )
+    }
+
+    private fun buildDepartureCache(index: GdyniaDepartureMatchIndex): DepartureCache =
+        DepartureCache(
+            stopTimesByStopId = index.stopTimeIndex.associate { it.toPair() },
+        )
+
+    private fun buildShapeCache(index: GdyniaShapeIndex): ShapeCache =
+        ShapeCache(
+            shapeIdByTripId = index.tripShapes.associate { it.toPair() },
+            routeByShapeId = index.shapeRoutes.associate { it.toPair() },
+        )
+
+    private fun applyFullCache(fullCache: FullCache) {
+        departureCache = fullCache.departure
+        shapeCache = fullCache.shape
+        downloadedAt = fullCache.downloadedAt
     }
 
     private fun parseShapes(content: String): Map<Int, Route> {
@@ -305,11 +358,19 @@ internal class GdyniaGtfsStore(
         return values
     }
 
-    private data class Cache(
+    private data class FullCache(
         val downloadedAt: Instant?,
+        val departure: DepartureCache,
+        val shape: ShapeCache,
+    )
+
+    private data class DepartureCache(
+        val stopTimesByStopId: Map<Int, List<StopTimeLookup>>,
+    )
+
+    private data class ShapeCache(
         val shapeIdByTripId: Map<Int, Int>,
         val routeByShapeId: Map<Int, Route>,
-        val stopTimesByStopId: Map<Int, List<StopTimeLookup>>,
     )
 
     private data class ShapePoint(
@@ -323,6 +384,20 @@ internal class GdyniaGtfsStore(
         val departureTime: String,
         val stopHeadsign: String?,
     )
+
+    private fun GdyniaTripShapeIndexEntry.toPair(): Pair<Int, Int> = tripId to shapeId
+
+    private fun GdyniaShapeRouteIndexEntry.toPair(): Pair<Int, Route> =
+        shapeId to Route(points.map { point -> Route.GeoPoint(point.latitude, point.longitude) })
+
+    private fun GdyniaStopTimeIndexEntry.toPair(): Pair<Int, List<StopTimeLookup>> =
+        stopId to departures.map { departure ->
+            StopTimeLookup(
+                tripId = departure.tripId,
+                departureTime = departure.time,
+                stopHeadsign = departure.headsign,
+            )
+        }
 }
 
 private fun String.shortTime(): String = split(":").take(2).joinToString(":")
