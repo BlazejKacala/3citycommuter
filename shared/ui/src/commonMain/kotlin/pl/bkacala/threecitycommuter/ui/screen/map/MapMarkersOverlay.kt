@@ -34,9 +34,11 @@ import org.maplibre.compose.camera.CameraState
 import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.sphericalDistance
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
+import pl.bkacala.threecitycommuter.ui.theme.stopMarkerColor
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.floor
@@ -46,6 +48,7 @@ internal data class StopMapMarker(
     val position: LatLng,
     val stop: BusStopMapItem?,
     val count: Int,
+    val provider: TransitProvider?,
 )
 
 internal fun List<BusStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapMarker> {
@@ -66,8 +69,18 @@ internal fun List<BusStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapMarke
     return groups.map { group ->
         if (group.size == 1) {
             val stop = group.first().value
-            StopMapMarker(position = stop.position, stop = stop, count = 1)
+            StopMapMarker(
+                position = stop.position,
+                stop = stop,
+                count = 1,
+                provider = stop.data.provider,
+            )
         } else {
+            val dominantProvider = group
+                .groupingBy { it.value.data.provider }
+                .eachCount()
+                .maxByOrNull { it.value }
+                ?.key
             StopMapMarker(
                 position = LatLng(
                     latitude = group.sumOf { it.value.position.latitude } / group.size,
@@ -75,6 +88,7 @@ internal fun List<BusStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapMarke
                 ),
                 stop = null,
                 count = group.size,
+                provider = dominantProvider,
             )
         }
     }
@@ -109,8 +123,6 @@ internal fun MapMarkersOverlay(
     stopMarkers: List<StopMapMarker>,
     selectedBusStop: BusStopMapItem?,
     trackedVehicle: TrackedVehicle?,
-    stopColor: Color,
-    selectedStopColor: Color,
     vehicleColor: Color,
 ) {
     val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
@@ -119,10 +131,10 @@ internal fun MapMarkersOverlay(
     val animatedVehiclePosition = remember { Animatable(Offset.Zero, OffsetVectorConverter) }
     var animatedVehicleNumber by remember { mutableStateOf<String?>(null) }
     val countTextStyle = remember {
-        TextStyle(color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        TextStyle(color = Color.White, fontSize = CLUSTER_COUNT_TEXT_SIZE, fontWeight = FontWeight.Bold)
     }
     val vehicleTextStyle = remember {
-        TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        TextStyle(color = Color.White, fontSize = VEHICLE_TEXT_SIZE, fontWeight = FontWeight.Bold)
     }
 
     LaunchedEffect(trackedVehicle?.number, trackedVehicle?.position) {
@@ -160,19 +172,24 @@ internal fun MapMarkersOverlay(
             if (!center.isInside(size)) return@forEach
 
             val isCluster = marker.stop == null
+            val markerColor = stopMarkerColor(marker.provider)
             drawCircle(
                 color = Color.White,
                 radius = (if (isCluster) CLUSTER_OUTER_RADIUS else STOP_OUTER_RADIUS).toPx(),
                 center = center,
             )
             drawCircle(
-                color = stopColor,
+                color = markerColor,
                 radius = (if (isCluster) CLUSTER_INNER_RADIUS else STOP_INNER_RADIUS).toPx(),
                 center = center,
             )
 
             if (isCluster) {
-                val count = if (marker.count < 100) marker.count.toString() else "99+"
+                val count = if (marker.count < CLUSTER_COUNT_OVERFLOW_THRESHOLD) {
+                    marker.count.toString()
+                } else {
+                    CLUSTER_COUNT_OVERFLOW_LABEL
+                }
                 val text = textMeasurer.measure(count, countTextStyle)
                 drawText(
                     textLayoutResult = text,
@@ -205,6 +222,7 @@ internal fun MapMarkersOverlay(
             val location = projection.screenLocationFromPosition(stop.position.toPosition())
             val center = Offset(location.x.toPx(), location.y.toPx())
             if (center.isInside(size)) {
+                val selectedStopColor = stopMarkerColor(stop.data.provider, isSelected = true)
                 drawCircle(Color.White, radius = SELECTED_STOP_OUTER_RADIUS.toPx(), center = center)
                 drawCircle(
                     color = selectedStopColor,
@@ -306,23 +324,38 @@ private fun Offset.isInside(canvasSize: Size): Boolean =
         x <= canvasSize.width + MARKER_EDGE_MARGIN_PX &&
         y <= canvasSize.height + MARKER_EDGE_MARGIN_PX
 
+// Clustering
 private const val STOPS_UNCLUSTERED_ZOOM = 16
-private const val CLUSTER_RADIUS_TILE_FRACTION = 50.0 / 512.0
+private const val CLUSTER_RADIUS_TILE_FRACTION = 72.0 / 512.0
 private const val MAP_REFERENCE_LATITUDE = 54.352
-private val CLUSTER_OUTER_RADIUS = 22.dp
-private val CLUSTER_INNER_RADIUS = 17.dp
+
+// Cluster markers
+private val CLUSTER_OUTER_RADIUS = 20.dp
+private val CLUSTER_INNER_RADIUS = 15.dp
+private val CLUSTER_COUNT_TEXT_SIZE = 12.sp
+private const val CLUSTER_COUNT_OVERFLOW_THRESHOLD = 100
+private const val CLUSTER_COUNT_OVERFLOW_LABEL = "99+"
+
+// Stop markers
 private val STOP_OUTER_RADIUS = 18.dp
 private val STOP_INNER_RADIUS = 13.dp
 private val STOP_ICON_SIZE = 20.dp
-private val SELECTED_STOP_OUTER_RADIUS = 24.dp
-private val SELECTED_STOP_INNER_RADIUS = 19.dp
+private val SELECTED_STOP_OUTER_RADIUS = 20.dp
+private val SELECTED_STOP_INNER_RADIUS = 15.dp
 private val SELECTED_STOP_ICON_SIZE = STOP_ICON_SIZE
+
+// Vehicle markers
 private val VEHICLE_MARKER_HEIGHT = 36.dp
 private val VEHICLE_ICON_SIZE = 20.dp
 private val VEHICLE_HORIZONTAL_PADDING = 10.dp
 private val VEHICLE_CONTENT_GAP = 4.dp
 private val VEHICLE_BORDER_WIDTH = 3.dp
+private val VEHICLE_TEXT_SIZE = 12.sp
+
+// Interaction
 private const val MARKER_CLICK_RADIUS_DP = 56f
 private const val MIN_MARKER_CLICK_RADIUS_METERS = 15.0
 private const val MARKER_EDGE_MARGIN_PX = 64f
+
+// Animation
 private const val VEHICLE_POSITION_ANIMATION_DURATION_MS = 9_000
