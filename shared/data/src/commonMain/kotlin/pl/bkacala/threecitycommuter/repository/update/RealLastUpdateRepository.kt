@@ -9,10 +9,18 @@ internal class RealLastUpdateRepository(private val settings: Settings) :
     LastUpdateRepository {
 
     override fun getLastUpdateTimeStamp(key: String): Long {
-        return settings.getLong("$LAST_UPDATE_KEY$key", 0)
+        return getLong("$LAST_UPDATE_KEY$key", 0)
     }
 
     override fun storeLastUpdateCurrentTimeStamp(key: String) {
-        settings.putLong("$LAST_UPDATE_KEY$key", Clock.System.now().epochSeconds)
+        putLong("$LAST_UPDATE_KEY$key", Clock.System.now().epochSeconds)
+    }
+
+    override fun getLong(key: String, defaultValue: Long): Long {
+        return settings.getLong(key, defaultValue)
+    }
+
+    override fun putLong(key: String, value: Long) {
+        settings.putLong(key, value)
     }
 }

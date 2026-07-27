@@ -21,6 +21,8 @@ import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
 import pl.bkacala.threecitycommuter.utils.isOlderThenOneDay
 
 private const val BUS_STOPS_KEY = "bus_stops"
+private const val BUS_STOPS_CACHE_VERSION_KEY = "bus_stops_cache_version"
+private const val BUS_STOPS_CACHE_VERSION = 2L
 
 internal class RealBusStopsRepository(
     private val transitDataSource: TransitDataSource,
@@ -32,14 +34,16 @@ internal class RealBusStopsRepository(
     override fun getBusStops(): Flow<List<BusStopData>> {
         return flow {
             val lastUpdateTimestamp = lastUpdateRepository.getLastUpdateTimeStamp(BUS_STOPS_KEY)
+            val cachedVersion = lastUpdateRepository.getLong(BUS_STOPS_CACHE_VERSION_KEY, 0)
 
-            if (lastUpdateTimestamp.isOlderThenOneDay()) {
+            if (lastUpdateTimestamp.isOlderThenOneDay() || cachedVersion < BUS_STOPS_CACHE_VERSION) {
                 val stops = transitDataSource.getStops()
                 busStopsDao.upsertBusStations(stops.map { it.toEntity() })
                 busStopsTypesDao.upsertBusStopsTypes(
                     stops.filter { it.provider == TransitProvider.GDYNIA }.map { it.toType().toEntity() },
                 )
                 lastUpdateRepository.storeLastUpdateCurrentTimeStamp(BUS_STOPS_KEY)
+                lastUpdateRepository.putLong(BUS_STOPS_CACHE_VERSION_KEY, BUS_STOPS_CACHE_VERSION)
             }
             val relationsByStopId = busStopsTypesDao.getBusStopsTypes()
                 .associate { entity ->
