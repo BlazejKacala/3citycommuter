@@ -29,6 +29,7 @@ object DeparturesMapper {
         selectedDepartureKey: String?,
     ): DeparturesBottomSheetModel {
         return DeparturesBottomSheetModel(
+            provider = busStopData.provider,
             header = DeparturesHeaderModel(
                 busStopName = busStopData.name,
                 isForDemand = busStopData.onDemand,

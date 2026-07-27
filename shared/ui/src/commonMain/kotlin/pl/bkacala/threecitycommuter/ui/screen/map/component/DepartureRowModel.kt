@@ -52,7 +52,10 @@ data class DepartureRowModel(
 )
 
 @Composable
-fun DepartureRowModel.Widget(onSelected: (String) -> Unit) {
+fun DepartureRowModel.Widget(
+    accentColor: Color,
+    onSelected: (String) -> Unit,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -61,7 +64,10 @@ fun DepartureRowModel.Widget(onSelected: (String) -> Unit) {
                 onSelected(departureKey)
             },
     ) {
-        Selection(isSelected)
+        Selection(
+            selected = isSelected,
+            accentColor = accentColor,
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -88,18 +94,25 @@ fun DepartureRowModel.Widget(onSelected: (String) -> Unit) {
             Spacer(modifier = Modifier.width(Padding.big))
             Spacer(modifier = Modifier.width(Padding.normal))
             DepartureTime(this@Widget)
-            GPSIcon(showGpsIndicator = showGpsIndicator, gpsPosition = gpsPosition)
+            GPSIcon(
+                showGpsIndicator = showGpsIndicator,
+                gpsPosition = gpsPosition,
+                accentColor = accentColor,
+            )
         }
     }
 }
 
 @Composable
-private fun Selection(selected: Boolean) {
+private fun Selection(
+    selected: Boolean,
+    accentColor: Color,
+) {
     Box(
         modifier = Modifier
             .width(2.dp)
             .fillMaxHeight()
-            .background(color = if (selected) MaterialTheme.colorScheme.primary else Color.Transparent),
+            .background(color = if (selected) accentColor else Color.Transparent),
     )
 }
 
@@ -127,7 +140,11 @@ private fun DepartureTime(model: DepartureRowModel) {
 }
 
 @Composable
-private fun GPSIcon(showGpsIndicator: Boolean, gpsPosition: Boolean) {
+private fun GPSIcon(
+    showGpsIndicator: Boolean,
+    gpsPosition: Boolean,
+    accentColor: Color,
+) {
     if (!showGpsIndicator) {
         return
     }
@@ -136,11 +153,7 @@ private fun GPSIcon(showGpsIndicator: Boolean, gpsPosition: Boolean) {
         imageVector = if (gpsPosition) Icons.Outlined.GpsFixed else Icons.Rounded.GpsNotFixed,
         contentDescription = "Czy pozycja pojazdu jest dostępna",
         modifier = Modifier.size(24.dp),
-        tint = if (gpsPosition) {
-            MaterialTheme.colorScheme.secondary
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        },
+        tint = if (gpsPosition) accentColor else MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
 

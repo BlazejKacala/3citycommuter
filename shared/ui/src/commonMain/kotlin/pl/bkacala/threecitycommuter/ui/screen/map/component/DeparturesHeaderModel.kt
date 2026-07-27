@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import pl.bkacala.threecitycommuter.ui.theme.Padding
 
 @Stable
@@ -17,13 +18,17 @@ data class DeparturesHeaderModel(
 )
 
 @Composable
-fun DeparturesHeaderModel.Widget() {
+fun DeparturesHeaderModel.Widget(accentColor: Color) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(Padding.big),
     ) {
-        Text(text = busStopName, style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = busStopName,
+            style = MaterialTheme.typography.headlineSmall,
+            color = accentColor,
+        )
         if (isForDemand) {
             Text(text = "na żądanie")
         }

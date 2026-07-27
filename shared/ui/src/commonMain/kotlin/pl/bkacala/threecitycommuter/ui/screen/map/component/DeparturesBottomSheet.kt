@@ -13,9 +13,12 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.ui.theme.stopMarkerColor
 
 @Stable
 data class DeparturesBottomSheetModel(
+    val provider: TransitProvider,
     val header: DeparturesHeaderModel,
     val departures: List<DepartureRowModel>,
 )
@@ -26,6 +29,7 @@ fun DeparturesBottomSheet(
     onDepartureSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val accentColor = stopMarkerColor(model.provider)
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
@@ -34,9 +38,12 @@ fun DeparturesBottomSheet(
         Column(
             modifier = Modifier.verticalScroll(rememberScrollState()),
         ) {
-            model.header.Widget()
+            model.header.Widget(accentColor = accentColor)
             model.departures.fastForEachIndexed { index, it ->
-                it.Widget(onSelected = onDepartureSelected)
+                it.Widget(
+                    accentColor = accentColor,
+                    onSelected = onDepartureSelected,
+                )
                 if (index != model.departures.size - 1) {
                     HorizontalDivider()
                 }
