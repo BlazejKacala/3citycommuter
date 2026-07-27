@@ -41,11 +41,20 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                loadStartupData()
+                loadBusStopsTypes()
             } catch (throwable: Throwable) {
                 logError(LOG_TAG, "Failed to load startup data", throwable)
             }
             dataLoaded.value = true
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                gdyniaGtfsPreloader.preload()
+                gdyniaGtfsPreloader.refresh()
+            } catch (throwable: Throwable) {
+                logError(LOG_TAG, "Failed to warm up Gdynia GTFS cache", throwable)
+            }
         }
 
         enableEdgeToEdge()
@@ -61,10 +70,6 @@ class MainActivity : ComponentActivity() {
         busStopsRepository.storeBusStopsTypes(relations)
     }
 
-    private suspend fun loadStartupData() {
-        loadBusStopsTypes()
-        gdyniaGtfsPreloader.preload()
-    }
 }
 
 private const val LOG_TAG = "MainActivity"

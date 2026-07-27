@@ -31,7 +31,14 @@ class TransitDataSourceTest {
             "http://api.zdiz.gdynia.pl/pt/trips" to MockResponse.Text(gdyniaTripsBody),
             "http://api.zdiz.gdynia.pl/pt/gtfs.zip" to MockResponse.Bytes(gdyniaGtfsZipBytes),
         )
-        val store = GdyniaGtfsStore(httpClient, testJson, ZipEntryReader())
+        val snapshotStorage = InMemoryGdyniaGtfsSnapshotStorage()
+        val store = GdyniaGtfsStore(
+            httpClient = httpClient,
+            json = testJson,
+            zipEntryReader = ZipEntryReader(),
+            snapshotStorage = snapshotStorage,
+            seedSource = InMemoryGdyniaGtfsSeedSource(),
+        )
 
         store.preload()
         val route = store.getRouteForTrip(201)
@@ -42,6 +49,57 @@ class TransitDataSourceTest {
         assertEquals(18.0, route.shape[0].longitude)
         assertEquals(54.1, route.shape[1].latitude)
         assertEquals(18.1, route.shape[1].longitude)
+        assertEquals(gdyniaTripsBody, snapshotStorage.snapshot?.tripsBody)
+        assertTrue(snapshotStorage.snapshot?.gtfsZip?.contentEquals(gdyniaGtfsZipBytes) == true)
+        assertNotNull(snapshotStorage.snapshot?.downloadedAtEpochMilliseconds)
+    }
+
+    @Test
+    fun `Gdynia GTFS store falls back to persisted snapshot when network refresh fails`() = runTest {
+        val snapshotStorage = InMemoryGdyniaGtfsSnapshotStorage(
+            GdyniaGtfsSnapshot(
+                tripsBody = gdyniaTripsBody,
+                gtfsZip = gdyniaGtfsZipBytes,
+                downloadedAtEpochMilliseconds = 1_700_000_000_000,
+            ),
+        )
+        val store = GdyniaGtfsStore(
+            httpClient = mockHttpClient(),
+            json = testJson,
+            zipEntryReader = ZipEntryReader(),
+            snapshotStorage = snapshotStorage,
+            seedSource = InMemoryGdyniaGtfsSeedSource(),
+        )
+
+        store.preload()
+        store.refresh()
+        val route = store.getRouteForTrip(201)
+
+        assertNotNull(route)
+        assertEquals(2, route.shape.size)
+    }
+
+    @Test
+    fun `Gdynia GTFS store falls back to bundled seed when persisted snapshot is missing`() = runTest {
+        val store = GdyniaGtfsStore(
+            httpClient = mockHttpClient(),
+            json = testJson,
+            zipEntryReader = ZipEntryReader(),
+            snapshotStorage = InMemoryGdyniaGtfsSnapshotStorage(),
+            seedSource = InMemoryGdyniaGtfsSeedSource(
+                GdyniaGtfsSnapshot(
+                    tripsBody = gdyniaTripsBody,
+                    gtfsZip = gdyniaGtfsZipBytes,
+                    downloadedAtEpochMilliseconds = null,
+                ),
+            ),
+        )
+
+        store.preload()
+        val route = store.getRouteForTrip(201)
+
+        assertNotNull(route)
+        assertEquals(2, route.shape.size)
     }
 
     @Test
@@ -53,7 +111,13 @@ class TransitDataSourceTest {
         val dataSource = GdyniaTransitDataSource(
             httpClient = httpClient,
             json = testJson,
-            gtfsStore = GdyniaGtfsStore(httpClient, testJson, ZipEntryReader()),
+            gtfsStore = GdyniaGtfsStore(
+                httpClient,
+                testJson,
+                ZipEntryReader(),
+                InMemoryGdyniaGtfsSnapshotStorage(),
+                InMemoryGdyniaGtfsSeedSource(),
+            ),
         )
 
         val departures = dataSource.getDepartures(1015)
@@ -74,7 +138,13 @@ class TransitDataSourceTest {
         val gdyniaDataSource = GdyniaTransitDataSource(
             httpClient = gdyniaHttpClient,
             json = testJson,
-            gtfsStore = GdyniaGtfsStore(gdyniaHttpClient, testJson, ZipEntryReader()),
+            gtfsStore = GdyniaGtfsStore(
+                gdyniaHttpClient,
+                testJson,
+                ZipEntryReader(),
+                InMemoryGdyniaGtfsSnapshotStorage(),
+                InMemoryGdyniaGtfsSeedSource(),
+            ),
         )
 
         val gdanskStop = gdanskDataSource.getStops().single()
@@ -191,6 +261,22 @@ class TransitDataSourceTest {
             }
         }
     }
+}
+
+private class InMemoryGdyniaGtfsSnapshotStorage(
+    var snapshot: GdyniaGtfsSnapshot? = null,
+) : GdyniaGtfsSnapshotStorage {
+    override suspend fun readSnapshot(): GdyniaGtfsSnapshot? = snapshot
+
+    override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot) {
+        this.snapshot = snapshot
+    }
+}
+
+private class InMemoryGdyniaGtfsSeedSource(
+    private val snapshot: GdyniaGtfsSnapshot? = null,
+) : GdyniaGtfsSeedSource {
+    override suspend fun readSeedSnapshot(): GdyniaGtfsSnapshot? = snapshot
 }
 
 private sealed interface MockResponse {

@@ -1,5 +1,12 @@
 package pl.bkacala.threecitycommuter.logging
 
+fun logInfo(
+    tag: String,
+    message: String,
+) {
+    println("INFO [$tag] $message")
+}
+
 fun logError(
     tag: String,
     message: String,

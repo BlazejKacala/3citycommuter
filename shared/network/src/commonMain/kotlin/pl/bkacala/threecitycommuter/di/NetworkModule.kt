@@ -46,7 +46,7 @@ val networkModule = module {
     }
 
     single { ZipEntryReader() }
-    single { GdyniaGtfsStore(get(), get(), get()) }
+    single { GdyniaGtfsStore(get(), get(), get(), get(), get()) }
     single<GdyniaGtfsPreloader> { get<GdyniaGtfsStore>() }
     single { GdanskTransitDataSource(get()) }
     single { GdyniaTransitDataSource(get(), get(), get()) }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.logging.logError
+import pl.bkacala.threecitycommuter.logging.logInfo
 import pl.bkacala.threecitycommuter.model.gdynia.GdyniaTripNetworkData
 import pl.bkacala.threecitycommuter.model.route.Route
 import kotlinx.serialization.json.Json
@@ -20,50 +21,149 @@ internal class GdyniaGtfsStore(
     private val httpClient: HttpClient,
     private val json: Json,
     private val zipEntryReader: ZipEntryReader,
+    private val snapshotStorage: GdyniaGtfsSnapshotStorage,
+    private val seedSource: GdyniaGtfsSeedSource,
 ) : GdyniaGtfsPreloader {
     private val cacheMutex = Mutex()
+    private val refreshMutex = Mutex()
     private var cache: Cache? = null
 
     suspend fun getRouteForTrip(tripId: Int): Route? =
         withContext(Dispatchers.IO) {
-            val currentCache = getCache()
+            val currentCache = ensureCacheLoaded()
             val shapeId = currentCache.shapeIdByTripId[tripId] ?: return@withContext null
             currentCache.routeByShapeId[shapeId]
         }
 
     override suspend fun preload() {
         withContext(Dispatchers.IO) {
-            getCache()
+            ensureCacheLoaded()
         }
     }
 
-    private suspend fun getCache(): Cache =
+    override suspend fun refresh() {
+        withContext(Dispatchers.IO) {
+            refreshFromNetworkIfStale()
+        }
+    }
+
+    private suspend fun ensureCacheLoaded(): Cache =
         cacheMutex.withLock {
             val current = cache
-            if (current != null && current.loadedAt.plus(CACHE_TTL) > Clock.System.now()) {
+            if (current != null) {
                 return current
             }
 
-            loadCache().also { loaded -> cache = loaded }
+            loadPersistedCache()
+                ?.also { loaded ->
+                    logInfo(LOG_TAG, "Loaded Gdynia GTFS cache from persisted snapshot")
+                    cache = loaded
+                }
+                ?: loadBundledCache()
+                    ?.also { loaded ->
+                        logInfo(LOG_TAG, "Loaded Gdynia GTFS cache from bundled asset seed")
+                        cache = loaded
+                    }
+                ?: loadNetworkCache().also { loaded ->
+                    cache = loaded
+                }
         }
 
-    private suspend fun loadCache(): Cache {
-        return try {
-            val tripsBody = httpClient.get(TRIPS_URL).body<String>()
-            val trips = json.decodeFromString<List<GdyniaTripNetworkData>>(tripsBody)
-            val gtfsZip = httpClient.get(GTFS_ZIP_URL).body<ByteArray>()
-            val shapesText = zipEntryReader.readEntry(gtfsZip, SHAPES_ENTRY_NAME)
-                ?: error("Missing $SHAPES_ENTRY_NAME in Gdynia GTFS archive")
+    private suspend fun refreshFromNetworkIfStale() {
+        refreshMutex.withLock {
+            val current = ensureCacheLoaded()
+            val downloadedAt = current.downloadedAt
+            if (downloadedAt != null && downloadedAt.plus(CACHE_TTL) > Clock.System.now()) {
+                return
+            }
 
-            Cache(
-                loadedAt = Clock.System.now(),
-                shapeIdByTripId = trips.associate { it.tripId to it.shapeId },
-                routeByShapeId = parseShapes(shapesText),
-            )
+            refreshCacheFromNetwork()
+        }
+    }
+
+    private suspend fun refreshCacheFromNetwork(): Cache {
+        val previousCache = cacheMutex.withLock { cache }
+        val networkCache = loadNetworkCacheOrNull()
+        if (networkCache != null) {
+            cacheMutex.withLock {
+                cache = networkCache
+            }
+            return networkCache
+        }
+
+        if (previousCache != null) {
+            logInfo(LOG_TAG, "Keeping previously loaded Gdynia GTFS cache after refresh failure")
+            return previousCache
+        }
+
+        error("Gdynia GTFS data unavailable: no local seed and network refresh failed")
+    }
+
+    private suspend fun loadNetworkCache(): Cache =
+        loadNetworkCacheOrNull()
+            ?: error("Gdynia GTFS data unavailable: no local seed and network refresh failed")
+
+    private suspend fun loadNetworkCacheOrNull(): Cache? {
+        val networkSnapshot = try {
+            downloadSnapshot().also { snapshot ->
+                persistSnapshot(snapshot)
+                logInfo(LOG_TAG, "Loaded Gdynia GTFS snapshot from network")
+            }
         } catch (throwable: Throwable) {
             logError(LOG_TAG, "Failed to download or parse Gdynia GTFS data", throwable)
-            throw throwable
+            null
         }
+
+        return networkSnapshot?.let(::buildCache)
+    }
+
+    private suspend fun loadPersistedCache(): Cache? {
+        val storedSnapshot = try {
+            snapshotStorage.readSnapshot()
+        } catch (throwable: Throwable) {
+            logError(LOG_TAG, "Failed to read persisted Gdynia GTFS snapshot", throwable)
+            null
+        }
+
+        return storedSnapshot?.let(::buildCache)
+    }
+
+    private suspend fun loadBundledCache(): Cache? =
+        try {
+            seedSource.readSeedSnapshot()?.let(::buildCache)
+        } catch (throwable: Throwable) {
+            logError(LOG_TAG, "Failed to read bundled Gdynia GTFS asset seed", throwable)
+            null
+        }
+
+    private suspend fun downloadSnapshot(): GdyniaGtfsSnapshot {
+        val tripsBody = httpClient.get(TRIPS_URL).body<String>()
+        val gtfsZip = httpClient.get(GTFS_ZIP_URL).body<ByteArray>()
+        return GdyniaGtfsSnapshot(
+            tripsBody = tripsBody,
+            gtfsZip = gtfsZip,
+            downloadedAtEpochMilliseconds = Clock.System.now().toEpochMilliseconds(),
+        )
+    }
+
+    private suspend fun persistSnapshot(snapshot: GdyniaGtfsSnapshot) {
+        try {
+            snapshotStorage.writeSnapshot(snapshot)
+        } catch (throwable: Throwable) {
+            logError(LOG_TAG, "Failed to persist Gdynia GTFS snapshot", throwable)
+        }
+    }
+
+    private fun buildCache(snapshot: GdyniaGtfsSnapshot): Cache {
+        val trips = json.decodeFromString<List<GdyniaTripNetworkData>>(snapshot.tripsBody)
+        val shapesText = zipEntryReader.readEntry(snapshot.gtfsZip, SHAPES_ENTRY_NAME)
+            ?: error("Missing $SHAPES_ENTRY_NAME in Gdynia GTFS archive")
+
+        return Cache(
+            downloadedAt = snapshot.downloadedAtEpochMilliseconds?.let(Instant::fromEpochMilliseconds),
+            shapeIdByTripId = trips.associate { it.tripId to it.shapeId },
+            routeByShapeId = parseShapes(shapesText),
+        )
     }
 
     private fun parseShapes(content: String): Map<Int, Route> {
@@ -128,7 +228,7 @@ internal class GdyniaGtfsStore(
     }
 
     private data class Cache(
-        val loadedAt: Instant,
+        val downloadedAt: Instant?,
         val shapeIdByTripId: Map<Int, Int>,
         val routeByShapeId: Map<Int, Route>,
     )
