@@ -116,7 +116,13 @@ class TransitDataSourceTest {
                 testJson,
                 ZipEntryReader(),
                 InMemoryGdyniaGtfsSnapshotStorage(),
-                InMemoryGdyniaGtfsSeedSource(),
+                InMemoryGdyniaGtfsSeedSource(
+                    GdyniaGtfsSnapshot(
+                        tripsBody = gdyniaTripsBody,
+                        gtfsZip = gdyniaGtfsZipBytes,
+                        downloadedAtEpochMilliseconds = null,
+                    ),
+                ),
             ),
         )
 
@@ -125,6 +131,7 @@ class TransitDataSourceTest {
         assertEquals(1, departures.size)
         assertEquals("181", departures.single().lineNumber)
         assertEquals(10181, departures.single().routeId)
+        assertEquals(201, departures.single().tripId)
     }
 
     @Test
@@ -143,7 +150,13 @@ class TransitDataSourceTest {
                 testJson,
                 ZipEntryReader(),
                 InMemoryGdyniaGtfsSnapshotStorage(),
-                InMemoryGdyniaGtfsSeedSource(),
+                InMemoryGdyniaGtfsSeedSource(
+                    GdyniaGtfsSnapshot(
+                        tripsBody = gdyniaTripsBody,
+                        gtfsZip = gdyniaGtfsZipBytes,
+                        downloadedAtEpochMilliseconds = null,
+                    ),
+                ),
             ),
         )
 
@@ -307,12 +320,12 @@ private val gdyniaDelaysBody = """
       "lastUpdate": "2026-07-27 10:09:34",
       "delay": [
         {
-          "id": "T201R10181",
+          "id": "T999R10181",
           "delayInSeconds": 46,
           "estimatedTime": "10:22",
           "headsign": "Kacze Buki",
           "routeId": 10181,
-          "tripId": 201,
+          "tripId": 999,
           "status": "REALTIME",
           "theoreticalTime": "10:22",
           "timestamp": "10:09:33",
@@ -345,15 +358,36 @@ private val gdyniaStopsBody = """
 """.trimIndent()
 
 private val gdyniaGtfsZipBytes = byteArrayOf(
-    80, 75, 3, 4, 20, 0, 0, 0, 8, 0, 228.toByte(), 90, 251.toByte(), 92, 101, 60, 250.toByte(),
-    143.toByte(), 61, 0, 0, 0, 94, 0, 0, 0, 10, 0, 0, 0, 115, 104, 97, 112, 101, 115, 46, 116,
-    120, 116, 43, 206.toByte(), 72, 44, 72, 141.toByte(), 207.toByte(), 76, 209.toByte(), 41, 6,
-    51, 10, 74, 226.toByte(), 115, 18, 75, 144.toByte(), 56, 249.toByte(), 121, 8, 78, 113, 106,
-    97, 105, 106, 94, 114, 42, 151.toByte(), 161.toByte(), 142.toByte(), 169.toByte(), 137.toByte(),
-    158.toByte(), 161.toByte(), 142.toByte(), 161.toByte(), 5, 144.toByte(), 48, 130.toByte(), 240.toByte(),
-    12, 64, 60, 32, 193.toByte(), 101, 164.toByte(), 99, 106, 10, 98, 88, 130.toByte(), 8, 0,
-    80, 75, 1, 2, 20, 0, 20, 0, 0, 0, 8, 0, 228.toByte(), 90, 251.toByte(), 92, 101, 60,
-    250.toByte(), 143.toByte(), 61, 0, 0, 0, 94, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 115, 104, 97, 112, 101, 115, 46, 116, 120, 116, 80, 75, 5, 6, 0,
-    0, 0, 0, 1, 0, 1, 0, 56, 0, 0, 0, 101, 0, 0, 0, 0, 0,
+    80, 75, 3, 4, 20, 0, 0, 0, 8, 0, 39, 155.toByte(), 251.toByte(), 92, 31, 66, 58, 142.toByte(),
+    52, 0, 0, 0, 80, 0, 0, 0, 10, 0, 0, 0, 115, 104, 97, 112, 101, 115, 46, 116, 120, 116,
+    43, 206.toByte(), 72, 44, 72, 141.toByte(), 207.toByte(), 76, 209.toByte(), 41, 6, 51, 10, 74,
+    226.toByte(), 115, 18, 75, 144.toByte(), 56, 249.toByte(), 121, 8, 78, 113, 106, 97, 105, 106,
+    94, 114, 42, 151.toByte(), 161.toByte(), 142.toByte(), 169.toByte(), 137.toByte(), 158.toByte(),
+    129.toByte(), 142.toByte(), 161.toByte(), 5, 136.toByte(), 128.toByte(), 240.toByte(), 12, 65,
+    60, 67, 29, 35, 0, 80, 75, 3, 4, 20, 0, 0, 0, 8, 0, 39, 155.toByte(), 251.toByte(), 92,
+    224.toByte(), 162.toByte(), 220.toByte(), 218.toByte(), 163.toByte(), 0, 0, 0, 216.toByte(), 0, 0,
+    0, 14, 0, 0, 0, 115, 116, 111, 112, 95, 116, 105, 109, 101, 115, 46, 116, 120, 116, 77,
+    140.toByte(), 49, 14, 194.toByte(), 48, 12, 69, 119, 78, 193.toByte(), 1, 60, 36, 149.toByte(),
+    144.toByte(), 80, 55, 16, 3, 136.toByte(), 129.toByte(), 129.toByte(), 78, 108, 38, 249.toByte(),
+    80, 171.toByte(), 37, 9, 78, 10, 130.toByte(), 211.toByte(), 83, 202.toByte(), 130.toByte(),
+    254.toByte(), 240.toByte(), 158.toByte(), 45, 251.toByte(), 23, 149.toByte(), 180.toByte(),
+    243.toByte(), 196.toByte(), 170.toByte(), 242.toByte(), 224.toByte(), 190.toByte(), 145.toByte(),
+    27, 200.toByte(), 35, 177.toByte(), 150.toByte(), 65, 49, 77, 185.toByte(), 196.toByte(),
+    239.toByte(), 193.toByte(), 23, 71, 220.toByte(), 7, 4, 247.toByte(), 219.toByte(), 109,
+    193.toByte(), 62, 203.toByte(), 53, 80, 18, 215.toByte(), 13, 169.toByte(), 121, 165.toByte(),
+    241.toByte(), 83, 99, 58, 92, 46, 147.toByte(), 231.toByte(), 150.toByte(), 19, 54, 146.toByte(),
+    75, 163.toByte(), 252.toByte(), 64, 15, 79, 101, 172.toByte(), 75, 81, 66, 25, 205.toByte(),
+    117, 40, 167.toByte(), 24, 176.toByte(), 142.toByte(), 234.toByte(), 161.toByte(), 20, 195.toByte(),
+    6, 55, 14, 158.toByte(), 158.toByte(), 45, 208.toByte(), 187.toByte(), 150.toByte(), 69, 87,
+    206.toByte(), 33, 103, 57, 247.toByte(), 152.toByte(), 85, 198.toByte(), 146.toByte(), 53, 117,
+    85, 213.toByte(), 198.toByte(), 252.toByte(), 139.toByte(), 93, 208.toByte(), 146.toByte(),
+    246.toByte(), 236.toByte(), 222.toByte(), 152.toByte(), 175.toByte(), 135.toByte(), 78, 200.toByte(),
+    140.toByte(), 33, 59, 193.toByte(), 126, 0, 80, 75, 1, 2, 20, 0, 20, 0, 0, 0, 8, 0,
+    39, 155.toByte(), 251.toByte(), 92, 31, 66, 58, 142.toByte(), 52, 0, 0, 0, 80, 0, 0, 0,
+    10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 115, 104, 97, 112, 101,
+    115, 46, 116, 120, 116, 80, 75, 1, 2, 20, 0, 20, 0, 0, 0, 8, 0, 39, 155.toByte(), 251.toByte(),
+    92, 224.toByte(), 162.toByte(), 220.toByte(), 218.toByte(), 163.toByte(), 0, 0, 0, 216.toByte(),
+    0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 0, 0, 0, 115, 116,
+    111, 112, 95, 116, 105, 109, 101, 115, 46, 116, 120, 116, 80, 75, 5, 6, 0, 0, 0, 0,
+    2, 0, 2, 0, 116, 0, 0, 0, 43, 1, 0, 0, 0, 0,
 )

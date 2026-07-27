@@ -196,9 +196,10 @@ class MapScreenViewModelTest {
         name: String = "Test Stop",
         lat: Double = 54.372158,
         lon: Double = 18.638306,
+        provider: TransitProvider = TransitProvider.GDANSK,
     ): BusStopData =
         BusStopData(
-            stopId = TransitStopId.toAppId(TransitProvider.GDANSK, stopId),
+            stopId = TransitStopId.toAppId(provider, stopId),
             stopCode = "SC$stopId",
             stopName = name,
             stopShortName = name,
@@ -314,15 +315,15 @@ class MapScreenViewModelTest {
         }
     }
 
-    private inner class FakeRoutesRepository : RoutesRepository {
+    private inner class FakeRoutesRepository(
+        private val route: Route = Route(
+            listOf(
+                Route.GeoPoint(54.372158, 18.638306),
+                Route.GeoPoint(54.351959, 18.648064),
+            ),
+        ),
+    ) : RoutesRepository {
         override fun getRoute(provider: TransitProvider, routeId: Int, tripId: Int): Flow<Route> =
-            flowOf(
-                Route(
-                    listOf(
-                        Route.GeoPoint(54.372158, 18.638306),
-                        Route.GeoPoint(54.351959, 18.648064),
-                    ),
-                ),
-            )
+            flowOf(route)
     }
 }

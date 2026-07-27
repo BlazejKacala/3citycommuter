@@ -3,8 +3,6 @@ package pl.bkacala.threecitycommuter.client
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
@@ -17,6 +15,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.gdynia.GdyniaDelayResponse
@@ -39,7 +38,7 @@ internal class GdyniaTransitDataSource(
     private val json: Json,
     private val gtfsStore: GdyniaGtfsStore,
 ) : TransitDataSource {
-    private val routeNamesMutex = Mutex()
+    private val routeNamesMutex = kotlinx.coroutines.sync.Mutex()
     private var routeNamesById: Map<Int, String>? = null
 
     override fun features(provider: TransitProvider): TransitFeatures =
@@ -88,6 +87,16 @@ internal class GdyniaTransitDataSource(
         val baseDateTime = payload.lastUpdate.toLocalDateTime()
         val routeNames = getRouteNames()
         return payload.delay.map { departure ->
+            // Gdynia realtime departures expose a tripId, but it is not reliably the same identifier
+            // as the GTFS trip_id used by /pt/trips and shapes.txt. We need the GTFS trip id to find
+            // the correct shape, so we resolve it from stop_times using the stop, departure time and
+            // headsign, and fall back to the realtime value only when the match stays ambiguous.
+            val resolvedTripId = gtfsStore.resolveTripId(
+                stopId = stopId,
+                departureTime = departure.theoreticalTime ?: departure.estimatedTime,
+                headsign = departure.headsign,
+                fallbackTripId = departure.tripId,
+            )
             Departure(
                 id = departure.id,
                 delayInSeconds = departure.delayInSeconds,
@@ -96,7 +105,7 @@ internal class GdyniaTransitDataSource(
                 lineNumber = routeNames[departure.routeId] ?: departure.routeId.toString(),
                 routeId = departure.routeId,
                 scheduledTripStartTime = null,
-                tripId = departure.tripId,
+                tripId = resolvedTripId,
                 status = departure.status,
                 theoreticalTime = departure.theoreticalTime?.toTodayInstant(baseDateTime.date, baseDateTime),
                 timestamp = departure.timestamp?.toTodayInstant(baseDateTime.date, baseDateTime),
