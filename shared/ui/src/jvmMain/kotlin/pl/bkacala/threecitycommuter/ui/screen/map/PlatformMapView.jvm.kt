@@ -146,8 +146,6 @@ actual fun PlatformMapView(
             stopMarkers = stopMarkers,
             selectedBusStop = selectedBusStop,
             trackedVehicle = trackedVehicle,
-            stopColor = primary,
-            selectedStopColor = tertiary,
             vehicleColor = MapVehicleColor,
         )
     }

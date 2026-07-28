@@ -21,6 +21,8 @@ import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.stops.BusStopType
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopId
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
@@ -123,6 +125,24 @@ class MapScreenViewModelTest {
         }
 
     @Test
+    fun `GIVEN real user location becomes available WHEN closest stop board opens automatically THEN selected stop is focused on the map`() =
+        runTest {
+            val nearestStop = busStopData(stopId = 17, name = "Brzezno")
+            val viewModel = createViewModel(stopsRepository = FakeBusStopsRepository(stops = listOf(nearestStop)))
+
+            viewModel.effects.test {
+                viewModel.onAction(MapAction.ScreenResumed)
+                advanceTimeBy(350.milliseconds)
+
+                awaitItem() shouldBe MapEffect.FocusCamera(BusStopMapItem(nearestStop).position)
+                viewModel.uiState.value.selectedBusStop?.data shouldBe nearestStop
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            viewModel.onAction(MapAction.ScreenPaused)
+        }
+
+    @Test
     fun `GIVEN view model is initialized WHEN no tracing has started THEN default location and center button state are exposed`() =
         runTest {
             val viewModel = createViewModel()
@@ -194,9 +214,10 @@ class MapScreenViewModelTest {
         name: String = "Test Stop",
         lat: Double = 54.372158,
         lon: Double = 18.638306,
+        provider: TransitProvider = TransitProvider.GDANSK,
     ): BusStopData =
         BusStopData(
-            stopId = stopId,
+            stopId = TransitStopId.toAppId(provider, stopId),
             stopCode = "SC$stopId",
             stopName = name,
             stopShortName = name,
@@ -301,26 +322,26 @@ class MapScreenViewModelTest {
 
         override fun getVehicle(id: Int): Flow<Vehicle> = flowOf(vehicles.first())
 
-        override fun getVehicles(): Flow<List<Vehicle>> = flow {
+        override fun getVehicles(provider: TransitProvider): Flow<List<Vehicle>> = flow {
             delay(100)
             emit(vehicles)
         }
 
-        override fun getVehiclePosition(vehicleId: Int): Flow<VehiclePosition?> = flow {
+        override fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): Flow<VehiclePosition?> = flow {
             delay(100)
             emit(null)
         }
     }
 
-    private inner class FakeRoutesRepository : RoutesRepository {
-        override fun getRoute(routeId: Int, tripId: Int): Flow<Route> =
-            flowOf(
-                Route(
-                    listOf(
-                        Route.GeoPoint(54.372158, 18.638306),
-                        Route.GeoPoint(54.351959, 18.648064),
-                    ),
-                ),
-            )
+    private inner class FakeRoutesRepository(
+        private val route: Route = Route(
+            listOf(
+                Route.GeoPoint(54.372158, 18.638306),
+                Route.GeoPoint(54.351959, 18.648064),
+            ),
+        ),
+    ) : RoutesRepository {
+        override fun getRoute(provider: TransitProvider, routeId: Int, tripId: Int): Flow<Route> =
+            flowOf(route)
     }
 }

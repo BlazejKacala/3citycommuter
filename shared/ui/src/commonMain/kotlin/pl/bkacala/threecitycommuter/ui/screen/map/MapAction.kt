@@ -7,7 +7,7 @@ sealed interface MapAction {
     data object ReloadClicked : MapAction
     data object CenterOnUserClicked : MapAction
     data class StopSelected(val stopId: Int) : MapAction
-    data class DepartureSelected(val vehicleId: Long?) : MapAction
+    data class DepartureSelected(val departureKey: String) : MapAction
     data class SearchQueryChanged(val query: String) : MapAction
     data class SearchActiveChanged(val isActive: Boolean) : MapAction
     data class SearchResultClicked(val stopId: Int) : MapAction

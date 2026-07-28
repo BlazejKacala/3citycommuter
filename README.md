@@ -17,11 +17,22 @@ Android target details:
 
 ## Data sources
 
-The app uses open data from [Otwarte Dane Gdanska](https://ckan.multimediagdansk.pl):
+The app aggregates multiple provider APIs into one shared transport model.
 
-- stops and routes: `ckan.multimediagdansk.pl`
-- real-time departures and GPS positions: `ckan2.multimediagdansk.pl`
-- vehicle-related files: `files.cloudgdansk.pl`
+Gdańsk sources:
+- stops: `ckan.multimediagdansk.pl`
+- real-time departures and route shapes: `ckan2.multimediagdansk.pl`
+- vehicles and metadata: `files.cloudgdansk.pl`
+
+Gdynia sources:
+- stops, delays, routes metadata, trips, GTFS: `api.zdiz.gdynia.pl`
+
+Provider differences are normalized before the UI sees them:
+- both cities map into the same `BusStopData`, `Departure`, and `Route` domain models
+- app-level stop IDs are globally unique even though provider-native IDs differ
+- Gdynia line labels come from `/pt/routes.routeShortName`
+- Gdynia route geometry comes from `gtfs.zip`, not from a direct route-shape endpoint
+- Gdynia does not currently expose a public live GPS feed compatible with the Gdańsk feed
 
 ## Tech stack
 
@@ -64,6 +75,23 @@ shared:network  shared:database
 
 `shared:core` contains domain models and utilities. The remaining shared modules cover networking, database, repositories, and Compose UI. Android and Desktop bootstrap Koin and consume `shared:ui`.
 
+Transport provider architecture:
+- `GdanskTransitDataSource` adapts the Gdańsk feeds
+- `GdyniaTransitDataSource` adapts the Gdynia API
+- `CombinedTransitDataSource` merges both into one application-facing source
+
+Important normalization rules:
+- `TransitStopId` converts provider-native stop IDs into globally unique app IDs
+- `BusStopData.provider` and `BusStopData.sourceStopId` are derived from the app-level stop ID
+- `Departure.lineNumber` is the display label shown in UI
+- `Departure.routeId` remains the internal provider route identifier used for route lookup
+
+Gdynia route parsing:
+- `GdyniaGtfsStore` loads `tripId -> shapeId` from `/pt/trips`
+- it loads route coordinates from `shapes.txt` inside `gtfs.zip`
+- the parsed route cache is kept in memory with a 1-day TTL
+- Android preloads that cache during startup so the first route selection does not need to parse GTFS on click
+
 ## Requirements
 
 - JDK 21
@@ -86,6 +114,10 @@ shared:network  shared:database
 ./gradlew :shared:network:jvmTest
 ./gradlew :composeApp:android:connectedDebugAndroidTest
 ```
+
+Useful provider-focused tests:
+- `./gradlew :shared:network:jvmTest --tests "pl.bkacala.threecitycommuter.client.TransitDataSourceTest"`
+- `./gradlew :shared:network:jvmTest --tests "pl.bkacala.threecitycommuter.model.gdynia.GdyniaRouteNetworkDataSerializationTest"`
 
 ## Code quality
 

@@ -1,13 +1,14 @@
 package pl.bkacala.threecitycommuter.model.departures
 
-import pl.bkacala.threecitycommuter.model.DepartureNetworkData
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
 
-fun DepartureNetworkData.toDepartureData(): Departure {
+fun GdanskDepartureResponse.toDepartureData(): Departure {
     return Departure(
         id = this.id,
         delayInSeconds = this.delayInSeconds,
         estimatedTime = this.estimatedTime,
         headsign = this.headsign,
+        lineNumber = this.routeId.toString(),
         routeId = this.routeId,
         scheduledTripStartTime = this.scheduledTripStartTime,
         tripId = this.tripId,

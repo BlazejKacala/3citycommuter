@@ -12,7 +12,9 @@ It displays public transport stops on a map, real-time departures, vehicle track
 - **Desktop (JVM)** (functional, Compose for Desktop)
 - **iOS** (configured via KMP targets `iosX64`, `iosArm64`, `iosSimulatorArm64`; `iosApp/` exists but has no app entry point yet)
 
-Data sources: open data from [Otwarte Dane Gdanska](https://ckan.multimediagdansk.pl) for stops, routes, departures, and GPS positions.
+Data sources:
+- **Gdańsk**: open data from [Otwarte Dane Gdanska](https://ckan.multimediagdansk.pl) and companion feeds from `ckan2.multimediagdansk.pl` and `files.cloudgdansk.pl`
+- **Gdynia**: public API from `api.zdiz.gdynia.pl`
 
 **Note:** Active map support uses **MapLibre**. Mapbox dependencies are deprecated and commented out.
 
@@ -23,7 +25,7 @@ Data sources: open data from [Otwarte Dane Gdanska](https://ckan.multimediagdans
 |- build-logic/convention/    # Convention plugins: KmpLibrary, KmpCompose
 |- shared/
 |  |- core/                   # Domain models and utilities
-|  |- network/                # Ktor client, DTOs, NetworkClient, platform engines
+|  |- network/                # Ktor client, DTOs, transport providers, platform engines
 |  |- database/               # Room KMP, DAOs, entities, DB module
 |  |- data/                   # Repositories, mappers, use cases, location, permissions
 |  `- ui/                     # Compose Multiplatform UI, ViewModels, navigation, screens
@@ -60,6 +62,7 @@ Data sources: open data from [Otwarte Dane Gdanska](https://ckan.multimediagdans
 
 ```bash
 ./gradlew :shared:ui:jvmTest --tests "pl.bkacala.threecitycommuter.ui.screen.map.MapScreenViewModelTest"
+./gradlew :shared:network:jvmTest --tests "pl.bkacala.threecitycommuter.client.TransitDataSourceTest"
 ```
 
 ### Code Quality
@@ -137,7 +140,7 @@ Koin modules:
 | Module | Location | Contents |
 |---|---|---|
 | `databaseModule` | `shared/database` | Room DB, DAOs |
-| `networkModule` | `shared/network` | Ktor client, JSON config |
+| `networkModule` | `shared/network` | Ktor client, JSON config, transport providers |
 | `platformNetworkModule` | `shared/network` | Platform HTTP engine |
 | `dataModule` | `shared/data` | Repositories, use cases, settings |
 | `platformDataModule` | `shared/data` | Platform location and permissions |
@@ -145,7 +148,37 @@ Koin modules:
 
 ### Network Layer
 
-`KtorNetworkClient` implements `NetworkClient`.
+`KtorNetworkClient` implements the legacy Gdańsk-specific `NetworkClient`.
+
+Transport data is normalized through a provider layer:
+- `GdanskTransitDataSource`
+- `GdyniaTransitDataSource`
+- `CombinedTransitDataSource`
+
+`CombinedTransitDataSource` is the application-facing source. It merges Gdańsk and Gdynia stops and routes later lookups by provider based on app-level stop IDs.
+
+#### Data parsing and normalization
+
+- App-level stop IDs are globally unique. `TransitStopId` offsets Gdynia native stop IDs and leaves Gdańsk IDs unchanged.
+- `BusStopData.provider` and `BusStopData.sourceStopId` are derived from the app-level stop ID.
+- `Departure.lineNumber` is the UI-facing line label:
+  - Gdańsk uses `routeId.toString()`
+  - Gdynia uses `/pt/routes.routeShortName`
+- `Departure.routeId` remains the provider-internal route identifier and must still be used for route lookup.
+- Gdynia route geometry is parsed from GTFS:
+  - `/pt/trips` provides `tripId -> shapeId`
+  - `shapes.txt` from `gtfs.zip` provides `shapeId -> ordered coordinates`
+  - `GdyniaGtfsStore` caches the parsed route index in memory with a 1-day TTL
+  - Android preloads the Gdynia GTFS cache during startup in the same background phase that loads `relations.json`
+- Gdynia does not expose a public live GPS feed compatible with the Gdańsk one:
+  - route drawing works
+  - live vehicle tracking is disabled in UI behavior
+- Android allows cleartext HTTP specifically for `api.zdiz.gdynia.pl` through `composeApp/android/src/main/res/xml/network_security_config.xml`
+
+#### Error logging
+
+- `MapScreenViewModel` logs failures for stops, departures, routes, and vehicle position loading.
+- `GdyniaGtfsStore` logs GTFS download and parse failures.
 
 Platform engines:
 - Android: `HttpClient(Android)`
@@ -190,18 +223,26 @@ Room KMP 2.7.2 with `@ConstructedBy(CommuterDatabaseConstructor::class)`.
 
 ### Adding a New API Endpoint
 
-1. Add method to `NetworkClient`
+1. Add method to the appropriate transport provider or `NetworkClient`
 2. Create DTO in `shared/network/.../model/`
-3. Implement the call in `KtorNetworkClient.kt`
-4. Add mapper in `shared/data/.../model/`
+3. Implement the call in the provider/client
+4. Add or update mapper logic in shared domain/data code
 
 ## Testing
 
 **Unit tests** live in `commonTest` and run with `:module:jvmTest`.
 
 - ViewModels: `shared/ui/src/commonTest/`
-- Serialization: `shared/network/src/commonTest/`
+- Serialization/provider tests: `shared/network/src/commonTest/`
 - Test doubles: `shared/ui/src/commonTest/.../mocks/`
+
+Important network/provider tests:
+- `TransitDataSourceTest`
+  - verifies Gdynia GTFS route parsing preserves point order
+  - verifies Gdynia maps `routeId` to user-facing `lineNumber`
+  - verifies Gdańsk and Gdynia providers populate a consistent shared domain model for stops and departures
+- `GdyniaRouteNetworkDataSerializationTest`
+  - verifies `/pt/routes` payload deserialization
 
 Use `@BeforeTest` and `@AfterTest` with:
 

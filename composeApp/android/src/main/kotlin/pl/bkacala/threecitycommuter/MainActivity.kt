@@ -14,6 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
+import pl.bkacala.threecitycommuter.client.GdyniaGtfsPreloader
+import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.model.stops.BusStopType
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.ui.App
@@ -21,6 +23,7 @@ import pl.bkacala.threecitycommuter.ui.App
 class MainActivity : ComponentActivity() {
 
     private val busStopsRepository: BusStopsRepository by inject()
+    private val gdyniaGtfsPreloader: GdyniaGtfsPreloader by inject()
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -37,8 +40,21 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { !dataLoaded.value }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            loadBusStopsTypes()
+            try {
+                loadBusStopsTypes()
+            } catch (throwable: Throwable) {
+                logError(LOG_TAG, "Failed to load startup data", throwable)
+            }
             dataLoaded.value = true
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                gdyniaGtfsPreloader.preload()
+                gdyniaGtfsPreloader.refresh()
+            } catch (throwable: Throwable) {
+                logError(LOG_TAG, "Failed to warm up Gdynia GTFS cache", throwable)
+            }
         }
 
         enableEdgeToEdge()
@@ -54,3 +70,5 @@ class MainActivity : ComponentActivity() {
         busStopsRepository.storeBusStopsTypes(relations)
     }
 }
+
+private const val LOG_TAG = "MainActivity"

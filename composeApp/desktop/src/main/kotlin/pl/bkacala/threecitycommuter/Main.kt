@@ -26,7 +26,7 @@ fun main() {
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "Przystanek Gdańsk",
+            title = "Przystanek Tr\u00F3jmiasto",
         ) {
             App()
         }

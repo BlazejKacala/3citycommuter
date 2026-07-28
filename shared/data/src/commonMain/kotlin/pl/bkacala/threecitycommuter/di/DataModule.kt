@@ -3,6 +3,7 @@ package pl.bkacala.threecitycommuter.di
 import com.russhwolf.settings.Settings
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.repository.routes.RealRoutesRepository
 import pl.bkacala.threecitycommuter.repository.routes.RoutesRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
@@ -18,8 +19,8 @@ expect val platformDataModule: Module
 val dataModule = module {
     single<Settings> { Settings() }
     single<LastUpdateRepository> { RealLastUpdateRepository(get()) }
-    single<BusStopsRepository> { RealBusStopsRepository(get(), get(), get(), get()) }
-    single<VehiclesRepository> { RealVehiclesRepository(get(), get(), get()) }
+    single<BusStopsRepository> { RealBusStopsRepository(get<TransitDataSource>(), get(), get(), get()) }
+    single<VehiclesRepository> { RealVehiclesRepository(get(), get<TransitDataSource>(), get()) }
     single<RoutesRepository> { RealRoutesRepository(get()) }
     single { GetDeparturesUseCase(get(), get()) }
 }

@@ -3,6 +3,7 @@ package pl.bkacala.threecitycommuter.mocks
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.repository.vehicles.VehiclesRepository
@@ -19,12 +20,12 @@ object MockVehiclesRepository {
             emit(makeRandomInstance<Vehicle>().copy(vehicleCode = "1"))
         }
 
-        override fun getVehicles(): Flow<List<Vehicle>> = flow {
+        override fun getVehicles(provider: TransitProvider): Flow<List<Vehicle>> = flow {
             delay(100)
             emit(listOf(makeRandomInstance<Vehicle>().copy(vehicleCode = "1")))
         }
 
-        override fun getVehiclePosition(vehicleId: Int): Flow<VehiclePosition?> = flow {
+        override fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): Flow<VehiclePosition?> = flow {
             delay(100)
             emit(makeRandomInstance<VehiclePosition>().copy(vehicleId = vehicleId))
         }

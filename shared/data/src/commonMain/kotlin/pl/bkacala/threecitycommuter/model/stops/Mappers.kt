@@ -1,6 +1,6 @@
 package pl.bkacala.threecitycommuter.model.stops
 
-import pl.bkacala.threecitycommuter.model.BusStopsNetworkData
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
 
 fun BusStopEntity.toStopData(isForBuses: Boolean, isForTrams: Boolean): BusStopData {
     return BusStopData(
@@ -31,7 +31,12 @@ fun BusStopEntity.toStopData(isForBuses: Boolean, isForTrams: Boolean): BusStopD
     )
 }
 
-fun BusStopsNetworkData.BusStopNetworkData.toEntity(): BusStopEntity {
+fun GdanskStopResponse.toBusStopData(
+    isForBuses: Boolean,
+    isForTrams: Boolean,
+): BusStopData = toEntity().toStopData(isForBuses, isForTrams)
+
+fun GdanskStopResponse.toEntity(): BusStopEntity {
     return BusStopEntity(
         stopId = this.stopId,
         stopCode = this.stopCode,
@@ -58,9 +63,44 @@ fun BusStopsNetworkData.BusStopNetworkData.toEntity(): BusStopEntity {
     )
 }
 
+fun BusStopData.toEntity(): BusStopEntity {
+    return BusStopEntity(
+        stopId = this.stopId,
+        stopCode = this.stopCode,
+        stopName = this.stopName,
+        stopShortName = this.stopShortName,
+        stopDesc = this.stopDesc,
+        subName = this.subName,
+        date = this.date,
+        zoneId = this.zoneId,
+        zoneName = this.zoneName,
+        virtual = this.virtual,
+        nonpassenger = this.nonpassenger,
+        depot = this.depot,
+        ticketZoneBorder = this.ticketZoneBorder,
+        onDemand = if (this.onDemand) 1 else 0,
+        activationDate = this.activationDate,
+        stopLat = this.stopLat,
+        stopLon = this.stopLon,
+        stopUrl = this.stopUrl,
+        locationType = this.locationType,
+        parentStation = this.parentStation,
+        stopTimezone = this.stopTimezone,
+        wheelchairBoarding = this.wheelchairBoarding,
+    )
+}
+
 fun BusStopType.toEntity(): BusStopTypeEntity {
     return BusStopTypeEntity(
         busStopId = this.stopId,
+        isForBuses = this.isForBuses,
+        isForTrams = this.isForTrams,
+    )
+}
+
+fun BusStopData.toType(): BusStopType {
+    return BusStopType(
+        stopId = this.stopId,
         isForBuses = this.isForBuses,
         isForTrams = this.isForTrams,
     )

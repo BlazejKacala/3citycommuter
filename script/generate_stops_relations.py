@@ -1,9 +1,10 @@
+import os
 import json
-import requests
+from dataclasses import asdict
 from dataclasses import dataclass
 from typing import List
-from dataclasses import asdict
-import os
+
+import requests
 
 
 @dataclass
@@ -35,8 +36,9 @@ url = "https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4dc2-a171-a23eec8f
 response = requests.get(url)
 json_data = response.json()
 
-# Deserializacja najnowszej wersji danych do obiektu klasy StopData
-latest_version = max(json_data.values(), key=lambda version: version["lastUpdate"])
+# Deserializacja najnowszego snapshotu danych do obiektu klasy StopData
+latest_snapshot_key = max(json_data.keys())
+latest_version = json_data[latest_snapshot_key]
 source = StopData(
     lastUpdate=latest_version["lastUpdate"],
     stopsInTrip=[Stop(**stop) for stop in latest_version["stopsInTrip"]]
@@ -66,8 +68,7 @@ for stop_id, info in bus_stops_dict.items():
     output.append(BusStop(stopId=stop_id, isForBuses=is_for_buses, isForTrams=is_for_trams))
     
 output_dict = [asdict(obj) for obj in output]
-folder_path = os.path.dirname(os.path.abspath(__file__))
-
-output_file_path = os.path.join(folder_path, 'relations.json')
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+output_file_path = os.path.join(root_path, "composeApp", "android", "src", "main", "assets", "relations.json")
 with open(output_file_path, 'w') as f:
     json.dump(output_dict, f, indent=4)

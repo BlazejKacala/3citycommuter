@@ -7,6 +7,7 @@ data class Departure(
     val delayInSeconds: Int?,
     val estimatedTime: Instant?,
     val headsign: String?,
+    val lineNumber: String,
     val routeId: Int,
     val scheduledTripStartTime: Instant?,
     val tripId: Int,
