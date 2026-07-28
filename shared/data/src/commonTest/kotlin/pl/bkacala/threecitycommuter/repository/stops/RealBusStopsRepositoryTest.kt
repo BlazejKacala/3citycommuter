@@ -1,8 +1,6 @@
 package pl.bkacala.threecitycommuter.repository.stops
 
 import app.cash.turbine.test
-import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.dao.BusStopsDao
@@ -17,6 +15,8 @@ import pl.bkacala.threecitycommuter.model.transit.TransitStopId
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class RealBusStopsRepositoryTest {
 

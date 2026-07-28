@@ -1,5 +1,15 @@
 root = true
 
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{bat,cmd}]
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
 # Kotlin files - Compose support
 [*.{kt,kts}]
 # Allow Composable functions to start with uppercase letter (standard Compose convention)

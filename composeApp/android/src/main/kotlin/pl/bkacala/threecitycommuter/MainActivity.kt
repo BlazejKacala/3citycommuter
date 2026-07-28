@@ -69,7 +69,6 @@ class MainActivity : ComponentActivity() {
         val relations: List<BusStopType> = Json.decodeFromString(jsonString)
         busStopsRepository.storeBusStopsTypes(relations)
     }
-
 }
 
 private const val LOG_TAG = "MainActivity"
