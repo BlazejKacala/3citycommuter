@@ -19,8 +19,8 @@ android {
         applicationId = "pl.bkacala.threecitycommuter"
         minSdk = 29
         targetSdk = 37
-        versionCode = ciVersionCode ?: 5
-        versionName = ciVersionName ?: "2.1"
+        versionCode = ciVersionCode ?: 6
+        versionName = ciVersionName ?: "2.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
