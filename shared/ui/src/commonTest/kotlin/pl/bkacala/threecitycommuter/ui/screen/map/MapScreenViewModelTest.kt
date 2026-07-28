@@ -125,6 +125,24 @@ class MapScreenViewModelTest {
         }
 
     @Test
+    fun `GIVEN real user location becomes available WHEN closest stop board opens automatically THEN selected stop is focused on the map`() =
+        runTest {
+            val nearestStop = busStopData(stopId = 17, name = "Brzezno")
+            val viewModel = createViewModel(stopsRepository = FakeBusStopsRepository(stops = listOf(nearestStop)))
+
+            viewModel.effects.test {
+                viewModel.onAction(MapAction.ScreenResumed)
+                advanceTimeBy(350.milliseconds)
+
+                awaitItem() shouldBe MapEffect.FocusCamera(BusStopMapItem(nearestStop).position)
+                viewModel.uiState.value.selectedBusStop?.data shouldBe nearestStop
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            viewModel.onAction(MapAction.ScreenPaused)
+        }
+
+    @Test
     fun `GIVEN view model is initialized WHEN no tracing has started THEN default location and center button state are exposed`() =
         runTest {
             val viewModel = createViewModel()
