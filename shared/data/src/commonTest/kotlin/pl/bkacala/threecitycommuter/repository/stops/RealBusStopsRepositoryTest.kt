@@ -52,6 +52,28 @@ class RealBusStopsRepositoryTest {
         assertEquals(2L, lastUpdateRepository.values["bus_stops_cache_version"])
     }
 
+    @Test
+    fun `uses bus fallback for gdansk stop when relation is missing`() = runTest {
+        val gdanskStop = createStop(1001, TransitProvider.GDANSK, isForBuses = false, isForTrams = false)
+        val repository = RealBusStopsRepository(
+            transitDataSource = FakeTransitDataSource(listOf(gdanskStop)),
+            busStopsDao = FakeBusStopsDao(mutableListOf(gdanskStop.toEntity())),
+            busStopsTypesDao = FakeBusStopsTypesDao(mutableListOf()),
+            lastUpdateRepository = FakeLastUpdateRepository(
+                timestamps = mutableMapOf("bus_stops" to Long.MAX_VALUE),
+                values = mutableMapOf("bus_stops_cache_version" to 2),
+            ),
+        )
+
+        repository.getBusStops().test {
+            val stops = awaitItem()
+            assertEquals(1, stops.size)
+            assertEquals(true, stops.single().isForBuses)
+            assertEquals(false, stops.single().isForTrams)
+            awaitComplete()
+        }
+    }
+
     private fun createStop(
         sourceStopId: Int,
         provider: TransitProvider,

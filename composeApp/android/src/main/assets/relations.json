@@ -1,21 +1,21 @@
 [
     {
+        "stopId": 14619,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5704,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1553,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14617,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 14425,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 15112,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -45,7 +45,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 1209,
+        "stopId": 14433,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -55,7 +55,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 14579,
+        "stopId": 14728,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -65,17 +65,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 14972,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1424,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14886,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -95,9 +85,19 @@
         "isForTrams": true
     },
     {
+        "stopId": 5832,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14825,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 5225,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 1791,
@@ -110,12 +110,17 @@
         "isForTrams": true
     },
     {
+        "stopId": 5812,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2085,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1958,
+        "stopId": 14557,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -123,6 +128,11 @@
         "stopId": 2223,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 14577,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 2043,
@@ -135,6 +145,11 @@
         "isForTrams": true
     },
     {
+        "stopId": 14667,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2100,
         "isForBuses": false,
         "isForTrams": true
@@ -145,7 +160,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 5869,
+        "stopId": 171,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -160,22 +175,17 @@
         "isForTrams": true
     },
     {
-        "stopId": 14615,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2095,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1223,
+        "stopId": 14681,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1965,
+        "stopId": 14610,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -195,7 +205,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 1854,
+        "stopId": 14611,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -210,7 +220,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 15095,
+        "stopId": 1217,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -235,7 +245,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 1312,
+        "stopId": 5837,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -245,7 +255,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 15115,
+        "stopId": 1983,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -255,12 +265,32 @@
         "isForTrams": true
     },
     {
+        "stopId": 15108,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2013,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1205,
+        "stopId": 14830,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14612,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1028,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 15095,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -275,6 +305,11 @@
         "isForTrams": false
     },
     {
+        "stopId": 1213,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2150,
         "isForBuses": false,
         "isForTrams": true
@@ -283,11 +318,6 @@
         "stopId": 2171,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1222,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 2136,
@@ -310,7 +340,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 15116,
+        "stopId": 14531,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -335,12 +365,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14613,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1318,
+        "stopId": 1264,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -348,11 +373,6 @@
         "stopId": 2061,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1033,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 14480,
@@ -365,12 +385,27 @@
         "isForTrams": true
     },
     {
+        "stopId": 5841,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1397,
         "isForBuses": true,
         "isForTrams": false
     },
     {
+        "stopId": 1960,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1420,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 191,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -393,11 +428,6 @@
         "stopId": 2097,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1320,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 14494,
@@ -425,11 +455,6 @@
         "isForTrams": true
     },
     {
-        "stopId": 5840,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2216,
         "isForBuses": false,
         "isForTrams": true
@@ -438,11 +463,6 @@
         "stopId": 2231,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14868,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 1545,
@@ -460,16 +480,6 @@
         "isForTrams": true
     },
     {
-        "stopId": 14947,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5821,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2149,
         "isForBuses": false,
         "isForTrams": true
@@ -481,11 +491,6 @@
     },
     {
         "stopId": 1573,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1985,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -510,16 +515,6 @@
         "isForTrams": true
     },
     {
-        "stopId": 171,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1687,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2140,
         "isForBuses": false,
         "isForTrams": true
@@ -530,7 +525,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 1806,
+        "stopId": 14727,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -545,19 +540,9 @@
         "isForTrams": true
     },
     {
-        "stopId": 14811,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2217,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14457,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 2181,
@@ -565,7 +550,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 14611,
+        "stopId": 1969,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -575,9 +560,19 @@
         "isForTrams": true
     },
     {
+        "stopId": 1318,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2213,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 1311,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 2151,
@@ -585,17 +580,12 @@
         "isForTrams": true
     },
     {
+        "stopId": 14723,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14487,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1790,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14883,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -608,11 +598,6 @@
         "stopId": 14815,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1016,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 1494,
@@ -645,11 +630,6 @@
         "isForTrams": false
     },
     {
-        "stopId": 1201,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 14488,
         "isForBuses": true,
         "isForTrams": false
@@ -665,14 +645,19 @@
         "isForTrams": false
     },
     {
-        "stopId": 1789,
+        "stopId": 2091,
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopId": 1016,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2091,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopId": 1201,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 1477,
@@ -685,27 +670,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 14429,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5600,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1492,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1959,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5606,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -730,7 +695,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 1961,
+        "stopId": 1320,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -738,11 +703,6 @@
         "stopId": 14654,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 5608,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 117,
@@ -760,12 +720,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 1215,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5832,
+        "stopId": 1971,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -775,14 +730,14 @@
         "isForTrams": true
     },
     {
-        "stopId": 5811,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2028,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 1218,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 2225,
@@ -790,7 +745,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 390,
+        "stopId": 5608,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -800,24 +755,19 @@
         "isForTrams": true
     },
     {
-        "stopId": 5839,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2098,
         "isForBuses": false,
         "isForTrams": true
     },
     {
+        "stopId": 14725,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2141,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 15105,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 1398,
@@ -850,17 +800,27 @@
         "isForTrams": false
     },
     {
-        "stopId": 14570,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2087,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1963,
+        "stopId": 1222,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14572,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5870,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14693,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -870,7 +830,17 @@
         "isForTrams": false
     },
     {
+        "stopId": 1313,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1844,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 175,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -880,7 +850,17 @@
         "isForTrams": true
     },
     {
+        "stopId": 14620,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 8246,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14811,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -895,7 +875,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 5602,
+        "stopId": 1013,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -910,17 +890,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 1020,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 14966,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1956,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -950,11 +920,6 @@
         "isForTrams": true
     },
     {
-        "stopId": 1208,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 8100,
         "isForBuses": true,
         "isForTrams": false
@@ -965,9 +930,24 @@
         "isForTrams": true
     },
     {
+        "stopId": 14618,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14543,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 14832,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5701,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 2071,
@@ -975,17 +955,12 @@
         "isForTrams": true
     },
     {
-        "stopId": 5841,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2135,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14724,
+        "stopId": 1684,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1000,7 +975,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 1013,
+        "stopId": 1321,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1035,14 +1010,14 @@
         "isForTrams": true
     },
     {
-        "stopId": 14572,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2172,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 14598,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 2173,
@@ -1090,22 +1065,17 @@
         "isForTrams": true
     },
     {
+        "stopId": 1207,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2010,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1219,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 8234,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1028,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1115,14 +1085,14 @@
         "isForTrams": true
     },
     {
+        "stopId": 14691,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2081,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14601,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 14987,
@@ -1130,7 +1100,22 @@
         "isForTrams": true
     },
     {
+        "stopId": 14741,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1015,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1984,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14726,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1143,16 +1128,6 @@
         "stopId": 2178,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1804,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14556,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 1512,
@@ -1170,14 +1145,24 @@
         "isForTrams": true
     },
     {
-        "stopId": 14831,
+        "stopId": 2088,
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopId": 5604,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2088,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopId": 14583,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 15107,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 14983,
@@ -1195,19 +1180,14 @@
         "isForTrams": true
     },
     {
+        "stopId": 15119,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2072,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14971,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1979,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 2073,
@@ -1215,7 +1195,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 1004,
+        "stopId": 1215,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1235,6 +1215,11 @@
         "isForTrams": true
     },
     {
+        "stopId": 14579,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2189,
         "isForBuses": false,
         "isForTrams": true
@@ -1248,6 +1233,11 @@
         "stopId": 2084,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 14573,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 1750,
@@ -1265,6 +1255,11 @@
         "isForTrams": false
     },
     {
+        "stopId": 1686,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1527,
         "isForBuses": true,
         "isForTrams": false
@@ -1273,11 +1268,6 @@
         "stopId": 14542,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1212,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 2194,
@@ -1295,17 +1285,12 @@
         "isForTrams": true
     },
     {
-        "stopId": 1200,
+        "stopId": 14575,
         "isForBuses": true,
         "isForTrams": false
     },
     {
         "stopId": 1394,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5601,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1325,6 +1310,11 @@
         "isForTrams": false
     },
     {
+        "stopId": 14599,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2052,
         "isForBuses": false,
         "isForTrams": true
@@ -1333,6 +1323,11 @@
         "stopId": 2067,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 5821,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 2039,
@@ -1370,11 +1365,6 @@
         "isForTrams": true
     },
     {
-        "stopId": 1204,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 14541,
         "isForBuses": false,
         "isForTrams": true
@@ -1385,12 +1375,22 @@
         "isForTrams": true
     },
     {
+        "stopId": 1981,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2161,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1962,
+        "stopId": 14689,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5873,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1405,22 +1405,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14458,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1216,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1686,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14688,
+        "stopId": 5840,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1435,6 +1420,11 @@
         "isForTrams": true
     },
     {
+        "stopId": 5606,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2153,
         "isForBuses": false,
         "isForTrams": true
@@ -1443,6 +1433,11 @@
         "stopId": 2190,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 1033,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 9001,
@@ -1475,11 +1470,6 @@
         "isForTrams": false
     },
     {
-        "stopId": 14616,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 8231,
         "isForBuses": true,
         "isForTrams": false
@@ -1491,26 +1481,6 @@
     },
     {
         "stopId": 14621,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1971,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1308,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 15005,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14577,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1535,22 +1505,17 @@
         "isForTrams": true
     },
     {
-        "stopId": 5836,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1969,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2041,
         "isForBuses": false,
         "isForTrams": true
     },
     {
         "stopId": 1044,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 15110,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1565,12 +1530,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 1805,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5225,
+        "stopId": 14429,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1585,27 +1545,17 @@
         "isForTrams": true
     },
     {
-        "stopId": 14575,
+        "stopId": 14887,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15107,
+        "stopId": 14812,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1957,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1210,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1970,
+        "stopId": 14867,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1616,6 +1566,11 @@
     },
     {
         "stopId": 14673,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1308,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1655,6 +1610,11 @@
         "isForTrams": true
     },
     {
+        "stopId": 5609,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14905,
         "isForBuses": true,
         "isForTrams": false
@@ -1668,6 +1628,11 @@
         "stopId": 2099,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 5813,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 14544,
@@ -1695,19 +1660,9 @@
         "isForTrams": true
     },
     {
-        "stopId": 5812,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2077,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1211,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 2195,
@@ -1715,17 +1670,22 @@
         "isForTrams": true
     },
     {
+        "stopId": 1020,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 205,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 5702,
+        "stopId": 15019,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15019,
+        "stopId": 15005,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1735,12 +1695,22 @@
         "isForTrams": true
     },
     {
+        "stopId": 14653,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1469,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14851,
+        "stopId": 14868,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1221,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1753,6 +1723,16 @@
         "stopId": 15122,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 15111,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5836,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 2068,
@@ -1768,6 +1748,26 @@
         "stopId": 2174,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 15106,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 15114,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1959,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1203,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 1526,
@@ -1790,12 +1790,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14684,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14576,
+        "stopId": 1211,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1815,12 +1810,12 @@
         "isForTrams": true
     },
     {
-        "stopId": 114,
+        "stopId": 1968,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14610,
+        "stopId": 114,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1830,17 +1825,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 15117,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1511,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5226,
+        "stopId": 14614,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1851,11 +1841,6 @@
     },
     {
         "stopId": 1536,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5701,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1880,12 +1865,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 14973,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14812,
+        "stopId": 15115,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1905,6 +1885,11 @@
         "isForTrams": false
     },
     {
+        "stopId": 390,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14829,
         "isForBuses": false,
         "isForTrams": true
@@ -1913,11 +1898,6 @@
         "stopId": 2090,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14666,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 14424,
@@ -1930,12 +1910,27 @@
         "isForTrams": true
     },
     {
-        "stopId": 5604,
+        "stopId": 14851,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1206,
+        "stopId": 1214,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14682,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5607,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 15109,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1955,7 +1950,27 @@
         "isForTrams": false
     },
     {
+        "stopId": 15116,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14844,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5820,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1309,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1206,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -1980,6 +1995,11 @@
         "isForTrams": true
     },
     {
+        "stopId": 14666,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 7993,
         "isForBuses": true,
         "isForTrams": false
@@ -2000,12 +2020,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 15087,
+        "stopId": 5819,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1803,
+        "stopId": 15087,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2020,7 +2040,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 5704,
+        "stopId": 14578,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2030,12 +2050,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 5822,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14882,
+        "stopId": 14569,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2060,7 +2075,22 @@
         "isForTrams": false
     },
     {
-        "stopId": 1685,
+        "stopId": 5871,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1956,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1985,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1310,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2070,27 +2100,17 @@
         "isForTrams": false
     },
     {
-        "stopId": 1311,
+        "stopId": 1979,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14867,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1214,
+        "stopId": 14576,
         "isForBuses": true,
         "isForTrams": false
     },
     {
         "stopId": 8250,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14667,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2110,12 +2130,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14530,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1202,
+        "stopId": 14586,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2150,12 +2165,17 @@
         "isForTrams": true
     },
     {
+        "stopId": 1806,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14496,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5870,
+        "stopId": 1803,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2168,26 +2188,6 @@
         "stopId": 2139,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1218,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5831,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14573,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14686,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 8236,
@@ -2210,7 +2210,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 14693,
+        "stopId": 14690,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2225,7 +2225,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14887,
+        "stopId": 1004,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2233,6 +2233,16 @@
         "stopId": 14984,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 1200,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14687,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 14943,
@@ -2260,7 +2270,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 1207,
+        "stopId": 5602,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2280,7 +2290,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 5874,
+        "stopId": 5226,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14616,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2290,12 +2305,27 @@
         "isForTrams": true
     },
     {
+        "stopId": 14613,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2227,
         "isForBuses": false,
         "isForTrams": true
     },
     {
+        "stopId": 15105,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14497,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14584,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2306,11 +2336,6 @@
     },
     {
         "stopId": 14472,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14583,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2330,17 +2355,22 @@
         "isForTrams": false
     },
     {
-        "stopId": 14974,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1510,
         "isForBuses": true,
         "isForTrams": false
     },
     {
+        "stopId": 5702,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1692,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14878,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2355,17 +2385,12 @@
         "isForTrams": false
     },
     {
+        "stopId": 14947,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1661,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14598,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14599,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2380,12 +2405,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 1203,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5873,
+        "stopId": 14974,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2395,7 +2415,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 14879,
+        "stopId": 1204,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1202,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2405,12 +2430,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 15109,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 15106,
+        "stopId": 1685,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2420,9 +2440,34 @@
         "isForTrams": false
     },
     {
+        "stopId": 1980,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 204,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 1314,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14883,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1208,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14972,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 1050,
@@ -2440,12 +2485,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14569,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5819,
+        "stopId": 14600,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2465,7 +2505,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14876,
+        "stopId": 1209,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2490,6 +2530,11 @@
         "isForTrams": false
     },
     {
+        "stopId": 14530,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1509,
         "isForBuses": true,
         "isForTrams": false
@@ -2510,7 +2555,17 @@
         "isForTrams": false
     },
     {
-        "stopId": 14620,
+        "stopId": 1965,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1205,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1687,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2525,7 +2580,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 1306,
+        "stopId": 1212,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2555,22 +2610,22 @@
         "isForTrams": false
     },
     {
+        "stopId": 1804,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14820,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 175,
+        "stopId": 14683,
         "isForBuses": true,
         "isForTrams": false
     },
     {
         "stopId": 14489,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14650,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2585,22 +2640,32 @@
         "isForTrams": false
     },
     {
+        "stopId": 5811,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1306,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 15023,
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14685,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1981,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1395,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14556,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1216,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2610,12 +2675,27 @@
         "isForTrams": false
     },
     {
+        "stopId": 14570,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 2156,
         "isForBuses": false,
         "isForTrams": true
     },
     {
+        "stopId": 5601,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 8235,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5874,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2630,29 +2710,9 @@
         "isForTrams": false
     },
     {
-        "stopId": 14830,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1264,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 2078,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14619,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5609,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 14482,
@@ -2661,6 +2721,16 @@
     },
     {
         "stopId": 1508,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1961,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1964,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2680,7 +2750,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 15108,
+        "stopId": 1854,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2690,7 +2760,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 1852,
+        "stopId": 5822,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2705,17 +2775,17 @@
         "isForTrams": false
     },
     {
-        "stopId": 14725,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1319,
+        "stopId": 14831,
         "isForBuses": true,
         "isForTrams": false
     },
     {
         "stopId": 14936,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1790,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2735,6 +2805,11 @@
         "isForTrams": false
     },
     {
+        "stopId": 5611,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14845,
         "isForBuses": true,
         "isForTrams": false
@@ -2743,11 +2818,6 @@
         "stopId": 208,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14584,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 1425,
@@ -2765,14 +2835,14 @@
         "isForTrams": false
     },
     {
+        "stopId": 5838,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14537,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 5837,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 1556,
@@ -2790,17 +2860,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 14557,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 7986,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14433,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2810,9 +2870,19 @@
         "isForTrams": false
     },
     {
+        "stopId": 1219,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 211,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 1210,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 1926,
@@ -2825,17 +2895,12 @@
         "isForTrams": true
     },
     {
+        "stopId": 14680,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 8247,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1221,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14727,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2845,17 +2910,12 @@
         "isForTrams": false
     },
     {
+        "stopId": 5834,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1922,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14568,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5611,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2865,17 +2925,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 14609,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1730,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1684,
+        "stopId": 14877,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2885,22 +2940,17 @@
         "isForTrams": false
     },
     {
-        "stopId": 1980,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1983,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 14476,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14689,
+        "stopId": 1970,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14971,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2910,12 +2960,22 @@
         "isForTrams": false
     },
     {
-        "stopId": 1213,
+        "stopId": 14490,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14490,
+        "stopId": 15112,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14724,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 1852,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2925,17 +2985,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 14653,
+        "stopId": 15117,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1217,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14612,
+        "stopId": 14568,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -2943,6 +2998,11 @@
         "stopId": 2160,
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopId": 1957,
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
         "stopId": 2155,
@@ -2955,47 +3015,27 @@
         "isForTrams": false
     },
     {
-        "stopId": 14586,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1674,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1313,
+        "stopId": 14973,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5813,
+        "stopId": 1805,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5814,
+        "stopId": 1319,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14614,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1968,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14618,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1984,
+        "stopId": 14684,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3005,7 +3045,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 15114,
+        "stopId": 14601,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3020,22 +3060,7 @@
         "isForTrams": true
     },
     {
-        "stopId": 14682,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14691,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1309,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5607,
+        "stopId": 5831,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3050,27 +3075,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 1314,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1479,
         "isForBuses": true,
         "isForTrams": false
     },
     {
         "stopId": 14491,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14600,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14578,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3083,11 +3093,6 @@
         "stopId": 14946,
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 5820,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
         "stopId": 14554,
@@ -3125,12 +3130,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14680,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14681,
+        "stopId": 1312,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3145,7 +3145,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 14728,
+        "stopId": 1958,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5869,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3160,12 +3165,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14531,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 191,
+        "stopId": 14617,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3175,12 +3175,17 @@
         "isForTrams": false
     },
     {
+        "stopId": 14886,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1470,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1310,
+        "stopId": 14615,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3195,12 +3200,22 @@
         "isForTrams": false
     },
     {
-        "stopId": 1960,
+        "stopId": 5600,
         "isForBuses": true,
         "isForTrams": false
     },
     {
         "stopId": 14944,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 5839,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14882,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3215,7 +3230,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 15119,
+        "stopId": 14742,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3230,7 +3245,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14723,
+        "stopId": 1789,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3240,17 +3255,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14832,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 7577,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1321,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3270,27 +3275,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 1964,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14741,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5835,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 7432,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14878,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3300,7 +3285,7 @@
         "isForTrams": false
     },
     {
-        "stopId": 14726,
+        "stopId": 5835,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3310,7 +3295,17 @@
         "isForTrams": false
     },
     {
+        "stopId": 14458,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1421,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14688,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3320,32 +3315,32 @@
         "isForTrams": false
     },
     {
-        "stopId": 15111,
+        "stopId": 1962,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15110,
+        "stopId": 1223,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14686,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14457,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14876,
         "isForBuses": true,
         "isForTrams": false
     },
     {
         "stopId": 1792,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14742,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5838,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 5834,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3366,6 +3361,11 @@
     },
     {
         "stopId": 1669,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14879,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3400,12 +3400,12 @@
         "isForTrams": false
     },
     {
-        "stopId": 14690,
+        "stopId": 14609,
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5871,
+        "stopId": 1963,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3416,16 +3416,6 @@
     },
     {
         "stopId": 7997,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14877,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14687,
         "isForBuses": true,
         "isForTrams": false
     },
@@ -3445,6 +3435,11 @@
         "isForTrams": false
     },
     {
+        "stopId": 5814,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 14499,
         "isForBuses": true,
         "isForTrams": false
@@ -3460,11 +3455,6 @@
         "isForTrams": false
     },
     {
-        "stopId": 14683,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
         "stopId": 1127,
         "isForBuses": true,
         "isForTrams": false
@@ -3475,7 +3465,17 @@
         "isForTrams": false
     },
     {
+        "stopId": 14685,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
         "stopId": 1507,
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopId": 14650,
         "isForBuses": true,
         "isForTrams": false
     }

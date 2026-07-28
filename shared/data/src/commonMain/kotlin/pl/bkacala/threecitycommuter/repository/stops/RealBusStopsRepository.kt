@@ -51,10 +51,14 @@ internal class RealBusStopsRepository(
                 }
             emit(
                 busStopsDao.getRealBusStations()
-                    .mapNotNull { entity ->
+                    .map { entity ->
                         val relation = relationsByStopId[entity.stopId]
-                        relation?.let {
-                            entity.toStopData(it.isForBuses, it.isForTrams)
+                        if (relation != null) {
+                            entity.toStopData(relation.isForBuses, relation.isForTrams)
+                        } else if (TransitStopId.providerOf(entity.stopId) == TransitProvider.GDANSK) {
+                            entity.toStopData(isForBuses = true, isForTrams = false)
+                        } else {
+                            entity.toStopData(isForBuses = false, isForTrams = false)
                         }
                     },
             )
