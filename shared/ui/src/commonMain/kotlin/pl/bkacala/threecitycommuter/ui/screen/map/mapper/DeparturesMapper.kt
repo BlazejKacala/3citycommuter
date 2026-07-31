@@ -88,9 +88,9 @@ object DeparturesMapper {
             if (delay > 0) {
                 "opóźnienie ${minutes} min"
             } else {
-                "przyspieszenie ${minutes} min"
+                "przyśpieszenie ${minutes} min"
             }
-        } ?: status
+        }
     }
 
     private fun Departure.selectionKey(): String =

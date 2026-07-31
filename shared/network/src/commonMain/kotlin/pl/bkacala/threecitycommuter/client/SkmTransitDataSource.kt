@@ -5,6 +5,7 @@ import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.transit.supportsLiveVehicleTracking
 import pl.bkacala.threecitycommuter.model.transit.supportsRouteShapes
 import pl.bkacala.threecitycommuter.model.transit.supportsVehicleMetadata
@@ -25,8 +26,8 @@ internal class SkmTransitDataSource(
 
     override suspend fun getStops(): List<BusStopData> = SkmStaticFeed.stops
 
-    override suspend fun getDepartures(stopId: Int): List<Departure> =
-        realtimeDataSource.getDepartures(stopId)
+    override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> =
+        realtimeDataSource.getDepartures(stopKey)
 
     override suspend fun getRouteShape(provider: TransitProvider, routeId: Int, tripId: Int): Route? =
         SkmStaticFeed.routeShapesByTripId[tripId]

@@ -18,6 +18,7 @@ import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclesResponse
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -150,7 +151,7 @@ class TransitDataSourceTest {
             ),
         )
 
-        val departures = dataSource.getDepartures(1015)
+        val departures = dataSource.getDepartures(TransitStopKey(TransitProvider.GDYNIA, 1015))
 
         assertEquals(1, departures.size)
         assertEquals("181", departures.single().lineNumber)
@@ -183,8 +184,8 @@ class TransitDataSourceTest {
 
         val gdanskStop = gdanskDataSource.getStops().single()
         val gdyniaStop = gdyniaDataSource.getStops().single()
-        val gdanskDeparture = gdanskDataSource.getDepartures(gdanskStop.sourceStopId).single()
-        val gdyniaDeparture = gdyniaDataSource.getDepartures(gdyniaStop.sourceStopId).single()
+        val gdanskDeparture = gdanskDataSource.getDepartures(gdanskStop.stopKey).single()
+        val gdyniaDeparture = gdyniaDataSource.getDepartures(gdyniaStop.stopKey).single()
 
         assertEquals(TransitProvider.GDANSK, gdanskStop.provider)
         assertEquals(TransitProvider.GDYNIA, gdyniaStop.provider)
@@ -208,7 +209,7 @@ class TransitDataSourceTest {
         val dataSource = SkmTransitDataSource(MockSkmRealtimeDataSource())
 
         val stops = dataSource.getStops()
-        val departures = dataSource.getDepartures(stops.first().sourceStopId)
+        val departures = dataSource.getDepartures(stops.first().stopKey)
         val route = dataSource.getRouteShape(TransitProvider.SKM, departures.first().routeId, departures.first().tripId)
 
         assertTrue(stops.isNotEmpty())

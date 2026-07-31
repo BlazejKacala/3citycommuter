@@ -77,7 +77,7 @@ fun MapScreen(
             selectedBusStop = state.selectedBusStop,
             trackedVehicle = state.trackedVehicle,
             userLocation = state.userLocation,
-            onBusStopSelected = { viewModel.onAction(MapAction.StopSelected(it.id)) },
+            onBusStopSelected = { viewModel.onAction(MapAction.StopSelected(it.key)) },
             onMapClicked = { viewModel.onAction(MapAction.MapClicked) },
             route = state.route,
             mapBottomPadding = if (state.departures == null) 0.dp else mapBottomPadding.value,

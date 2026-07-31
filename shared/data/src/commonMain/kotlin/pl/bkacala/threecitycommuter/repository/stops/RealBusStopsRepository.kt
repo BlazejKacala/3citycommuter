@@ -16,13 +16,13 @@ import pl.bkacala.threecitycommuter.model.stops.toEntity
 import pl.bkacala.threecitycommuter.model.stops.toStopData
 import pl.bkacala.threecitycommuter.model.stops.toType
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.model.transit.TransitStopId
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
 import pl.bkacala.threecitycommuter.utils.isOlderThenOneDay
 
 private const val BUS_STOPS_KEY = "bus_stops"
 private const val BUS_STOPS_CACHE_VERSION_KEY = "bus_stops_cache_version"
-private const val BUS_STOPS_CACHE_VERSION = 2L
+private const val BUS_STOPS_CACHE_VERSION = 3L
 
 internal class RealBusStopsRepository(
     private val transitDataSource: TransitDataSource,
@@ -46,16 +46,16 @@ internal class RealBusStopsRepository(
                 lastUpdateRepository.putLong(BUS_STOPS_CACHE_VERSION_KEY, BUS_STOPS_CACHE_VERSION)
             }
             val relationsByStopId = busStopsTypesDao.getBusStopsTypes()
-                .associate { entity ->
-                    entity.busStopId to entity.toData()
-                }
+                .map { it.toData() }
+                .associateBy { it.stopKey }
             emit(
                 busStopsDao.getRealBusStations()
                     .map { entity ->
-                        val relation = relationsByStopId[entity.stopId]
+                        val stopData = entity.toStopData(isForBuses = false, isForTrams = false)
+                        val relation = relationsByStopId[stopData.stopKey]
                         if (relation != null) {
                             entity.toStopData(relation.isForBuses, relation.isForTrams)
-                        } else if (TransitStopId.providerOf(entity.stopId) == TransitProvider.GDANSK) {
+                        } else if (TransitProvider.valueOf(entity.provider) == TransitProvider.GDANSK) {
                             entity.toStopData(isForBuses = true, isForTrams = false)
                         } else {
                             entity.toStopData(isForBuses = false, isForTrams = false)
@@ -65,17 +65,13 @@ internal class RealBusStopsRepository(
         }.flowOn(Dispatchers.IO)
     }
 
-    override fun getDepartures(stopId: Int): Flow<List<Departure>> {
+    override fun getDepartures(stopKey: TransitStopKey): Flow<List<Departure>> {
         return flow {
-            emit(transitDataSource.getDepartures(stopId))
+            emit(transitDataSource.getDepartures(stopKey))
         }
     }
 
     override suspend fun storeBusStopsTypes(types: List<BusStopType>) {
-        busStopsTypesDao.upsertBusStopsTypes(
-            types.map { type ->
-                type.copy(stopId = TransitStopId.toAppId(TransitProvider.GDANSK, type.stopId)).toEntity()
-            },
-        )
+        busStopsTypesDao.upsertBusStopsTypes(types.map { it.toEntity() })
     }
 }

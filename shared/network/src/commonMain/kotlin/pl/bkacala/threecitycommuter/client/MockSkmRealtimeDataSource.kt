@@ -2,11 +2,13 @@ package pl.bkacala.threecitycommuter.client
 
 import kotlinx.datetime.Clock
 import pl.bkacala.threecitycommuter.model.departures.Departure
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import kotlin.time.Duration.Companion.minutes
 
 internal class MockSkmRealtimeDataSource : SkmRealtimeDataSource {
 
-    override suspend fun getDepartures(stopId: Int): List<Departure> {
+    override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> {
+        val stopId = stopKey.sourceStopId
         val now = Clock.System.now()
         return departuresByStopId[stopId].orEmpty().mapIndexed { index, seed ->
             val estimatedTime = now + seed.departureInMinutes.minutes

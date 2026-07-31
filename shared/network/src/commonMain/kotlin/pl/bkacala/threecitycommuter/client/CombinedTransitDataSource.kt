@@ -5,7 +5,7 @@ import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.model.transit.TransitStopId
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 
@@ -21,11 +21,8 @@ internal class CombinedTransitDataSource(
     override suspend fun getStops(): List<BusStopData> =
         gdanskDataSource.getStops() + gdyniaDataSource.getStops() + skmDataSource.getStops()
 
-    override suspend fun getDepartures(stopId: Int): List<Departure> {
-        val provider = TransitStopId.providerOf(stopId)
-        val sourceStopId = TransitStopId.sourceIdOf(stopId)
-        return dataSourceFor(provider).getDepartures(sourceStopId)
-    }
+    override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> =
+        dataSourceFor(stopKey.provider).getDepartures(stopKey)
 
     override suspend fun getRouteShape(
         provider: TransitProvider,

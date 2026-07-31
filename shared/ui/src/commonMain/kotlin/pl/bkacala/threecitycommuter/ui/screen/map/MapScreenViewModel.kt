@@ -23,6 +23,7 @@ import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.model.sphericalDistance
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.transit.supportsLiveVehicleTracking
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
 import pl.bkacala.threecitycommuter.repository.location.PermissionChecker
@@ -71,11 +72,11 @@ class MapScreenViewModel(
             MapAction.MapClicked -> clearSelection()
             MapAction.ReloadClicked -> onMapReloadRequest()
             MapAction.CenterOnUserClicked -> centerOnUserPosition()
-            is MapAction.StopSelected -> selectBusStop(action.stopId)
+            is MapAction.StopSelected -> selectBusStop(action.stopKey)
             is MapAction.DepartureSelected -> onSelectDeparture(action.departureKey)
             is MapAction.SearchQueryChanged -> updateSearchQuery(action.query)
             is MapAction.SearchActiveChanged -> updateSearchActive(action.isActive)
-            is MapAction.SearchResultClicked -> selectStopFromSearch(action.stopId)
+            is MapAction.SearchResultClicked -> selectStopFromSearch(action.stopKey)
         }
     }
 
@@ -153,8 +154,8 @@ class MapScreenViewModel(
         }
     }
 
-    private fun selectBusStop(stopId: Int) {
-        currentBusStops().firstOrNull { it.id == stopId }?.let { onBusStopSelected(it) }
+    private fun selectBusStop(stopKey: TransitStopKey) {
+        currentBusStops().firstOrNull { it.key == stopKey }?.let { onBusStopSelected(it) }
     }
 
     private fun onBusStopSelected(selected: BusStopMapItem) {
@@ -206,19 +207,19 @@ class MapScreenViewModel(
     private fun updateDepartures(selected: BusStopMapItem) {
         updateDeparturesJob = viewModelScope.launch {
             while (isActive) {
-                getDeparturesUseCase.getDepartures(selected.id)
+                getDeparturesUseCase.getDepartures(selected.key)
                     .take(1)
                     .catch { throwable ->
                         logError(
                             LOG_TAG,
-                            "Failed to load departures for stopId=${selected.id} stopName=${selected.data.name}",
+                            "Failed to load departures for provider=${selected.data.provider} sourceStopId=${selected.data.sourceStopId} stopName=${selected.data.name}",
                             throwable,
                         )
                         emitError()
                     }
                     .collect { departures ->
                         _uiState.update { state ->
-                            if (state.selectedBusStop?.id != selected.id) {
+                            if (state.selectedBusStop?.key != selected.key) {
                                 state
                             } else {
                                 state.copy(
@@ -341,8 +342,8 @@ class MapScreenViewModel(
         showClosestStationBoard()
     }
 
-    private fun selectStopFromSearch(stopId: Int) {
-        val station = currentBusStops().firstOrNull { it.id == stopId } ?: return
+    private fun selectStopFromSearch(stopKey: TransitStopKey) {
+        val station = currentBusStops().firstOrNull { it.key == stopKey } ?: return
         _uiState.update { it.copy(isSearchActive = false) }
         onBusStopSelected(station)
         viewModelScope.launch {
@@ -376,7 +377,7 @@ class MapScreenViewModel(
                     .sortedBy { it.second }
                     .map { (item, distance) ->
                         SearchResultRowModel(
-                            stopId = item.id,
+                            stopKey = item.key,
                             station = item.data.name,
                             distance = getDistanceString(distance, location),
                             provider = item.data.provider,

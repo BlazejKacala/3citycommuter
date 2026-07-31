@@ -168,7 +168,7 @@ internal fun MapMarkersOverlay(
         val projection = cameraState.projection ?: return@Canvas
 
         stopMarkers.forEach { marker ->
-            if (marker.stop != null && marker.stop.id == selectedBusStop?.id) return@forEach
+            if (marker.stop != null && marker.stop.key == selectedBusStop?.key) return@forEach
 
             val location = projection.screenLocationFromPosition(marker.position.toPosition())
             val center = Offset(location.x.toPx(), location.y.toPx())

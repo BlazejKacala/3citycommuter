@@ -18,10 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.ui.theme.Padding
 
 data class SearchResultRowModel(
-    val stopId: Int,
+    val stopKey: TransitStopKey,
     val station: String,
     val distance: String,
     val provider: TransitProvider,
@@ -30,11 +31,11 @@ data class SearchResultRowModel(
 )
 
 @Composable
-fun SearchResultRowModel.Widget(onClicked: (Int) -> Unit) {
+fun SearchResultRowModel.Widget(onClicked: (TransitStopKey) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClicked(stopId) }
+            .clickable { onClicked(stopKey) }
             .padding(horizontal = Padding.big, vertical = Padding.normal),
         verticalAlignment = Alignment.CenterVertically,
     ) {

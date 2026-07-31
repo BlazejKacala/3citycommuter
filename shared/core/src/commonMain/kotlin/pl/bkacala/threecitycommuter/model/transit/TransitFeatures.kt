@@ -1,5 +1,7 @@
 package pl.bkacala.threecitycommuter.model.transit
 
+import kotlinx.serialization.Serializable
+
 data class TransitFeatures(
     val provider: TransitProvider,
     val supportsLiveVehicleTracking: Boolean,
@@ -7,6 +9,7 @@ data class TransitFeatures(
     val supportsVehicleMetadata: Boolean,
 )
 
+@Serializable
 enum class TransitProvider {
     GDANSK,
     GDYNIA,

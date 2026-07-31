@@ -1,14 +1,13 @@
 package pl.bkacala.threecitycommuter.model.stops
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
-
 @Entity(
     tableName = "bus_stops_types",
+    primaryKeys = ["provider", "sourceStopId"],
 )
 data class BusStopTypeEntity(
-    @PrimaryKey
-    val busStopId: Int,
+    val provider: String,
+    val sourceStopId: Int,
     val isForBuses: Boolean,
     val isForTrams: Boolean,
 )

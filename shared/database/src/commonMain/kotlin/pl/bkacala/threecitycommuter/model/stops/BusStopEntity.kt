@@ -5,10 +5,11 @@ import androidx.room.PrimaryKey
 
 @Entity(
     tableName = "bus_stops",
+    primaryKeys = ["provider", "sourceStopId"],
 )
 data class BusStopEntity(
-    @PrimaryKey
-    val stopId: Int,
+    val provider: String,
+    val sourceStopId: Int,
     val stopCode: String?,
     val stopName: String?,
     val stopShortName: String?,

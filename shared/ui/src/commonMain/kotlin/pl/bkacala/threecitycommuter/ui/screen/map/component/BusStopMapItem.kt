@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
 @Stable
 class BusStopMapItem(
@@ -19,7 +20,7 @@ class BusStopMapItem(
 
     val position = LatLng(busStopItem.stopLat, busStopItem.stopLon)
 
-    val id = busStopItem.stopId
+    val key: TransitStopKey = busStopItem.stopKey
 
     val data = busStopItem
 

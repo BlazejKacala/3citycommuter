@@ -3,7 +3,7 @@ package pl.bkacala.threecitycommuter.client
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.model.transit.TransitStopId
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
 internal object SkmStaticFeed {
     val stops: List<BusStopData> = listOf(
@@ -39,7 +39,7 @@ internal object SkmStaticFeed {
         longitude: Double,
     ): BusStopData =
         BusStopData(
-            stopId = TransitStopId.toAppId(TransitProvider.SKM, sourceStopId),
+            stopKey = TransitStopKey(TransitProvider.SKM, sourceStopId),
             stopCode = sourceStopId.toString(),
             stopName = name,
             stopShortName = name,
