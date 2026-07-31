@@ -89,9 +89,9 @@ object DeparturesMapper {
             return null
         }
         return if (delay > 0) {
-            "opóźnienie ${minutes} min"
+            "opóźnienie $minutes min"
         } else {
-            "przyśpieszenie ${minutes} min"
+            "przyśpieszenie $minutes min"
         }
     }
 
