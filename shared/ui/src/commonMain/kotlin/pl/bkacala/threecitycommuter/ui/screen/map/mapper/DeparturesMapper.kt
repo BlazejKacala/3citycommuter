@@ -83,13 +83,15 @@ object DeparturesMapper {
         }
 
     private fun Departure.statusLabel(): String? {
-        return delayInSeconds?.takeIf { it != 0 }?.let { delay ->
-            val minutes = kotlin.math.abs(delay) / 60
-            if (delay > 0) {
-                "opóźnienie ${minutes} min"
-            } else {
-                "przyśpieszenie ${minutes} min"
-            }
+        val delay = delayInSeconds?.takeIf { it != 0 } ?: return null
+        val minutes = kotlin.math.abs(delay) / 60
+        if (minutes == 0) {
+            return null
+        }
+        return if (delay > 0) {
+            "opóźnienie ${minutes} min"
+        } else {
+            "przyśpieszenie ${minutes} min"
         }
     }
 
