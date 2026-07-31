@@ -1,3482 +1,5570 @@
 [
     {
-        "stopId": 14619,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 114
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5704,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 117
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1553,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 119
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14425,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 120
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14581,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 122
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 171
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 173
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 175
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 191
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 196
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 202
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 203
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 204
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 205
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 208
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 210
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 211
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 213
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2186,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 220
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2018,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 221
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2148,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 292
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 15022,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 300
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14433,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 313
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2011,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 320
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14728,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 390
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2221,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1004
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1424,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1013
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2218,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1015
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2014,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1016
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2169,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1020
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 5832,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1028
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14825,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1033
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 5225,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1037
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1791,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1038
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2036,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1042
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 5812,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1044
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2085,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1050
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14557,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1099
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2223,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1101
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14577,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1102
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2043,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1103
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14982,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1125
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14667,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1126
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2100,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1127
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2020,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1128
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 171,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1129
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8245,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1200
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2058,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1201
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2095,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1202
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14681,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1203
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14610,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1204
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2025,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1205
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1426,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1206
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2056,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1207
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14611,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1208
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14470,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1209
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2038,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1210
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1217,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1211
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8228,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1212
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15088,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1213
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 300,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1214
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2079,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1215
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 5837,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1216
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14955,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1217
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1983,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1218
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2214,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1219
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 15108,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1221
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2013,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1222
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14830,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1223
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14612,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1256
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1028,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1264
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15095,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1306
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2031,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1308
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1422,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1309
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1213,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1310
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2150,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1311
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2171,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1312
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2136,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1313
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2022,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1314
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2147,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1318
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1478,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1319
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14531,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1320
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1390,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1321
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2184,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1382
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2229,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1383
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14740,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1389
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1264,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1390
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2061,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1391
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14480,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1394
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2034,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1395
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 5841,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1396
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1397,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1397
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1960,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1398
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1420,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1411
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 191,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1413
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1925,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1414
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1037,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1415
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2211,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1416
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2097,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1417
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14494,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1418
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1451,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1419
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2007,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1420
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2029,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1421
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2157,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1422
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2216,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1423
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2231,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1424
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1545,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1425
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2019,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1426
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2070,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1447
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2149,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1448
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14977,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1451
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1573,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1465
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2069,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1466
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14986,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1467
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 15123,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1468
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14535,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1469
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2140,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1470
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 213,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1477
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14727,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1478
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2042,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1479
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2089,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1491
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2217,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1492
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2181,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1493
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1969,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1494
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2024,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1503
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1318,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1504
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2213,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1506
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1311,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1507
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2151,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1508
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14723,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1509
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14487,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1510
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2005,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1511
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14815,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1512
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1494,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1513
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7982,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1514
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2094,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1516
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2026,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1525
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14655,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1526
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14526,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1527
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14488,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1528
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14918,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1529
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 7575,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1530
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2091,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1532
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1016,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1533
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1201,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1534
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1477,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1535
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2212,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1536
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1492,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1537
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2142,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1538
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14985,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1540
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2002,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1545
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1675,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1552
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1320,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1553
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14654,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1554
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1555
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1556
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1571
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1572
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1573
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1574
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1661
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1662
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1665
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1666
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1667
+        },
+        "isForBuses": true,
+        "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1668
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 117,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1669
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2009,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1674
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2033,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1675
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1971,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1684
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2044,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1685
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2028,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1686
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1218,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1687
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2225,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1692
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 5608,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1714
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2144,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1715
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2098,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1718
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14725,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1730
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2141,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1750
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1398,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1751
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1382,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1778
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14843,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1779
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2035,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1789
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2040,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1790
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1715,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1791
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2087,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1792
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1222,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1803
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14572,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1804
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5870,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1805
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14693,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1806
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1668,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1840
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1313,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1844
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1844,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1845
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 175,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1852
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2030,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1854
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14620,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1909
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8246,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1922
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14811,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1923
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2146,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1924
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2096,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1925
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1013,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1926
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2006,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1956
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1038,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1957
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14966,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1958
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1256,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1959
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14538,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1960
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2048,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1961
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14822,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1962
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2008,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1963
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 8100,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1964
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2132,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1965
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14618,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1968
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14543,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1969
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14832,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1970
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5701,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1971
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2071,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1979
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2135,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1980
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1684,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1981
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15093,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1983
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14495,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1984
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1321,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1985
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14804,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1998
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 173,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 1999
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2050,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2001
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2015,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2002
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2076,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2005
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2092,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2006
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2172,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2007
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14598,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2173,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2008
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1537,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2175,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2009
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14938,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2163,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2010
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2176,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2011
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14819,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2012
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1572,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2021,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2013
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1207,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2010,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2014
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 8234,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2215,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2015
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14691,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2081,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2016
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14987,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2017
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14741,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1015,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 1984,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14726,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 14950,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2018
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2178,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2019
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1512,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2023,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2020
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2062,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2021
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2088,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2022
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 5604,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 14583,
-        "isForBuses": true,
-        "isForTrams": false
-    },
-    {
-        "stopId": 15107,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 14983,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2023
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2064,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2024
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2046,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2025
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 15119,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2072,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2026
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2073,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2027
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1215,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 14493,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2028
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2224,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2029
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14945,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2030
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14579,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2031
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2189,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2033
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2187,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2034
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2084,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2035
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14573,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2036
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1750,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2037
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14481,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2038
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 15084,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2039
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1686,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2040
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1527,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2041
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14542,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2042
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2194,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2043
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2145,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2044
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2228,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2045
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14575,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2046
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1394,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2047
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14520,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2048
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2057,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2049
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1516,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2050
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14599,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2051
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2052,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2052
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2067,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2054
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 5821,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2055
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2039,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2056
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14969,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2057
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14803,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2058
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1129,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2061
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2012,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2062
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2183,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2063
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2080,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2064
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14541,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2065
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2045,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2066
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1981,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2067
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2161,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2068
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14689,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2069
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 5873,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2070
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14818,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2071
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 15017,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2072
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 5840,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2073
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 7578,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2074
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14460,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2076
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 5606,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2077
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2153,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2078
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2190,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2079
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1033,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2080
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 9001,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2081
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14953,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2082
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2049,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2083
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1099,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2084
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14952,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2085
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1840,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2086
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 8231,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2087
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 15083,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2088
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14621,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2089
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2188,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2090
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1128,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2091
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2222,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2092
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2177,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2093
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2041,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2094
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1044,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2095
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 15110,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2096
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2179,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2097
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2074,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2098
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14429,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2099
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 202,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2100
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2093,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2132
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14887,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2135
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14812,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2136
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14867,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2139
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14428,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2140
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14673,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2141
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1308,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2142
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 7979,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2143
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14967,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2144
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14536,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2145
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1504,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2146
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2226,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2147
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1662,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2148
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2037,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2149
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 5609,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2150
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14905,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2151
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1538,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2153
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2099,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2154
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 5813,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2155
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14544,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2156
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2066,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2157
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2219,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2158
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1525,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2159
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14951,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2160
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2077,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2161
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2195,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2162
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1020,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2163
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 205,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2164
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 15019,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2165
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 15005,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2166
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2027,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2169
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14653,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2171
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1469,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2172
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14868,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2173
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1221,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2174
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2054,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2175
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 15122,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2176
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 15111,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2177
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 5836,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2178
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2068,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2179
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 8265,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2181
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2174,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2183
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 15106,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2184
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 15114,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2186
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1959,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2187
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1203,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2188
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1526,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2189
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14827,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2190
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14545,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2191
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 7427,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2192
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1211,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2193
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2017,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2194
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2191,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2195
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2165,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2196
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1968,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2211
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 114,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2212
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14968,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2213
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1511,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2214
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14614,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2215
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1528,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2216
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1536,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2217
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1714,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2218
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 122,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2219
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 15121,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2221
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14821,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2222
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 15115,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2223
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2001,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2224
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2065,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2225
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 119,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2226
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 390,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2227
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14829,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2228
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2090,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2229
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14424,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2230
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 203,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 2231
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14851,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5225
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1214,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5226
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14682,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5600
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5607,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5601
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15109,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5602
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7987,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5604
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14498,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5606
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1493,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5607
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15116,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5608
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14844,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5609
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5820,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5611
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1309,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5701
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1206,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5702
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 2230,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 1574,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5704
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 2196,
-        "isForBuses": false,
-        "isForTrams": true
-    },
-    {
-        "stopId": 2016,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 14666,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5811
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7993,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5812
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14527,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5813
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 2193,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 1514,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5814
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5819,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5819
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15087,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5820
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8229,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5821
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2047,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5822
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14578,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5831
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14473,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5832
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14569,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5834
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1042,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5835
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1101,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5836
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14547,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5837
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 7576,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5838
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5871,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5839
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1956,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5840
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1985,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5841
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1310,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5869
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14567,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5870
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1979,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5871
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14576,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5873
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8250,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 5874
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2192,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7427
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 8237,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7428
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1103,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7429
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14586,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7430
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1396,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7432
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 292,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7575
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 313,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7576
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14665,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7577
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8244,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7578
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2083,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7979
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1806,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7982
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14496,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7983
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1803,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7986
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2164,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7987
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2139,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7988
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 8236,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7989
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 221,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7990
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 2082,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7991
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14828,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7992
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14690,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7993
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1532,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7994
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14485,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7995
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1004,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7997
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14984,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 7998
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1200,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8100
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14687,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8102
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14943,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8227
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1414,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8228
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7428,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8229
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1413,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8230
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1416,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8231
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5602,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8234
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1125,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8235
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1465,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8236
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14813,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8237
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5226,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8239
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14616,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8244
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2158,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8245
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14613,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8246
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2227,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8247
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 15105,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8248
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14497,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8249
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14584,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8250
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1533,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 8265
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14472,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 9001
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7430,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14424
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2086,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14425
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14478,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14428
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1510,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14429
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5702,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14433
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1692,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14457
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14878,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14458
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2055,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14460
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1448,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 14947,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14470
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1661,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14472
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7989,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14473
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1909,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14474
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14974,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14476
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1751,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14477
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1204,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14478
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1202,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14479
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1503,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14480
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1685,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14481
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1417,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14482
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1980,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14484
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 204,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 1314,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14485
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14883,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14486
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1208,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14487
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14972,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14488
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1050,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14489
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 14546,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 14553,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14490
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14600,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14491
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15086,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14492
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 14954,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 196,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14493
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1209,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14494
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14486,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14495
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14477,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14496
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1383,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14497
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8102,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14498
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14530,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14499
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1509,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14520
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1423,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14521
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 2159,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 1534,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14526
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1965,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14527
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1205,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14530
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1687,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14531
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 320,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14535
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 2051,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14536
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1212,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14537
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 7992,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14538
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14817,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14541
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2162,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14542
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 2143,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14543
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1529,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14544
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1804,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14545
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14820,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14546
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14683,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14547
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14489,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14553
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14814,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14554
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8248,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14556
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5811,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14557
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1306,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14567
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 15023,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 1395,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14568
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14556,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14569
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1216,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14570
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14474,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14572
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14570,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14573
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 2156,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 5601,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14575
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8235,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14576
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5874,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14577
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1419,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14578
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8230,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14579
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2078,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14581
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 14482,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 1508,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14582
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1961,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14583
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1964,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14584
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1466,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14586
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15120,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14587
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1540,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14590
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1854,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14598
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1666,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14599
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5822,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14600
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1530,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14601
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1554,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14609
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14831,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14610
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14936,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14611
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1790,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14612
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14479,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14613
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 2063,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 14492,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14614
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5611,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14615
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14845,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14616
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 208,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 1425,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14617
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14960,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14618
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1126,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14619
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5838,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14620
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14537,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14621
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1556,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14650
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1667,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14653
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2154,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14654
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 7986,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14655
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1389,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14665
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1219,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14666
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 211,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14667
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 1210,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14673
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1926,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14680
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2166,
-        "isForBuses": false,
-        "isForTrams": true
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14681
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 14680,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14682
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8247,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14683
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14582,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14684
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5834,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14685
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1922,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14686
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1535,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14687
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1730,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14688
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14877,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14689
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15085,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14690
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14476,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14691
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1970,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14693
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14971,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14723
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14521,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14724
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14490,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14725
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15112,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14726
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14724,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14727
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1852,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14728
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1391,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14740
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15117,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14741
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14568,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14742
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 2160,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14803
+        },
         "isForBuses": false,
         "isForTrams": true
-    },
-    {
-        "stopId": 1957,
-        "isForBuses": true,
-        "isForTrams": false
     },
     {
-        "stopId": 2155,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14804
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1718,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14811
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1674,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14812
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14973,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14813
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1805,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14814
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1319,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14815
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14684,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14816
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14590,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14817
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14601,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14818
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1923,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14819
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14587,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14820
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 5831,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14821
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 7998,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14822
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 8227,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14825
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14827
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14828
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14829
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1479,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14830
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14491,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14831
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7429,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14832
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14946,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14843
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 14554,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14844
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1924,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14845
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1491,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14851
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1555,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14867
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1998,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14868
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1552,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14876
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7995,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14877
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1312,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14878
+        },
         "isForBuses": true,
         "isForTrams": false
-    },
-    {
-        "stopId": 220,
-        "isForBuses": false,
-        "isForTrams": true
     },
     {
-        "stopId": 14937,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14879
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1958,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14882
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5869,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14883
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1468,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14886
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14942,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14887
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14617,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14905
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1506,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14918
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14886,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14924
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1470,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14936
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14615,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14937
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1415,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14938
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1447,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14939
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5600,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14941
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14944,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14942
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5839,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14943
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14882,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14944
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14816,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14945
+        },
         "isForBuses": false,
         "isForTrams": true
     },
     {
-        "stopId": 1779,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14946
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14742,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14947
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 8239,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14950
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14941,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14951
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1789,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14952
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14484,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14953
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 7577,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14954
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1571,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14955
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1411,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14960
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1845,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14966
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7432,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14967
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1418,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14968
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5835,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14969
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7990,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14970
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14458,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14971
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1421,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14972
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14688,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14973
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14939,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14974
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1962,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14977
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1223,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14982
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14686,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14983
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14457,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14984
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 14876,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14985
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1792,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14986
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 1102,
-        "isForBuses": true,
-        "isForTrams": false
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 14987
+        },
+        "isForBuses": false,
+        "isForTrams": true
     },
     {
-        "stopId": 8249,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15005
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7988,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15017
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1669,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15019
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14879,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15021
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1467,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15022
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 210,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15023
+        },
         "isForBuses": false,
         "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15083
+        },
+        "isForBuses": true,
+        "isForTrams": false
     },
     {
-        "stopId": 120,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15084
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7983,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15085
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 15021,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15086
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1778,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15087
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14609,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15088
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1963,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15093
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14970,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15095
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7997,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15105
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1999,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15106
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7991,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15107
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14924,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15108
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 5814,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15109
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14499,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15110
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1665,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15111
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1513,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15112
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1127,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15114
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 7994,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15115
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14685,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15116
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 1507,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15117
+        },
         "isForBuses": true,
         "isForTrams": false
     },
     {
-        "stopId": 14650,
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15119
+        },
         "isForBuses": true,
         "isForTrams": false
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15120
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15121
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15122
+        },
+        "isForBuses": false,
+        "isForTrams": true
+    },
+    {
+        "stopKey": {
+            "provider": "GDANSK",
+            "sourceStopId": 15123
+        },
+        "isForBuses": false,
+        "isForTrams": true
     }
 ]
