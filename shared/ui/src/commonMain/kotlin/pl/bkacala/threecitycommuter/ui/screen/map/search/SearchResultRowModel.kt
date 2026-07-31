@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsBus
+import androidx.compose.material.icons.filled.Train
 import androidx.compose.material.icons.filled.Tram
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -16,12 +17,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.ui.theme.Padding
 
 data class SearchResultRowModel(
     val stopId: Int,
     val station: String,
     val distance: String,
+    val provider: TransitProvider,
     val isForBuses: Boolean,
     val isForTrams: Boolean,
 )
@@ -35,7 +38,13 @@ fun SearchResultRowModel.Widget(onClicked: (Int) -> Unit) {
             .padding(horizontal = Padding.big, vertical = Padding.normal),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (isForTrams) {
+        if (provider == TransitProvider.SKM) {
+            Icon(
+                imageVector = Icons.Filled.Train,
+                contentDescription = "Stacja kolejowa",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else if (isForTrams) {
             Icon(
                 imageVector = Icons.Filled.Tram,
                 contentDescription = "Przystanek tramwajowy",
@@ -53,7 +62,7 @@ fun SearchResultRowModel.Widget(onClicked: (Int) -> Unit) {
         Column {
             Text(text = station, style = MaterialTheme.typography.titleMedium)
             Text(
-                text = distance,
+                text = if (provider == TransitProvider.SKM) "$distance - SKM" else distance,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

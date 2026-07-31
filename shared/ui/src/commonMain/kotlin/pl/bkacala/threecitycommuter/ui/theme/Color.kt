@@ -18,6 +18,8 @@ val GdanskStopColor = Color(0xFFD62839)
 val GdanskSelectedStopColor = Color(0xFFB71C2D)
 val GdyniaStopColor = Color(0xFF0077C8)
 val GdyniaSelectedStopColor = Color(0xFF005A9C)
+val SkmStopColor = Color(0xFF1B5E20)
+val SkmSelectedStopColor = Color(0xFF0D3B12)
 
 val PrimaryTextLight = Color(0xFF212121)
 val SecondaryTextLight = Color(0x99212121)
@@ -33,6 +35,7 @@ fun stopMarkerColor(
     return when (provider) {
         TransitProvider.GDANSK -> if (isSelected) GdanskSelectedStopColor else GdanskStopColor
         TransitProvider.GDYNIA -> if (isSelected) GdyniaSelectedStopColor else GdyniaStopColor
+        TransitProvider.SKM -> if (isSelected) SkmSelectedStopColor else SkmStopColor
         null -> if (isSelected) DarkPrimaryColor else PrimaryColor
     }
 }

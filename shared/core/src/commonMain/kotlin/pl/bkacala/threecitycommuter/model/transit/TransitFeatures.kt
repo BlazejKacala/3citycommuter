@@ -10,6 +10,7 @@ data class TransitFeatures(
 enum class TransitProvider {
     GDANSK,
     GDYNIA,
+    SKM,
 }
 
 val TransitProvider.supportsLiveVehicleTracking: Boolean

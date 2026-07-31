@@ -3,6 +3,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map.component
 import androidx.compose.runtime.Stable
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 
 @Stable
 class BusStopMapItem(
@@ -13,6 +14,7 @@ class BusStopMapItem(
         Bus,
         Tram,
         Both,
+        Train,
     }
 
     val position = LatLng(busStopItem.stopLat, busStopItem.stopLon)
@@ -22,7 +24,9 @@ class BusStopMapItem(
     val data = busStopItem
 
     fun getStationType(): Type {
-        return if (data.isForBuses && data.isForTrams) {
+        return if (data.provider == TransitProvider.SKM) {
+            Type.Train
+        } else if (data.isForBuses && data.isForTrams) {
             Type.Both
         } else if (data.isForTrams) {
             Type.Tram

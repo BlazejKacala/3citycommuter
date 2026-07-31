@@ -186,6 +186,30 @@ class MapScreenViewModelTest {
             viewModel.onAction(MapAction.ScreenPaused)
         }
 
+    @Test
+    fun `GIVEN SKM stop and departure WHEN departure is selected THEN route loads without GPS tracking`() = runTest {
+        val stop = busStopData(stopId = 101, name = "Sopot", provider = TransitProvider.SKM)
+        val departure = departure(lineNumber = "S1", routeId = 9001, tripId = 9101, vehicleId = null)
+        val viewModel = createViewModel(
+            stopsRepository = FakeBusStopsRepository(stops = listOf(stop), departures = listOf(departure)),
+        )
+
+        advanceTimeBy(150.milliseconds)
+        viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().id))
+        advanceTimeBy(250.milliseconds)
+
+        val departureKey = viewModel.uiState.value.departures?.departures?.first()?.departureKey ?: error("missing departure")
+        viewModel.onAction(MapAction.DepartureSelected(departureKey))
+        advanceTimeBy(250.milliseconds)
+
+        viewModel.uiState.value.selectedBusStop?.data?.provider shouldBe TransitProvider.SKM
+        viewModel.uiState.value.selectedDeparture?.vehicleType shouldBe pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType.Train
+        viewModel.uiState.value.selectedDeparture?.showGpsIndicator shouldBe false
+        viewModel.uiState.value.trackedVehicle shouldBe null
+        viewModel.uiState.value.route shouldNotBe null
+        viewModel.onAction(MapAction.ScreenPaused)
+    }
+
     private fun createViewModel(
         stopsRepository: BusStopsRepository = FakeBusStopsRepository(),
         locationRepository: LocationRepository = FakeLocationRepository(UserLocation.default().copy(isFixed = false)),
@@ -272,6 +296,30 @@ class MapScreenViewModelTest {
             patron = "",
             url = "",
             passengersDoors = 3,
+        )
+
+    private fun departure(
+        lineNumber: String = "6",
+        routeId: Int = 6,
+        tripId: Int = 42,
+        vehicleId: Long? = 1001,
+    ): Departure =
+        Departure(
+            id = "dep-$routeId-$tripId",
+            delayInSeconds = 0,
+            estimatedTime = kotlinx.datetime.Clock.System.now(),
+            headsign = "Test direction",
+            lineNumber = lineNumber,
+            routeId = routeId,
+            scheduledTripStartTime = null,
+            tripId = tripId,
+            status = "PLANOWO",
+            theoreticalTime = kotlinx.datetime.Clock.System.now(),
+            timestamp = kotlinx.datetime.Clock.System.now(),
+            trip = tripId.toLong(),
+            vehicleCode = if (vehicleId != null) 1 else null,
+            vehicleId = vehicleId,
+            vehicleService = lineNumber,
         )
 
     private inner class FakeBusStopsRepository(

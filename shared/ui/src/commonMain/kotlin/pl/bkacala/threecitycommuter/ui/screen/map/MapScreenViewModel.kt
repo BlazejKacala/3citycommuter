@@ -379,6 +379,7 @@ class MapScreenViewModel(
                             stopId = item.id,
                             station = item.data.name,
                             distance = getDistanceString(distance, location),
+                            provider = item.data.provider,
                             isForBuses = item.data.isForBuses,
                             isForTrams = item.data.isForTrams,
                         )

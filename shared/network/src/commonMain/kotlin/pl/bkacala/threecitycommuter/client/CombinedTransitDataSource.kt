@@ -12,13 +12,14 @@ import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 internal class CombinedTransitDataSource(
     private val gdanskDataSource: GdanskTransitDataSource,
     private val gdyniaDataSource: GdyniaTransitDataSource,
+    private val skmDataSource: SkmTransitDataSource,
 ) : TransitDataSource {
 
     override fun features(provider: TransitProvider): TransitFeatures =
         dataSourceFor(provider).features(provider)
 
     override suspend fun getStops(): List<BusStopData> =
-        gdanskDataSource.getStops() + gdyniaDataSource.getStops()
+        gdanskDataSource.getStops() + gdyniaDataSource.getStops() + skmDataSource.getStops()
 
     override suspend fun getDepartures(stopId: Int): List<Departure> {
         val provider = TransitStopId.providerOf(stopId)
@@ -44,6 +45,7 @@ internal class CombinedTransitDataSource(
         return when (provider) {
             TransitProvider.GDANSK -> gdanskDataSource
             TransitProvider.GDYNIA -> gdyniaDataSource
+            TransitProvider.SKM -> skmDataSource
         }
     }
 }

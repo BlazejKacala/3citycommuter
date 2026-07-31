@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.GpsFixed
+import androidx.compose.material.icons.outlined.Train
 import androidx.compose.material.icons.rounded.DirectionsBike
 import androidx.compose.material.icons.rounded.GpsNotFixed
 import androidx.compose.material.icons.rounded.WheelchairPickup
@@ -49,6 +50,7 @@ data class DepartureRowModel(
     val vehicleId: Long?,
     val routeId: Int,
     val tripId: Int,
+    val statusLabel: String?,
 )
 
 @Composable
@@ -100,6 +102,14 @@ fun DepartureRowModel.Widget(
                 accentColor = accentColor,
             )
         }
+    }
+    if (!statusLabel.isNullOrBlank()) {
+        Text(
+            text = statusLabel,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = Padding.large),
+        )
     }
 }
 
@@ -200,6 +210,7 @@ private fun VehicleImage(vehicleType: VehicleType) {
     val image = when (vehicleType) {
         VehicleType.Bus -> Icons.Sharp.DirectionsBusFilled
         VehicleType.Tram -> Icons.Sharp.Tram
+        VehicleType.Train -> Icons.Outlined.Train
     }
 
     Icon(

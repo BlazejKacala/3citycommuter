@@ -55,7 +55,7 @@ fun BoxScope.BusSearchBar(
                         contentDescription = "szukajka",
                     )
                 },
-                placeholder = { Text(text = "Szukaj przystanku") },
+                placeholder = { Text(text = "Szukaj przystanku lub stacji") },
             )
         },
         expanded = isActive,

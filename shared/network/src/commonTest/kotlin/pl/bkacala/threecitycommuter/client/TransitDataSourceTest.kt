@@ -203,6 +203,26 @@ class TransitDataSourceTest {
         assertTrue(gdyniaDeparture.tripId > 0)
     }
 
+    @Test
+    fun `SKM provider exposes stations departures and route shapes without live vehicle tracking`() = runTest {
+        val dataSource = SkmTransitDataSource(MockSkmRealtimeDataSource())
+
+        val stops = dataSource.getStops()
+        val departures = dataSource.getDepartures(stops.first().sourceStopId)
+        val route = dataSource.getRouteShape(TransitProvider.SKM, departures.first().routeId, departures.first().tripId)
+
+        assertTrue(stops.isNotEmpty())
+        assertEquals(TransitProvider.SKM, stops.first().provider)
+        assertTrue(departures.isNotEmpty())
+        assertEquals("S1", departures.first().lineNumber)
+        assertEquals(null, departures.first().vehicleId)
+        assertNotNull(route)
+        assertTrue(route.shape.isNotEmpty())
+        assertEquals(false, dataSource.features(TransitProvider.SKM).supportsLiveVehicleTracking)
+        assertEquals(false, dataSource.features(TransitProvider.SKM).supportsVehicleMetadata)
+        assertEquals(null, dataSource.getVehiclePosition(TransitProvider.SKM, 1))
+    }
+
     private fun fakeGdanskApiClient(): GdanskApiClient =
         object : GdanskApiClient {
             override suspend fun getStops(): GdanskStopsResponse =
