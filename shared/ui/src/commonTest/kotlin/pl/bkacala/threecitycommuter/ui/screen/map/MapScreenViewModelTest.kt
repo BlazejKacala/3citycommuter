@@ -22,7 +22,7 @@ import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.stops.BusStopType
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.model.transit.TransitStopId
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
@@ -95,7 +95,7 @@ class MapScreenViewModelTest {
             val viewModel = createViewModel()
             advanceTimeBy(150.milliseconds)
             val stop = busStopsFrom(viewModel).first()
-            viewModel.onAction(MapAction.StopSelected(stop.id))
+            viewModel.onAction(MapAction.StopSelected(stop.key))
             advanceTimeBy(250.milliseconds)
 
             viewModel.onAction(MapAction.MapClicked)
@@ -115,7 +115,7 @@ class MapScreenViewModelTest {
             val viewModel = createViewModel(stopsRepository = FakeBusStopsRepository(stops = listOf(selectedStop)))
 
             advanceTimeBy(150.milliseconds)
-            viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().id))
+            viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().key))
             advanceTimeBy(250.milliseconds)
 
             viewModel.uiState.value.selectedBusStop?.data shouldBe selectedStop
@@ -178,13 +178,37 @@ class MapScreenViewModelTest {
             advanceTimeBy(150.milliseconds)
 
             viewModel.effects.test {
-                viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().id))
+                viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().key))
 
                 awaitItem() shouldBe MapEffect.ShowError("Nie udało się wczytać danych")
                 cancelAndIgnoreRemainingEvents()
             }
             viewModel.onAction(MapAction.ScreenPaused)
         }
+
+    @Test
+    fun `GIVEN SKM stop and departure WHEN departure is selected THEN route loads without GPS tracking`() = runTest {
+        val stop = busStopData(stopId = 101, name = "Sopot", provider = TransitProvider.SKM)
+        val departure = departure(lineNumber = "S1", routeId = 9001, tripId = 9101, vehicleId = null)
+        val viewModel = createViewModel(
+            stopsRepository = FakeBusStopsRepository(stops = listOf(stop), departures = listOf(departure)),
+        )
+
+        advanceTimeBy(150.milliseconds)
+        viewModel.onAction(MapAction.StopSelected(busStopsFrom(viewModel).first().key))
+        advanceTimeBy(250.milliseconds)
+
+        val departureKey = viewModel.uiState.value.departures?.departures?.first()?.departureKey ?: error("missing departure")
+        viewModel.onAction(MapAction.DepartureSelected(departureKey))
+        advanceTimeBy(250.milliseconds)
+
+        viewModel.uiState.value.selectedBusStop?.data?.provider shouldBe TransitProvider.SKM
+        viewModel.uiState.value.selectedDeparture?.vehicleType shouldBe pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType.Train
+        viewModel.uiState.value.selectedDeparture?.showGpsIndicator shouldBe false
+        viewModel.uiState.value.trackedVehicle shouldBe null
+        viewModel.uiState.value.route shouldNotBe null
+        viewModel.onAction(MapAction.ScreenPaused)
+    }
 
     private fun createViewModel(
         stopsRepository: BusStopsRepository = FakeBusStopsRepository(),
@@ -217,7 +241,7 @@ class MapScreenViewModelTest {
         provider: TransitProvider = TransitProvider.GDANSK,
     ): BusStopData =
         BusStopData(
-            stopId = TransitStopId.toAppId(provider, stopId),
+            stopKey = TransitStopKey(provider, stopId),
             stopCode = "SC$stopId",
             stopName = name,
             stopShortName = name,
@@ -274,6 +298,30 @@ class MapScreenViewModelTest {
             passengersDoors = 3,
         )
 
+    private fun departure(
+        lineNumber: String = "6",
+        routeId: Int = 6,
+        tripId: Int = 42,
+        vehicleId: Long? = 1001,
+    ): Departure =
+        Departure(
+            id = "dep-$routeId-$tripId",
+            delayInSeconds = 0,
+            estimatedTime = kotlinx.datetime.Clock.System.now(),
+            headsign = "Test direction",
+            lineNumber = lineNumber,
+            routeId = routeId,
+            scheduledTripStartTime = null,
+            tripId = tripId,
+            status = "PLANOWO",
+            theoreticalTime = kotlinx.datetime.Clock.System.now(),
+            timestamp = kotlinx.datetime.Clock.System.now(),
+            trip = tripId.toLong(),
+            vehicleCode = if (vehicleId != null) 1 else null,
+            vehicleId = vehicleId,
+            vehicleService = lineNumber,
+        )
+
     private inner class FakeBusStopsRepository(
         private val stops: List<BusStopData> = listOf(busStopData()),
         private val departures: List<Departure> = emptyList(),
@@ -289,7 +337,7 @@ class MapScreenViewModelTest {
             emit(stops)
         }
 
-        override fun getDepartures(stopId: Int): Flow<List<Departure>> = flow {
+        override fun getDepartures(stopKey: TransitStopKey): Flow<List<Departure>> = flow {
             delay(100)
             departuresError?.let { throw it }
             emit(departures)

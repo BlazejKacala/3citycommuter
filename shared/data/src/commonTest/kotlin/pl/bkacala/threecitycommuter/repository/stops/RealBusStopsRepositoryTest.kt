@@ -11,7 +11,7 @@ import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.stops.BusStopTypeEntity
 import pl.bkacala.threecitycommuter.model.stops.toEntity
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.model.transit.TransitStopId
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
@@ -29,7 +29,14 @@ class RealBusStopsRepositoryTest {
             mutableListOf(createStop(101, TransitProvider.GDANSK, isForBuses = false, isForTrams = true).toEntity()),
         )
         val busStopsTypesDao = FakeBusStopsTypesDao(
-            mutableListOf(BusStopTypeEntity(gdanskStop.stopId, isForBuses = false, isForTrams = true)),
+            mutableListOf(
+                BusStopTypeEntity(
+                    provider = gdanskStop.provider.name,
+                    sourceStopId = gdanskStop.sourceStopId,
+                    isForBuses = false,
+                    isForTrams = true,
+                ),
+            ),
         )
         val lastUpdateRepository = FakeLastUpdateRepository(
             timestamps = mutableMapOf("bus_stops" to Long.MAX_VALUE),
@@ -44,12 +51,12 @@ class RealBusStopsRepositoryTest {
 
         repository.getBusStops().test {
             val stops = awaitItem()
-            assertEquals(listOf(gdanskStop.stopId, gdyniaStop.stopId), stops.map { it.stopId })
+            assertEquals(listOf(gdanskStop.stopKey, gdyniaStop.stopKey), stops.map { it.stopKey })
             awaitComplete()
         }
 
         assertEquals(1, transitDataSource.getStopsCalls)
-        assertEquals(2L, lastUpdateRepository.values["bus_stops_cache_version"])
+        assertEquals(3L, lastUpdateRepository.values["bus_stops_cache_version"])
     }
 
     @Test
@@ -81,7 +88,7 @@ class RealBusStopsRepositoryTest {
         isForTrams: Boolean,
     ): BusStopData {
         return BusStopData(
-            stopId = TransitStopId.toAppId(provider, sourceStopId),
+            stopKey = TransitStopKey(provider, sourceStopId),
             stopCode = sourceStopId.toString(),
             stopName = "Stop $sourceStopId",
             stopShortName = null,
@@ -115,13 +122,13 @@ private class FakeBusStopsDao(
 
     override suspend fun upsertBusStations(stops: List<pl.bkacala.threecitycommuter.model.stops.BusStopEntity>) {
         stops.forEach { stop ->
-            entities.removeAll { it.stopId == stop.stopId }
+            entities.removeAll { it.provider == stop.provider && it.sourceStopId == stop.sourceStopId }
             entities.add(stop)
         }
     }
 
     override suspend fun getRealBusStations(): List<pl.bkacala.threecitycommuter.model.stops.BusStopEntity> {
-        return entities.sortedBy { it.stopId }
+        return entities.sortedWith(compareBy({ it.provider }, { it.sourceStopId }))
     }
 }
 
@@ -131,13 +138,13 @@ private class FakeBusStopsTypesDao(
 
     override suspend fun upsertBusStopsTypes(types: List<BusStopTypeEntity>) {
         types.forEach { type ->
-            entities.removeAll { it.busStopId == type.busStopId }
+            entities.removeAll { it.provider == type.provider && it.sourceStopId == type.sourceStopId }
             entities.add(type)
         }
     }
 
     override suspend fun getBusStopsTypes(): List<BusStopTypeEntity> {
-        return entities.sortedBy { it.busStopId }
+        return entities.sortedWith(compareBy({ it.provider }, { it.sourceStopId }))
     }
 }
 
@@ -176,7 +183,7 @@ private class FakeTransitDataSource(
         return stops
     }
 
-    override suspend fun getDepartures(stopId: Int): List<Departure> = emptyList()
+    override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> = emptyList()
 
     override suspend fun getRouteShape(
         provider: TransitProvider,

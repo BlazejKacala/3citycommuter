@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +29,7 @@ fun BoxScope.BusSearchBar(
     results: List<SearchResultRowModel>,
     onQueryChange: (String) -> Unit,
     onExpandedChange: (Boolean) -> Unit,
-    onResultClick: (Int) -> Unit,
+    onResultClick: (TransitStopKey) -> Unit,
 ) {
     SearchBar(
         inputField = {
@@ -55,7 +56,7 @@ fun BoxScope.BusSearchBar(
                         contentDescription = "szukajka",
                     )
                 },
-                placeholder = { Text(text = "Szukaj przystanku") },
+                placeholder = { Text(text = "Szukaj przystanku lub stacji") },
             )
         },
         expanded = isActive,

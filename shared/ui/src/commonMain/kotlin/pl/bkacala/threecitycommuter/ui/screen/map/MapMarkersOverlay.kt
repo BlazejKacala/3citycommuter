@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DirectionsBus
+import androidx.compose.material.icons.outlined.Train
 import androidx.compose.material.icons.outlined.Tram
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,17 +54,18 @@ internal data class StopMapMarker(
 
 internal fun List<BusStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapMarker> {
     val stopsWithIndex = withIndex().toList()
+    val (skmStops, otherStops) = stopsWithIndex.partition { it.value.data.provider == TransitProvider.SKM }
     val groups = if (zoom >= STOPS_UNCLUSTERED_ZOOM) {
         stopsWithIndex.map { listOf(it) }
     } else {
         val longitudeCellSize = 360.0 / 2.0.pow(zoom) * CLUSTER_RADIUS_TILE_FRACTION
         val latitudeCellSize = longitudeCellSize * cos(MAP_REFERENCE_LATITUDE * PI / 180.0)
-        stopsWithIndex.groupBy { indexedStop ->
+        otherStops.groupBy { indexedStop ->
             Pair(
                 floor(indexedStop.value.position.longitude / longitudeCellSize).toLong(),
                 floor(indexedStop.value.position.latitude / latitudeCellSize).toLong(),
             )
-        }.values
+        }.values + skmStops.map { listOf(it) }
     }
 
     return groups.map { group ->
@@ -127,6 +129,7 @@ internal fun MapMarkersOverlay(
 ) {
     val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
     val tramPainter = rememberVectorPainter(Icons.Outlined.Tram)
+    val trainPainter = rememberVectorPainter(Icons.Outlined.Train)
     val textMeasurer = rememberTextMeasurer()
     val animatedVehiclePosition = remember { Animatable(Offset.Zero, OffsetVectorConverter) }
     var animatedVehicleNumber by remember { mutableStateOf<String?>(null) }
@@ -165,7 +168,7 @@ internal fun MapMarkersOverlay(
         val projection = cameraState.projection ?: return@Canvas
 
         stopMarkers.forEach { marker ->
-            if (marker.stop != null && marker.stop.id == selectedBusStop?.id) return@forEach
+            if (marker.stop != null && marker.stop.key == selectedBusStop?.key) return@forEach
 
             val location = projection.screenLocationFromPosition(marker.position.toPosition())
             val center = Offset(location.x.toPx(), location.y.toPx())
@@ -201,6 +204,7 @@ internal fun MapMarkersOverlay(
             } else {
                 val painter = when (marker.stop.getStationType()) {
                     BusStopMapItem.Type.Tram -> tramPainter
+                    BusStopMapItem.Type.Train -> trainPainter
                     else -> busPainter
                 }
                 val iconSize = STOP_ICON_SIZE.toPx()
@@ -231,6 +235,7 @@ internal fun MapMarkersOverlay(
                 )
                 val painter = when (stop.getStationType()) {
                     BusStopMapItem.Type.Tram -> tramPainter
+                    BusStopMapItem.Type.Train -> trainPainter
                     else -> busPainter
                 }
                 val iconSize = SELECTED_STOP_ICON_SIZE.toPx()
@@ -279,6 +284,7 @@ internal fun MapMarkersOverlay(
                 val painter = when (vehicle.type) {
                     VehicleType.Tram -> tramPainter
                     VehicleType.Bus -> busPainter
+                    VehicleType.Train -> trainPainter
                 }
                 translate(
                     left = topLeft.x + borderWidth + VEHICLE_HORIZONTAL_PADDING.toPx(),

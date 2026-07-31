@@ -1,10 +1,15 @@
 package pl.bkacala.threecitycommuter.model.stops
 
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
 fun BusStopEntity.toStopData(isForBuses: Boolean, isForTrams: Boolean): BusStopData {
     return BusStopData(
-        stopId = this.stopId,
+        stopKey = TransitStopKey(
+            provider = TransitProvider.valueOf(this.provider),
+            sourceStopId = this.sourceStopId,
+        ),
         stopCode = this.stopCode,
         stopName = this.stopName,
         stopShortName = this.stopShortName,
@@ -38,7 +43,8 @@ fun GdanskStopResponse.toBusStopData(
 
 fun GdanskStopResponse.toEntity(): BusStopEntity {
     return BusStopEntity(
-        stopId = this.stopId,
+        provider = TransitProvider.GDANSK.name,
+        sourceStopId = this.stopId,
         stopCode = this.stopCode,
         stopName = this.stopName,
         stopShortName = this.stopShortName,
@@ -65,7 +71,8 @@ fun GdanskStopResponse.toEntity(): BusStopEntity {
 
 fun BusStopData.toEntity(): BusStopEntity {
     return BusStopEntity(
-        stopId = this.stopId,
+        provider = this.provider.name,
+        sourceStopId = this.sourceStopId,
         stopCode = this.stopCode,
         stopName = this.stopName,
         stopShortName = this.stopShortName,
@@ -92,7 +99,8 @@ fun BusStopData.toEntity(): BusStopEntity {
 
 fun BusStopType.toEntity(): BusStopTypeEntity {
     return BusStopTypeEntity(
-        busStopId = this.stopId,
+        provider = this.stopKey.provider.name,
+        sourceStopId = this.stopKey.sourceStopId,
         isForBuses = this.isForBuses,
         isForTrams = this.isForTrams,
     )
@@ -100,7 +108,7 @@ fun BusStopType.toEntity(): BusStopTypeEntity {
 
 fun BusStopData.toType(): BusStopType {
     return BusStopType(
-        stopId = this.stopId,
+        stopKey = this.stopKey,
         isForBuses = this.isForBuses,
         isForTrams = this.isForTrams,
     )
@@ -108,7 +116,10 @@ fun BusStopData.toType(): BusStopType {
 
 fun BusStopTypeEntity.toData(): BusStopType {
     return BusStopType(
-        stopId = this.busStopId,
+        stopKey = TransitStopKey(
+            provider = TransitProvider.valueOf(this.provider),
+            sourceStopId = this.sourceStopId,
+        ),
         isForBuses = this.isForBuses,
         isForTrams = this.isForTrams,
     )

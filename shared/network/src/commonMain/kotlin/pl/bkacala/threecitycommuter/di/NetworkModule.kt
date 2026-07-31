@@ -15,6 +15,9 @@ import pl.bkacala.threecitycommuter.client.GdyniaGtfsPreloader
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsStore
 import pl.bkacala.threecitycommuter.client.GdyniaTransitDataSource
 import pl.bkacala.threecitycommuter.client.KtorGdanskApiClient
+import pl.bkacala.threecitycommuter.client.MockSkmRealtimeDataSource
+import pl.bkacala.threecitycommuter.client.SkmRealtimeDataSource
+import pl.bkacala.threecitycommuter.client.SkmTransitDataSource
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.client.ZipEntryReader
 
@@ -50,5 +53,7 @@ val networkModule = module {
     single<GdyniaGtfsPreloader> { get<GdyniaGtfsStore>() }
     single { GdanskTransitDataSource(get()) }
     single { GdyniaTransitDataSource(get(), get(), get()) }
-    single<TransitDataSource> { CombinedTransitDataSource(get(), get()) }
+    single<SkmRealtimeDataSource> { MockSkmRealtimeDataSource() }
+    single { SkmTransitDataSource(get()) }
+    single<TransitDataSource> { CombinedTransitDataSource(get(), get(), get()) }
 }

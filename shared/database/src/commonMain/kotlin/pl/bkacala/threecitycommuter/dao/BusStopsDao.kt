@@ -11,6 +11,6 @@ interface BusStopsDao {
     @Upsert
     suspend fun upsertBusStations(stops: List<BusStopEntity>)
 
-    @Query("SELECT * FROM bus_stops WHERE virtual = 0")
+    @Query("SELECT * FROM bus_stops WHERE virtual = 0 ORDER BY provider, sourceStopId")
     suspend fun getRealBusStations(): List<BusStopEntity>
 }

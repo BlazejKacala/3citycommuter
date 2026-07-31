@@ -13,7 +13,7 @@ import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.model.transit.TransitStopId
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.transit.supportsLiveVehicleTracking
 import pl.bkacala.threecitycommuter.model.transit.supportsRouteShapes
 import pl.bkacala.threecitycommuter.model.transit.supportsVehicleMetadata
@@ -36,8 +36,8 @@ internal class GdanskTransitDataSource(
     override suspend fun getStops(): List<BusStopData> =
         gdanskApiClient.getStops().stops.map { it.toBusStopData(isForBuses = true, isForTrams = true) }
 
-    override suspend fun getDepartures(stopId: Int): List<Departure> =
-        gdanskApiClient.getDepartures(stopId).departures.map { it.toDepartureData() }
+    override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> =
+        gdanskApiClient.getDepartures(stopKey.sourceStopId).departures.map { it.toDepartureData() }
 
     override suspend fun getRouteShape(provider: TransitProvider, routeId: Int, tripId: Int): Route {
         val dateString =
@@ -59,7 +59,7 @@ private fun GdanskStopResponse.toBusStopData(
     isForTrams: Boolean,
 ): BusStopData {
     return BusStopData(
-        stopId = TransitStopId.toAppId(TransitProvider.GDANSK, stopId),
+        stopKey = TransitStopKey(TransitProvider.GDANSK, stopId),
         stopCode = stopCode,
         stopName = stopName,
         stopShortName = stopShortName,

@@ -18,6 +18,7 @@ import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclesResponse
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -150,7 +151,7 @@ class TransitDataSourceTest {
             ),
         )
 
-        val departures = dataSource.getDepartures(1015)
+        val departures = dataSource.getDepartures(TransitStopKey(TransitProvider.GDYNIA, 1015))
 
         assertEquals(1, departures.size)
         assertEquals("181", departures.single().lineNumber)
@@ -183,8 +184,8 @@ class TransitDataSourceTest {
 
         val gdanskStop = gdanskDataSource.getStops().single()
         val gdyniaStop = gdyniaDataSource.getStops().single()
-        val gdanskDeparture = gdanskDataSource.getDepartures(gdanskStop.sourceStopId).single()
-        val gdyniaDeparture = gdyniaDataSource.getDepartures(gdyniaStop.sourceStopId).single()
+        val gdanskDeparture = gdanskDataSource.getDepartures(gdanskStop.stopKey).single()
+        val gdyniaDeparture = gdyniaDataSource.getDepartures(gdyniaStop.stopKey).single()
 
         assertEquals(TransitProvider.GDANSK, gdanskStop.provider)
         assertEquals(TransitProvider.GDYNIA, gdyniaStop.provider)
@@ -201,6 +202,26 @@ class TransitDataSourceTest {
         assertTrue(gdyniaDeparture.routeId > 0)
         assertTrue(gdanskDeparture.tripId > 0)
         assertTrue(gdyniaDeparture.tripId > 0)
+    }
+
+    @Test
+    fun `SKM provider exposes stations departures and route shapes without live vehicle tracking`() = runTest {
+        val dataSource = SkmTransitDataSource(MockSkmRealtimeDataSource())
+
+        val stops = dataSource.getStops()
+        val departures = dataSource.getDepartures(stops.first().stopKey)
+        val route = dataSource.getRouteShape(TransitProvider.SKM, departures.first().routeId, departures.first().tripId)
+
+        assertTrue(stops.isNotEmpty())
+        assertEquals(TransitProvider.SKM, stops.first().provider)
+        assertTrue(departures.isNotEmpty())
+        assertEquals("S1", departures.first().lineNumber)
+        assertEquals(null, departures.first().vehicleId)
+        assertNotNull(route)
+        assertTrue(route.shape.isNotEmpty())
+        assertEquals(false, dataSource.features(TransitProvider.SKM).supportsLiveVehicleTracking)
+        assertEquals(false, dataSource.features(TransitProvider.SKM).supportsVehicleMetadata)
+        assertEquals(null, dataSource.getVehiclePosition(TransitProvider.SKM, 1))
     }
 
     private fun fakeGdanskApiClient(): GdanskApiClient =

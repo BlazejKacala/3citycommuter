@@ -7,6 +7,7 @@ import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.stops.BusStopType
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.tools.makeRandomInstance
 
@@ -25,7 +26,7 @@ object MockBusStopsRepository {
             )
         }
 
-        override fun getDepartures(stopId: Int): Flow<List<Departure>> = flow {
+        override fun getDepartures(stopKey: TransitStopKey): Flow<List<Departure>> = flow {
             delay(100)
             emit(listOf(makeRandomInstance<Departure>()))
         }

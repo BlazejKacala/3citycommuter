@@ -4,6 +4,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.supportsLiveVehicleTracking
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
@@ -36,7 +37,12 @@ object DeparturesMapper {
             ),
             departures = departures.map {
                 val (departure, vehicle) = it
-                departure.mapToUiRow(vehicle, selectedDepartureKey, busStopData.provider.supportsLiveVehicleTracking)
+                departure.mapToUiRow(
+                    vehicle = vehicle,
+                    selectedDepartureKey = selectedDepartureKey,
+                    supportsLiveTracking = busStopData.provider.supportsLiveVehicleTracking,
+                    provider = busStopData.provider,
+                )
             },
         )
     }
@@ -45,6 +51,7 @@ object DeparturesMapper {
         vehicle: Vehicle?,
         selectedDepartureKey: String?,
         supportsLiveTracking: Boolean,
+        provider: TransitProvider,
     ): DepartureRowModel {
         val now = Clock.System.now().epochSeconds
         val minutesToArrival = minutesToArrival(this.estimatedTime, now)
@@ -53,7 +60,7 @@ object DeparturesMapper {
         return DepartureRowModel(
             departureKey = departureKey,
             isNear = minutesToArrival == 0,
-            vehicleType = if (this.routeId < 100) VehicleType.Tram else VehicleType.Bus,
+            vehicleType = vehicleType(provider),
             departureTime = departureTime(minutesToArrival),
             lineNumber = this.lineNumber,
             direction = this.headsign ?: "",
@@ -65,7 +72,27 @@ object DeparturesMapper {
             vehicleId = this.vehicleId,
             routeId = this.routeId,
             tripId = this.tripId,
+            statusLabel = statusLabel(),
         )
+    }
+
+    private fun Departure.vehicleType(provider: TransitProvider): VehicleType =
+        when (provider) {
+            TransitProvider.SKM -> VehicleType.Train
+            TransitProvider.GDANSK, TransitProvider.GDYNIA -> if (this.routeId < 100) VehicleType.Tram else VehicleType.Bus
+        }
+
+    private fun Departure.statusLabel(): String? {
+        val delay = delayInSeconds?.takeIf { it != 0 } ?: return null
+        val minutes = kotlin.math.abs(delay) / 60
+        if (minutes == 0) {
+            return null
+        }
+        return if (delay > 0) {
+            "opóźnienie $minutes min"
+        } else {
+            "przyśpieszenie $minutes min"
+        }
     }
 
     private fun Departure.selectionKey(): String =

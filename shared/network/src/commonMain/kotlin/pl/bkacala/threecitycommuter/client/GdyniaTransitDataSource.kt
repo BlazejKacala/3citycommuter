@@ -24,7 +24,7 @@ import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.model.transit.TransitStopId
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.transit.supportsLiveVehicleTracking
 import pl.bkacala.threecitycommuter.model.transit.supportsRouteShapes
 import pl.bkacala.threecitycommuter.model.transit.supportsVehicleMetadata
@@ -52,7 +52,7 @@ internal class GdyniaTransitDataSource(
         val body = httpClient.get(STOPS_URL).body<String>()
         return json.decodeFromString<List<GdyniaStopNetworkData>>(body).map { stop ->
             BusStopData(
-                stopId = TransitStopId.toAppId(TransitProvider.GDYNIA, stop.stopId),
+                stopKey = TransitStopKey(TransitProvider.GDYNIA, stop.stopId),
                 stopCode = stop.stopCode,
                 stopName = stop.stopName,
                 stopShortName = stop.stopName,
@@ -80,7 +80,8 @@ internal class GdyniaTransitDataSource(
         }
     }
 
-    override suspend fun getDepartures(stopId: Int): List<Departure> {
+    override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> {
+        val stopId = stopKey.sourceStopId
         val body = httpClient.get("$DELAYS_URL?stopId=$stopId").body<String>()
         val payload = json.decodeFromString<GdyniaDelayResponse>(body)
         val baseDateTime = payload.lastUpdate.toLocalDateTime()
