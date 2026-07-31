@@ -156,9 +156,10 @@ internal class GdyniaGtfsStore(
 
     private suspend fun loadNetworkCacheOrNull(): FullCache? {
         val networkSnapshot = try {
-            downloadSnapshot().also { snapshot ->
-                persistSnapshot(snapshot)
-                logInfo(LOG_TAG, "Loaded Gdynia GTFS snapshot from network")
+            downloadSnapshot().let { snapshot ->
+                persistSnapshot(snapshot).also {
+                    logInfo(LOG_TAG, "Loaded Gdynia GTFS snapshot from network")
+                }
             }
         } catch (throwable: Throwable) {
             logError(LOG_TAG, "Failed to download or parse Gdynia GTFS data", throwable)
@@ -201,37 +202,36 @@ internal class GdyniaGtfsStore(
 
     private suspend fun downloadSnapshot(): GdyniaGtfsSnapshot {
         val tripsBody = httpClient.get(TRIPS_URL).body<String>()
-        val gtfsZip = httpClient.get(GTFS_ZIP_URL).body<ByteArray>()
-        return GdyniaGtfsSnapshot(
+        return snapshotStorage.writeDownloadedSnapshot(
             tripsBody = tripsBody,
-            gtfsZip = gtfsZip,
             downloadedAtEpochMilliseconds = Clock.System.now().toEpochMilliseconds(),
+            downloadGtfsZipToPath = { filePath ->
+                downloadUrlToFile(httpClient, GTFS_ZIP_URL, filePath)
+            },
+            downloadGtfsZipToBytes = {
+                httpClient.get(GTFS_ZIP_URL).body<ByteArray>()
+            },
         )
     }
 
-    private suspend fun persistSnapshot(snapshot: GdyniaGtfsSnapshot) {
-        try {
+    private suspend fun persistSnapshot(snapshot: GdyniaGtfsSnapshot): GdyniaGtfsSnapshot {
+        return try {
             snapshotStorage.writeSnapshot(snapshot)
         } catch (throwable: Throwable) {
             logError(LOG_TAG, "Failed to persist Gdynia GTFS snapshot", throwable)
+            snapshot
         }
     }
 
     private fun buildFullCache(snapshot: GdyniaGtfsSnapshot): FullCache {
-        val trips = json.decodeFromString<List<GdyniaTripNetworkData>>(snapshot.tripsBody)
-        val shapesText = zipEntryReader.readEntry(snapshot.gtfsZip, SHAPES_ENTRY_NAME)
-            ?: error("Missing $SHAPES_ENTRY_NAME in Gdynia GTFS archive")
-        val stopTimesText = zipEntryReader.readEntry(snapshot.gtfsZip, STOP_TIMES_ENTRY_NAME)
-            ?: error("Missing $STOP_TIMES_ENTRY_NAME in Gdynia GTFS archive")
-
         return FullCache(
             downloadedAt = snapshot.downloadedAtEpochMilliseconds?.let(Instant::fromEpochMilliseconds),
             departure = DepartureCache(
-                stopTimesByStopId = parseStopTimes(stopTimesText),
+                stopTimesByStopId = parseStopTimes(snapshot),
             ),
             shape = ShapeCache(
-                shapeIdByTripId = trips.associate { it.tripId to it.shapeId },
-                routeByShapeId = parseShapes(shapesText),
+                shapeIdByTripId = parseTrips(snapshot.tripsBody),
+                routeByShapeId = parseShapes(snapshot),
             ),
         )
     }
@@ -253,34 +253,34 @@ internal class GdyniaGtfsStore(
         downloadedAt = fullCache.downloadedAt
     }
 
-    private fun parseShapes(content: String): Map<Int, Route> {
-        val linesIterator = content.lineSequence()
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .iterator()
-        if (!linesIterator.hasNext()) {
-            return emptyMap()
-        }
+    private fun parseTrips(content: String): Map<Int, Int> =
+        json.decodeFromString<List<GdyniaTripNetworkData>>(content)
+            .associate { it.tripId to it.shapeId }
 
-        val header = linesIterator.next().parseCsvLine()
-        val shapeIdIndex = header.indexOf("shape_id")
-        val latIndex = header.indexOf("shape_pt_lat")
-        val lonIndex = header.indexOf("shape_pt_lon")
-        val sequenceIndex = header.indexOf("shape_pt_sequence")
-        if (shapeIdIndex == -1 || latIndex == -1 || lonIndex == -1 || sequenceIndex == -1) {
-            logError(LOG_TAG, "Invalid shapes.txt header, required columns are missing")
-            return emptyMap()
-        }
-
+    private fun parseShapes(snapshot: GdyniaGtfsSnapshot): Map<Int, Route> {
         val pointsByShapeId = mutableMapOf<Int, MutableList<ShapePoint>>()
+        var shapeIdIndex = -1
+        var latIndex = -1
+        var lonIndex = -1
+        var sequenceIndex = -1
 
-        while (linesIterator.hasNext()) {
-            val line = linesIterator.next()
+        val entryRead = readGtfsEntryLines(snapshot, SHAPES_ENTRY_NAME) { rawLine ->
+            val line = rawLine.trim()
+            if (line.isEmpty()) {
+                return@readGtfsEntryLines
+            }
             val columns = line.parseCsvLine()
-            val shapeId = columns.getOrNull(shapeIdIndex)?.toIntOrNull() ?: continue
-            val latitude = columns.getOrNull(latIndex)?.toDoubleOrNull() ?: continue
-            val longitude = columns.getOrNull(lonIndex)?.toDoubleOrNull() ?: continue
-            val sequence = columns.getOrNull(sequenceIndex)?.toIntOrNull() ?: continue
+            if (shapeIdIndex == -1) {
+                shapeIdIndex = columns.indexOf("shape_id")
+                latIndex = columns.indexOf("shape_pt_lat")
+                lonIndex = columns.indexOf("shape_pt_lon")
+                sequenceIndex = columns.indexOf("shape_pt_sequence")
+                return@readGtfsEntryLines
+            }
+            val shapeId = columns.getOrNull(shapeIdIndex)?.toIntOrNull() ?: return@readGtfsEntryLines
+            val latitude = columns.getOrNull(latIndex)?.toDoubleOrNull() ?: return@readGtfsEntryLines
+            val longitude = columns.getOrNull(lonIndex)?.toDoubleOrNull() ?: return@readGtfsEntryLines
+            val sequence = columns.getOrNull(sequenceIndex)?.toIntOrNull() ?: return@readGtfsEntryLines
             val point = ShapePoint(
                 shapeId = shapeId,
                 sequence = sequence,
@@ -288,42 +288,46 @@ internal class GdyniaGtfsStore(
             )
             pointsByShapeId.getOrPut(shapeId) { mutableListOf() }.add(point)
         }
+        if (!entryRead) {
+            error("Missing $SHAPES_ENTRY_NAME in Gdynia GTFS archive")
+        }
+        if (shapeIdIndex == -1 || latIndex == -1 || lonIndex == -1 || sequenceIndex == -1) {
+            logError(LOG_TAG, "Invalid shapes.txt header, required columns are missing")
+            return emptyMap()
+        }
 
         return pointsByShapeId.mapValues { (_, points) ->
             Route(points.sortedBy { it.sequence }.map { it.point })
         }
     }
 
-    private fun parseStopTimes(content: String): Map<Int, List<StopTimeLookup>> {
-        val linesIterator = content.lineSequence()
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .iterator()
-        if (!linesIterator.hasNext()) {
-            return emptyMap()
-        }
-
-        val header = linesIterator.next().parseCsvLine()
-        val tripIdIndex = header.indexOf("tripId").takeIf { it != -1 } ?: header.indexOf("trip_id")
-        val departureTimeIndex =
-            header.indexOf("departureTime").takeIf { it != -1 } ?: header.indexOf("departure_time")
-        val stopIdIndex = header.indexOf("stopId").takeIf { it != -1 } ?: header.indexOf("stop_id")
-        val headsignIndex =
-            header.indexOf("stopHeadsign").takeIf { it != -1 } ?: header.indexOf("stop_headsign")
-        if (tripIdIndex == -1 || departureTimeIndex == -1 || stopIdIndex == -1) {
-            logError(LOG_TAG, "Invalid stop_times header, required columns are missing")
-            return emptyMap()
-        }
-
+    private fun parseStopTimes(snapshot: GdyniaGtfsSnapshot): Map<Int, List<StopTimeLookup>> {
         val stopTimesByStopId = mutableMapOf<Int, MutableList<StopTimeLookup>>()
+        var tripIdIndex = -1
+        var departureTimeIndex = -1
+        var stopIdIndex = -1
+        var headsignIndex = -1
 
-        while (linesIterator.hasNext()) {
-            val columns = linesIterator.next().parseCsvLine()
-            val tripId = columns.getOrNull(tripIdIndex)?.toIntOrNull() ?: continue
-            val stopId = columns.getOrNull(stopIdIndex)?.toIntOrNull() ?: continue
+        val entryRead = readGtfsEntryLines(snapshot, STOP_TIMES_ENTRY_NAME) { rawLine ->
+            val line = rawLine.trim()
+            if (line.isEmpty()) {
+                return@readGtfsEntryLines
+            }
+            val columns = line.parseCsvLine()
+            if (tripIdIndex == -1) {
+                tripIdIndex = columns.indexOf("tripId").takeIf { it != -1 } ?: columns.indexOf("trip_id")
+                departureTimeIndex =
+                    columns.indexOf("departureTime").takeIf { it != -1 } ?: columns.indexOf("departure_time")
+                stopIdIndex = columns.indexOf("stopId").takeIf { it != -1 } ?: columns.indexOf("stop_id")
+                headsignIndex =
+                    columns.indexOf("stopHeadsign").takeIf { it != -1 } ?: columns.indexOf("stop_headsign")
+                return@readGtfsEntryLines
+            }
+            val tripId = columns.getOrNull(tripIdIndex)?.toIntOrNull() ?: return@readGtfsEntryLines
+            val stopId = columns.getOrNull(stopIdIndex)?.toIntOrNull() ?: return@readGtfsEntryLines
             val departureTime = columns.getOrNull(departureTimeIndex).orEmpty()
             if (departureTime.isBlank()) {
-                continue
+                return@readGtfsEntryLines
             }
 
             stopTimesByStopId.getOrPut(stopId) { mutableListOf() }.add(
@@ -334,8 +338,29 @@ internal class GdyniaGtfsStore(
                 ),
             )
         }
+        if (!entryRead) {
+            error("Missing $STOP_TIMES_ENTRY_NAME in Gdynia GTFS archive")
+        }
+        if (tripIdIndex == -1 || departureTimeIndex == -1 || stopIdIndex == -1) {
+            logError(LOG_TAG, "Invalid stop_times header, required columns are missing")
+            return emptyMap()
+        }
 
         return stopTimesByStopId
+    }
+
+    private fun readGtfsEntryLines(
+        snapshot: GdyniaGtfsSnapshot,
+        entryName: String,
+        onLine: (String) -> Unit,
+    ): Boolean {
+        snapshot.gtfsZipFilePath?.let { path ->
+            return zipEntryReader.readEntryLines(path, entryName, onLine)
+        }
+        snapshot.gtfsZip?.let { bytes ->
+            return zipEntryReader.readEntryLines(bytes, entryName, onLine)
+        }
+        return false
     }
 
     private fun String.parseCsvLine(): List<String> {

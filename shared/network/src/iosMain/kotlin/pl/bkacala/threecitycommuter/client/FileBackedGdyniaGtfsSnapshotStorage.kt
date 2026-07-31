@@ -1,7 +1,6 @@
 package pl.bkacala.threecitycommuter.client
 
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.refTo
 import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
@@ -10,9 +9,7 @@ import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.NSUserDomainMask
 import platform.Foundation.create
-import platform.Foundation.dataWithBytes
 import platform.Foundation.stringWithContentsOfFile
-import platform.posix.memcpy
 
 internal class FileBackedGdyniaGtfsSnapshotStorage : GdyniaGtfsSnapshotStorage {
     private val fileManager = NSFileManager.defaultManager
@@ -39,15 +36,11 @@ internal class FileBackedGdyniaGtfsSnapshotStorage : GdyniaGtfsSnapshotStorage {
             encoding = NSUTF8StringEncoding,
             error = null,
         )?.toString() ?: return null
-        val gtfsData = NSData.dataWithContentsOfFile(gtfsFilePath) ?: return null
+        if (NSData.dataWithContentsOfFile(gtfsFilePath) == null) return null
 
         return GdyniaGtfsSnapshot(
             tripsBody = tripsBody,
-            gtfsZip = ByteArray(gtfsData.length.toInt()).apply {
-                usePinned { pinned ->
-                    memcpy(pinned.addressOf(0), gtfsData.bytes, gtfsData.length)
-                }
-            },
+            gtfsZipFilePath = gtfsFilePath,
             downloadedAtEpochMilliseconds = NSString.stringWithContentsOfFile(
                 path = metadataFilePath,
                 encoding = NSUTF8StringEncoding,
@@ -56,7 +49,7 @@ internal class FileBackedGdyniaGtfsSnapshotStorage : GdyniaGtfsSnapshotStorage {
         )
     }
 
-    override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot) {
+    override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot): GdyniaGtfsSnapshot {
         fileManager.createDirectoryAtPath(
             path = snapshotDirectoryPath,
             withIntermediateDirectories = true,
@@ -71,11 +64,12 @@ internal class FileBackedGdyniaGtfsSnapshotStorage : GdyniaGtfsSnapshotStorage {
             error = null,
         )
 
-        snapshot.gtfsZip.usePinned { pinned ->
-            NSData.dataWithBytes(
-                bytes = pinned.addressOf(0),
-                length = snapshot.gtfsZip.size.toULong(),
-            ).writeToFile(gtfsFilePath, atomically = true)
+        snapshot.gtfsZip?.let { bytes ->
+            bytes.toNSData()?.writeToFile(gtfsFilePath, atomically = true)
+        }
+        snapshot.gtfsZipFilePath?.takeIf { it != gtfsFilePath }?.let { sourcePath ->
+            fileManager.removeItemAtPath(gtfsFilePath, error = null)
+            fileManager.copyItemAtPath(sourcePath, toPath = gtfsFilePath, error = null)
         }
 
         NSString.create(string = snapshot.downloadedAtEpochMilliseconds?.toString().orEmpty()).writeToFile(
@@ -83,6 +77,44 @@ internal class FileBackedGdyniaGtfsSnapshotStorage : GdyniaGtfsSnapshotStorage {
             atomically = true,
             encoding = NSUTF8StringEncoding,
             error = null,
+        )
+        return GdyniaGtfsSnapshot(
+            tripsBody = snapshot.tripsBody,
+            gtfsZipFilePath = gtfsFilePath,
+            downloadedAtEpochMilliseconds = snapshot.downloadedAtEpochMilliseconds,
+        )
+    }
+
+    override suspend fun writeDownloadedSnapshot(
+        tripsBody: String,
+        downloadedAtEpochMilliseconds: Long?,
+        downloadGtfsZipToPath: suspend (String) -> Unit,
+        downloadGtfsZipToBytes: suspend () -> ByteArray,
+    ): GdyniaGtfsSnapshot {
+        fileManager.createDirectoryAtPath(
+            path = snapshotDirectoryPath,
+            withIntermediateDirectories = true,
+            attributes = null,
+            error = null,
+        )
+
+        NSString.create(string = tripsBody).writeToFile(
+            path = tripsFilePath,
+            atomically = true,
+            encoding = NSUTF8StringEncoding,
+            error = null,
+        )
+        downloadGtfsZipToPath(gtfsFilePath)
+        NSString.create(string = downloadedAtEpochMilliseconds?.toString().orEmpty()).writeToFile(
+            path = metadataFilePath,
+            atomically = true,
+            encoding = NSUTF8StringEncoding,
+            error = null,
+        )
+        return GdyniaGtfsSnapshot(
+            tripsBody = tripsBody,
+            gtfsZipFilePath = gtfsFilePath,
+            downloadedAtEpochMilliseconds = downloadedAtEpochMilliseconds,
         )
     }
 
@@ -94,6 +126,9 @@ internal class FileBackedGdyniaGtfsSnapshotStorage : GdyniaGtfsSnapshotStorage {
         ).firstOrNull() as? String
             ?: error("Unable to resolve iOS caches directory")
 }
+
+private fun ByteArray.toNSData(): NSData =
+    NSData.create(bytes = refTo(0), length = size.toULong())
 
 private const val SNAPSHOT_DIRECTORY_NAME = "gdynia_gtfs"
 private const val TRIPS_FILE_NAME = "trips.json"
