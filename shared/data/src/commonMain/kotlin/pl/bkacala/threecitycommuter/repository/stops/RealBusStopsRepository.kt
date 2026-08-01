@@ -48,8 +48,9 @@ internal class RealBusStopsRepository(
             val relationsByStopId = busStopsTypesDao.getBusStopsTypes()
                 .map { it.toData() }
                 .associateBy { it.stopKey }
+            val storedStops = busStopsDao.getRealBusStations()
             emit(
-                busStopsDao.getRealBusStations()
+                storedStops
                     .map { entity ->
                         val stopData = entity.toStopData(isForBuses = false, isForTrams = false)
                         val relation = relationsByStopId[stopData.stopKey]

@@ -27,14 +27,12 @@ internal class KtorGdanskApiClient(
 
     override suspend fun getStops(): GdanskStopsResponse {
         val stops = withContext(Dispatchers.IO) {
-            val rawBody = httpClient.get(
-                "$BASE_URL/dataset/c24aa637-3619-4dc2-a171-a23eec8f2172/" +
+            readGdanskStopsResponse(
+                httpClient = httpClient,
+                json = json,
+                url = "$BASE_URL/dataset/c24aa637-3619-4dc2-a171-a23eec8f2172/" +
                     "resource/4c4025f0-01bf-41f7-a39f-d156d201b82b/download/stops.json",
-            ).bodyAsText()
-            val payloadByDate = json.decodeFromString<Map<String, GdanskStopsResponse>>(rawBody)
-
-            payloadByDate.values.firstOrNull()
-                ?: error("Stops payload is empty")
+            )
         }
         return stops
     }

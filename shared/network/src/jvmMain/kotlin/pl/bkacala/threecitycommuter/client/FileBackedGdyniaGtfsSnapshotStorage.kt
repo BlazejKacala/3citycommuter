@@ -15,16 +15,41 @@ internal class FileBackedGdyniaGtfsSnapshotStorage : GdyniaGtfsSnapshotStorage {
 
         return GdyniaGtfsSnapshot(
             tripsBody = tripsFile.readText(),
-            gtfsZip = gtfsFile.readBytes(),
+            gtfsZipFilePath = gtfsFile.absolutePath,
             downloadedAtEpochMilliseconds = metadataFile.readText().trim().toLongOrNull(),
         )
     }
 
-    override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot) {
+    override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot): GdyniaGtfsSnapshot {
         snapshotDirectory.mkdirs()
         tripsFile.writeText(snapshot.tripsBody)
-        gtfsFile.writeBytes(snapshot.gtfsZip)
+        snapshot.gtfsZip?.let { gtfsFile.writeBytes(it) }
+        snapshot.gtfsZipFilePath?.takeIf { it != gtfsFile.absolutePath }?.let { sourcePath ->
+            File(sourcePath).copyTo(gtfsFile, overwrite = true)
+        }
         metadataFile.writeText(snapshot.downloadedAtEpochMilliseconds?.toString().orEmpty())
+        return GdyniaGtfsSnapshot(
+            tripsBody = snapshot.tripsBody,
+            gtfsZipFilePath = gtfsFile.absolutePath,
+            downloadedAtEpochMilliseconds = snapshot.downloadedAtEpochMilliseconds,
+        )
+    }
+
+    override suspend fun writeDownloadedSnapshot(
+        tripsBody: String,
+        downloadedAtEpochMilliseconds: Long?,
+        downloadGtfsZipToPath: suspend (String) -> Unit,
+        downloadGtfsZipToBytes: suspend () -> ByteArray,
+    ): GdyniaGtfsSnapshot {
+        snapshotDirectory.mkdirs()
+        tripsFile.writeText(tripsBody)
+        downloadGtfsZipToPath(gtfsFile.absolutePath)
+        metadataFile.writeText(downloadedAtEpochMilliseconds?.toString().orEmpty())
+        return GdyniaGtfsSnapshot(
+            tripsBody = tripsBody,
+            gtfsZipFilePath = gtfsFile.absolutePath,
+            downloadedAtEpochMilliseconds = downloadedAtEpochMilliseconds,
+        )
     }
 
     private fun resolveBaseDirectory(): File {

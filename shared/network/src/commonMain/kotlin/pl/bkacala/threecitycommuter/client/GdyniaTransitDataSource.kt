@@ -50,7 +50,8 @@ internal class GdyniaTransitDataSource(
 
     override suspend fun getStops(): List<BusStopData> {
         val body = httpClient.get(STOPS_URL).body<String>()
-        return json.decodeFromString<List<GdyniaStopNetworkData>>(body).map { stop ->
+        val decoded = json.decodeFromString<List<GdyniaStopNetworkData>>(body)
+        return decoded.map { stop ->
             BusStopData(
                 stopKey = TransitStopKey(TransitProvider.GDYNIA, stop.stopId),
                 stopCode = stop.stopCode,
@@ -153,7 +154,6 @@ internal class GdyniaTransitDataSource(
         return candidate
     }
 }
-
 private const val STOPS_URL = "http://api.zdiz.gdynia.pl/pt/stops"
 private const val DELAYS_URL = "http://api.zdiz.gdynia.pl/pt/delays"
 private const val ROUTES_URL = "http://api.zdiz.gdynia.pl/pt/routes"
