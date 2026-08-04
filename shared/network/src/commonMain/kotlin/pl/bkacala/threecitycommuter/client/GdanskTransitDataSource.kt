@@ -6,6 +6,7 @@ import kotlinx.datetime.toLocalDateTime
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteShapeResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteStopTimeResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehicleResponse
@@ -42,7 +43,23 @@ internal class GdanskTransitDataSource(
     override suspend fun getRouteShape(provider: TransitProvider, routeId: Int, tripId: Int): Route {
         val dateString =
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toddMMyyyyString()
-        return gdanskApiClient.getRouteShape(dateString, routeId, tripId).mapToRoute()
+        val shape = gdanskApiClient.getRouteShape(dateString, routeId, tripId)
+        val stopTimes = gdanskApiClient.getRouteStopTimes(dateString, routeId)
+
+        return shape.mapToRoute(
+            stops = stopTimes.stopTimes
+                .asSequence()
+                .filter { it.tripId == tripId }
+                .filterNot { it.isNonPassengerStop() }
+                .sortedBy { it.stopSequence }
+                .map { stopTime ->
+                    Route.Stop(
+                        key = TransitStopKey(TransitProvider.GDANSK, stopTime.stopId),
+                        sequence = stopTime.stopSequence,
+                    )
+                }
+                .toList(),
+        )
     }
 
     override suspend fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): VehiclePosition? =
@@ -106,7 +123,7 @@ private fun GdanskDepartureResponse.toDepartureData(): Departure {
     )
 }
 
-private fun GdanskRouteShapeResponse.mapToRoute(): Route {
+private fun GdanskRouteShapeResponse.mapToRoute(stops: List<Route.Stop> = emptyList()): Route {
     return Route(
         shape = coordinates.mapNotNull { coordinate ->
             if (coordinate.size == 2) {
@@ -115,8 +132,12 @@ private fun GdanskRouteShapeResponse.mapToRoute(): Route {
                 null
             }
         },
+        stops = stops,
     )
 }
+
+private fun GdanskRouteStopTimeResponse.isNonPassengerStop(): Boolean =
+    passenger == false || nonpassenger == 1 || virtual == 1
 
 private fun GdanskVehicleResponse.toVehicle(): Vehicle {
     return Vehicle(

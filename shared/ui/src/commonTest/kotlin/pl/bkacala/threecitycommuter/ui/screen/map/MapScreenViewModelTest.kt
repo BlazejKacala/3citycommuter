@@ -383,7 +383,7 @@ class MapScreenViewModelTest {
 
     private inner class FakeRoutesRepository(
         private val route: Route = Route(
-            listOf(
+            shape = listOf(
                 Route.GeoPoint(54.372158, 18.638306),
                 Route.GeoPoint(54.351959, 18.648064),
             ),

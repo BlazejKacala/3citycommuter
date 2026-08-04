@@ -20,6 +20,8 @@ import pl.bkacala.threecitycommuter.model.gdynia.GdyniaStopTimeIndexEntry
 import pl.bkacala.threecitycommuter.model.gdynia.GdyniaTripNetworkData
 import pl.bkacala.threecitycommuter.model.gdynia.GdyniaTripShapeIndexEntry
 import pl.bkacala.threecitycommuter.model.route.Route
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import kotlin.time.Duration.Companion.days
 
 internal class GdyniaGtfsStore(
@@ -39,9 +41,16 @@ internal class GdyniaGtfsStore(
 
     suspend fun getRouteForTrip(tripId: Int): Route? =
         withContext(Dispatchers.IO) {
-            val currentCache = ensureShapeCacheLoaded()
+            var currentCache = ensureShapeCacheLoaded()
+            if (currentCache.routeStopsByTripId[tripId].isNullOrEmpty()) {
+                refreshShapeCacheWithTripStops(tripId)?.let { refreshedCache ->
+                    currentCache = refreshedCache
+                }
+            }
             val shapeId = currentCache.shapeIdByTripId[tripId] ?: return@withContext null
-            currentCache.routeByShapeId[shapeId]
+            currentCache.routeByShapeId[shapeId]?.copy(
+                stops = currentCache.routeStopsByTripId[tripId].orEmpty(),
+            )
         }
 
     suspend fun resolveTripId(
@@ -224,14 +233,16 @@ internal class GdyniaGtfsStore(
     }
 
     private fun buildFullCache(snapshot: GdyniaGtfsSnapshot): FullCache {
+        val stopTimes = parseStopTimes(snapshot)
         return FullCache(
             downloadedAt = snapshot.downloadedAtEpochMilliseconds?.let(Instant::fromEpochMilliseconds),
             departure = DepartureCache(
-                stopTimesByStopId = parseStopTimes(snapshot),
+                stopTimesByStopId = stopTimes.stopTimesByStopId,
             ),
             shape = ShapeCache(
                 shapeIdByTripId = parseTrips(snapshot.tripsBody),
                 routeByShapeId = parseShapes(snapshot),
+                routeStopsByTripId = stopTimes.routeStopsByTripId,
             ),
         )
     }
@@ -245,6 +256,7 @@ internal class GdyniaGtfsStore(
         ShapeCache(
             shapeIdByTripId = index.tripShapes.associate { it.toPair() },
             routeByShapeId = index.shapeRoutes.associate { it.toPair() },
+            routeStopsByTripId = emptyMap(),
         )
 
     private fun applyFullCache(fullCache: FullCache) {
@@ -301,11 +313,13 @@ internal class GdyniaGtfsStore(
         }
     }
 
-    private fun parseStopTimes(snapshot: GdyniaGtfsSnapshot): Map<Int, List<StopTimeLookup>> {
+    private fun parseStopTimes(snapshot: GdyniaGtfsSnapshot): StopTimesParseResult {
         val stopTimesByStopId = mutableMapOf<Int, MutableList<StopTimeLookup>>()
+        val routeStopsByTripId = mutableMapOf<Int, MutableList<Route.Stop>>()
         var tripIdIndex = -1
         var departureTimeIndex = -1
         var stopIdIndex = -1
+        var stopSequenceIndex = -1
         var headsignIndex = -1
 
         val entryRead = readGtfsEntryLines(snapshot, STOP_TIMES_ENTRY_NAME) { rawLine ->
@@ -319,12 +333,15 @@ internal class GdyniaGtfsStore(
                 departureTimeIndex =
                     columns.indexOf("departureTime").takeIf { it != -1 } ?: columns.indexOf("departure_time")
                 stopIdIndex = columns.indexOf("stopId").takeIf { it != -1 } ?: columns.indexOf("stop_id")
+                stopSequenceIndex =
+                    columns.indexOf("stopSequence").takeIf { it != -1 } ?: columns.indexOf("stop_sequence")
                 headsignIndex =
                     columns.indexOf("stopHeadsign").takeIf { it != -1 } ?: columns.indexOf("stop_headsign")
                 return@readGtfsEntryLines
             }
             val tripId = columns.getOrNull(tripIdIndex)?.toIntOrNull() ?: return@readGtfsEntryLines
             val stopId = columns.getOrNull(stopIdIndex)?.toIntOrNull() ?: return@readGtfsEntryLines
+            val stopSequence = columns.getOrNull(stopSequenceIndex)?.toIntOrNull() ?: return@readGtfsEntryLines
             val departureTime = columns.getOrNull(departureTimeIndex).orEmpty()
             if (departureTime.isBlank()) {
                 return@readGtfsEntryLines
@@ -337,16 +354,25 @@ internal class GdyniaGtfsStore(
                     stopHeadsign = columns.getOrNull(headsignIndex),
                 ),
             )
+            routeStopsByTripId.getOrPut(tripId) { mutableListOf() }.add(
+                Route.Stop(
+                    key = TransitStopKey(TransitProvider.GDYNIA, stopId),
+                    sequence = stopSequence,
+                ),
+            )
         }
         if (!entryRead) {
             error("Missing $STOP_TIMES_ENTRY_NAME in Gdynia GTFS archive")
         }
-        if (tripIdIndex == -1 || departureTimeIndex == -1 || stopIdIndex == -1) {
+        if (tripIdIndex == -1 || departureTimeIndex == -1 || stopIdIndex == -1 || stopSequenceIndex == -1) {
             logError(LOG_TAG, "Invalid stop_times header, required columns are missing")
-            return emptyMap()
+            return StopTimesParseResult(emptyMap(), emptyMap())
         }
 
-        return stopTimesByStopId
+        return StopTimesParseResult(
+            stopTimesByStopId = stopTimesByStopId,
+            routeStopsByTripId = routeStopsByTripId.mapValues { (_, stops) -> stops.sortedBy { it.sequence } },
+        )
     }
 
     private fun readGtfsEntryLines(
@@ -396,6 +422,7 @@ internal class GdyniaGtfsStore(
     private data class ShapeCache(
         val shapeIdByTripId: Map<Int, Int>,
         val routeByShapeId: Map<Int, Route>,
+        val routeStopsByTripId: Map<Int, List<Route.Stop>>,
     )
 
     private data class ShapePoint(
@@ -410,6 +437,11 @@ internal class GdyniaGtfsStore(
         val stopHeadsign: String?,
     )
 
+    private data class StopTimesParseResult(
+        val stopTimesByStopId: Map<Int, List<StopTimeLookup>>,
+        val routeStopsByTripId: Map<Int, List<Route.Stop>>,
+    )
+
     private fun GdyniaTripShapeIndexEntry.toPair(): Pair<Int, Int> = tripId to shapeId
 
     private fun GdyniaShapeRouteIndexEntry.toPair(): Pair<Int, Route> =
@@ -422,6 +454,23 @@ internal class GdyniaGtfsStore(
                 departureTime = departure.time,
                 stopHeadsign = departure.headsign,
             )
+        }
+
+    private suspend fun refreshShapeCacheWithTripStops(tripId: Int): ShapeCache? =
+        refreshMutex.withLock {
+            val persisted = loadPersistedCache()?.shape
+            if (persisted?.routeStopsByTripId?.containsKey(tripId) == true) {
+                shapeCacheMutex.withLock { shapeCache = persisted }
+                return persisted
+            }
+
+            val network = loadNetworkCacheOrNull()?.shape
+            if (network?.routeStopsByTripId?.containsKey(tripId) == true) {
+                shapeCacheMutex.withLock { shapeCache = network }
+                return network
+            }
+
+            null
         }
 }
 

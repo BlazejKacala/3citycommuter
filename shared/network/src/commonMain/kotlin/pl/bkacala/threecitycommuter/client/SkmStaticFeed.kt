@@ -30,6 +30,12 @@ internal object SkmStaticFeed {
             shape = stopIds.toList().mapNotNull { stopId ->
                 stopBySourceId(stopId)?.let { Route.GeoPoint(it.stopLat, it.stopLon) }
             },
+            stops = stopIds.mapIndexed { index, stopId ->
+                Route.Stop(
+                    key = TransitStopKey(TransitProvider.SKM, stopId),
+                    sequence = index,
+                )
+            },
         )
 
     private fun station(

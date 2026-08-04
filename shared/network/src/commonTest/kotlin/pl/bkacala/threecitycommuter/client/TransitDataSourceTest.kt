@@ -13,6 +13,8 @@ import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDeparturesResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteShapeResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteStopTimeResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteStopTimesResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionsResponse
@@ -50,6 +52,7 @@ class TransitDataSourceTest {
         assertEquals(18.0, route.shape[0].longitude)
         assertEquals(54.1, route.shape[1].latitude)
         assertEquals(18.1, route.shape[1].longitude)
+        assertEquals(listOf(1015), route.stops.map { it.key.sourceStopId })
         assertEquals(gdyniaTripsBody, snapshotStorage.snapshot?.tripsBody)
         assertTrue(snapshotStorage.snapshot?.gtfsZip?.contentEquals(gdyniaGtfsZipBytes) == true)
         assertNotNull(snapshotStorage.snapshot?.downloadedAtEpochMilliseconds)
@@ -81,6 +84,7 @@ class TransitDataSourceTest {
 
         assertNotNull(route)
         assertEquals(2, route.shape.size)
+        assertEquals(listOf(1015), route.stops.map { it.key.sourceStopId })
     }
 
     @Test
@@ -101,6 +105,7 @@ class TransitDataSourceTest {
 
         assertNotNull(route)
         assertEquals(2, route.shape.size)
+        assertEquals(emptyList(), route.stops)
     }
 
     @Test
@@ -128,6 +133,17 @@ class TransitDataSourceTest {
         assertNotNull(route)
         assertEquals(2, route.shape.size)
         assertEquals(201, resolvedTripId)
+        assertEquals(emptyList(), route.stops)
+    }
+
+    @Test
+    fun `Gdansk route shape includes ordered passenger stops for selected trip`() = runTest {
+        val dataSource = GdanskTransitDataSource(fakeGdanskApiClient())
+
+        val route = dataSource.getRouteShape(TransitProvider.GDANSK, routeId = 6, tripId = 42)
+
+        assertEquals(listOf(8227, 8228), route.stops.map { it.key.sourceStopId })
+        assertEquals(listOf(0, 1), route.stops.map { it.sequence })
     }
 
     @Test
@@ -219,6 +235,7 @@ class TransitDataSourceTest {
         assertEquals(null, departures.first().vehicleId)
         assertNotNull(route)
         assertTrue(route.shape.isNotEmpty())
+        assertEquals(listOf(101, 102, 103, 104, 105), route.stops.map { it.key.sourceStopId })
         assertEquals(false, dataSource.features(TransitProvider.SKM).supportsLiveVehicleTracking)
         assertEquals(false, dataSource.features(TransitProvider.SKM).supportsVehicleMetadata)
         assertEquals(null, dataSource.getVehiclePosition(TransitProvider.SKM, 1))
@@ -288,7 +305,47 @@ class TransitDataSourceTest {
                 date: String,
                 routeId: Int,
                 tripId: Int,
-            ): GdanskRouteShapeResponse = GdanskRouteShapeResponse(emptyList())
+            ): GdanskRouteShapeResponse =
+                GdanskRouteShapeResponse(
+                    coordinates = listOf(
+                        listOf(18.46509, 54.47317),
+                        listOf(18.47509, 54.48317),
+                    ),
+                )
+
+            override suspend fun getRouteStopTimes(
+                date: String,
+                routeId: Int,
+            ): GdanskRouteStopTimesResponse =
+                GdanskRouteStopTimesResponse(
+                    lastUpdate = "2026-07-27 10:00:00",
+                    stopTimes = listOf(
+                        GdanskRouteStopTimeResponse(
+                            tripId = 42,
+                            stopId = 8227,
+                            stopSequence = 0,
+                            passenger = true,
+                        ),
+                        GdanskRouteStopTimeResponse(
+                            tripId = 42,
+                            stopId = 9999,
+                            stopSequence = 1,
+                            passenger = false,
+                        ),
+                        GdanskRouteStopTimeResponse(
+                            tripId = 42,
+                            stopId = 8228,
+                            stopSequence = 1,
+                            passenger = true,
+                        ),
+                        GdanskRouteStopTimeResponse(
+                            tripId = 99,
+                            stopId = 1234,
+                            stopSequence = 0,
+                            passenger = true,
+                        ),
+                    ),
+                )
         }
 
     private fun mockHttpClient(vararg responses: Pair<String, MockResponse>): HttpClient {

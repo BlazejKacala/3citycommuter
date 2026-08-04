@@ -17,7 +17,7 @@ object MockRoutesRepository {
                 Route.GeoPoint(54.372158, 18.638306),
                 Route.GeoPoint(54.351959, 18.648064),
             )
-            return flowOf(Route(mockPoints))
+            return flowOf(Route(shape = mockPoints))
         }
     }
 }

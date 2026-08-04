@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDeparturesResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteShapeResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteStopTimesResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclesResponse
@@ -74,5 +75,17 @@ internal class KtorGdanskApiClient(
             json.decodeFromString<GdanskRouteShapeResponse>(rawBody)
         }
         return route
+    }
+
+    override suspend fun getRouteStopTimes(
+        date: String,
+        routeId: Int,
+    ): GdanskRouteStopTimesResponse {
+        val routeStopTimes = withContext(Dispatchers.IO) {
+            val rawBody = httpClient.get("$BASE_URLV2/stopTimes?date=$date&routeId=$routeId")
+                .bodyAsText()
+            json.decodeFromString<GdanskRouteStopTimesResponse>(rawBody)
+        }
+        return routeStopTimes
     }
 }
