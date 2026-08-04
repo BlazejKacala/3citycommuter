@@ -25,8 +25,14 @@ class StopData:
     stopsInTrip: List[Stop]
 
 @dataclass
+class TransitStopKey:
+    provider: str
+    sourceStopId: int
+
+
+@dataclass
 class BusStop:
-    stopId: int
+    stopKey: TransitStopKey
     isForBuses: bool
     isForTrams: bool
 
@@ -62,13 +68,19 @@ for stop in source:
         bus_stops_dict[stop_id]['isForTrams'] = True
     
 output = []
-for stop_id, info in bus_stops_dict.items():
+for stop_id, info in sorted(bus_stops_dict.items()):
     is_for_buses = info['isForBuses']
     is_for_trams = info['isForTrams']
-    output.append(BusStop(stopId=stop_id, isForBuses=is_for_buses, isForTrams=is_for_trams))
+    output.append(
+        BusStop(
+            stopKey=TransitStopKey(provider="GDANSK", sourceStopId=stop_id),
+            isForBuses=is_for_buses,
+            isForTrams=is_for_trams,
+        )
+    )
     
 output_dict = [asdict(obj) for obj in output]
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 output_file_path = os.path.join(root_path, "composeApp", "android", "src", "main", "assets", "relations.json")
-with open(output_file_path, 'w') as f:
+with open(output_file_path, 'w', encoding='utf-8') as f:
     json.dump(output_dict, f, indent=4)

@@ -368,24 +368,23 @@ class MapScreenViewModel(
             val busStops = (it.busStops as? UiState.Success)?.data ?: emptyList()
             val location = it.userLocation
             val query = it.searchQuery.lowercase()
-            it.copy(
-                searchResults = busStops
-                    .filter { stop -> stop.data.name.lowercase().contains(query) }
-                    .map { stop ->
-                        stop to stop.position.sphericalDistance(LatLng(location.latitude, location.longitude)).toInt()
-                    }
-                    .sortedBy { it.second }
-                    .map { (item, distance) ->
-                        SearchResultRowModel(
-                            stopKey = item.key,
-                            station = item.data.name,
-                            distance = getDistanceString(distance, location),
-                            provider = item.data.provider,
-                            isForBuses = item.data.isForBuses,
-                            isForTrams = item.data.isForTrams,
-                        )
-                    },
-            )
+            val searchResults = busStops
+                .filter { stop -> stop.data.name.lowercase().contains(query) }
+                .map { stop ->
+                    stop to stop.position.sphericalDistance(LatLng(location.latitude, location.longitude)).toInt()
+                }
+                .sortedBy { it.second }
+                .map { (item, distance) ->
+                    SearchResultRowModel(
+                        stopKey = item.key,
+                        station = item.data.name,
+                        distance = getDistanceString(distance, location),
+                        provider = item.data.provider,
+                        isForBuses = item.data.isForBuses,
+                        isForTrams = item.data.isForTrams,
+                    )
+                }
+            it.copy(searchResults = searchResults)
         }
     }
 

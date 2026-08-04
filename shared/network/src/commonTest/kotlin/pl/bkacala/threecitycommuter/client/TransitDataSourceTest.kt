@@ -323,8 +323,24 @@ private class InMemoryGdyniaGtfsSnapshotStorage(
 ) : GdyniaGtfsSnapshotStorage {
     override suspend fun readSnapshot(): GdyniaGtfsSnapshot? = snapshot
 
-    override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot) {
+    override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot): GdyniaGtfsSnapshot {
         this.snapshot = snapshot
+        return snapshot
+    }
+
+    override suspend fun writeDownloadedSnapshot(
+        tripsBody: String,
+        downloadedAtEpochMilliseconds: Long?,
+        downloadGtfsZipToPath: suspend (String) -> Unit,
+        downloadGtfsZipToBytes: suspend () -> ByteArray,
+    ): GdyniaGtfsSnapshot {
+        val snapshot = GdyniaGtfsSnapshot(
+            tripsBody = tripsBody,
+            gtfsZip = downloadGtfsZipToBytes(),
+            downloadedAtEpochMilliseconds = downloadedAtEpochMilliseconds,
+        )
+        this.snapshot = snapshot
+        return snapshot
     }
 }
 
