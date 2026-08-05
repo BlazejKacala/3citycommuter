@@ -8,6 +8,9 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
@@ -17,12 +20,22 @@ import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclesResponse
+import pl.bkacala.threecitycommuter.model.plk.PlkOperationStationDto
+import pl.bkacala.threecitycommuter.model.plk.PlkOperationsResponse
+import pl.bkacala.threecitycommuter.model.plk.PlkRouteDto
+import pl.bkacala.threecitycommuter.model.plk.PlkScheduleDictionaries
+import pl.bkacala.threecitycommuter.model.plk.PlkScheduleResponse
+import pl.bkacala.threecitycommuter.model.plk.PlkStationDto
+import pl.bkacala.threecitycommuter.model.plk.PlkStationOnRouteDto
+import pl.bkacala.threecitycommuter.model.plk.PlkStationsResponse
+import pl.bkacala.threecitycommuter.model.plk.PlkTrainOperationDto
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 
 class TransitDataSourceTest {
 
@@ -206,16 +219,21 @@ class TransitDataSourceTest {
 
     @Test
     fun `SKM provider exposes stations departures and route shapes without live vehicle tracking`() = runTest {
-        val dataSource = SkmTransitDataSource(MockSkmRealtimeDataSource())
+        val dataSource = SkmTransitDataSource(
+            plkApiClient = fakePlkApiClient(),
+            skmStaticFeed = SkmStaticFeed(testJson),
+        )
 
         val stops = dataSource.getStops()
-        val departures = dataSource.getDepartures(stops.first().stopKey)
+        val selectedStop = stops.first { it.sourceStopId == 258458 }
+        val departures = dataSource.getDepartures(selectedStop.stopKey)
         val route = dataSource.getRouteShape(TransitProvider.SKM, departures.first().routeId, departures.first().tripId)
 
         assertTrue(stops.isNotEmpty())
-        assertEquals(TransitProvider.SKM, stops.first().provider)
+        assertEquals(TransitProvider.SKM, selectedStop.provider)
+        assertEquals(258458, selectedStop.sourceStopId)
         assertTrue(departures.isNotEmpty())
-        assertEquals("S1", departures.first().lineNumber)
+        assertEquals("99450", departures.first().lineNumber)
         assertEquals(null, departures.first().vehicleId)
         assertNotNull(route)
         assertTrue(route.shape.isNotEmpty())
@@ -289,6 +307,78 @@ class TransitDataSourceTest {
                 routeId: Int,
                 tripId: Int,
             ): GdanskRouteShapeResponse = GdanskRouteShapeResponse(emptyList())
+        }
+
+    private fun fakePlkApiClient(): PlkApiClient =
+        object : PlkApiClient {
+            override suspend fun getStations(search: String, pageSize: Int): PlkStationsResponse =
+                PlkStationsResponse(
+                    generatedAt = kotlinx.datetime.Instant.parse("2026-08-04T10:00:00Z"),
+                    stations = listOf(
+                        PlkStationDto(id = stationIdsByName.getValue(search), name = search),
+                    ),
+                    totalCount = 1,
+                    returnedCount = 1,
+                    page = 1,
+                    pageSize = pageSize,
+                    totalPages = 1,
+                )
+
+            override suspend fun getSchedules(
+                dateFrom: String,
+                dateTo: String,
+                stations: String,
+                carriersInclude: String,
+                fullRoutes: Boolean,
+            ): PlkScheduleResponse =
+                PlkScheduleResponse(
+                    generatedAt = kotlinx.datetime.Instant.parse("2026-08-04T10:00:00Z"),
+                    routes = listOf(
+                        dynamicPlkRoute(),
+                    ),
+                    dictionaries = PlkScheduleDictionaries(
+                        stations = stationIdsByName.entries.associate { (name, id) ->
+                            id.toString() to PlkStationDto(id = id, name = name)
+                        },
+                    ),
+                )
+
+            override suspend fun getOperations(
+                stations: String,
+                carriersInclude: String,
+                fullRoutes: Boolean,
+                withPlanned: Boolean,
+            ): PlkOperationsResponse =
+                PlkOperationsResponse(
+                    generatedAt = kotlinx.datetime.Instant.parse("2026-08-04T10:00:00Z"),
+                    trains = listOf(
+                        PlkTrainOperationDto(
+                            scheduleId = 25,
+                            orderId = 501,
+                            trainOrderId = 501,
+                            operatingDate = dynamicOperatingDate(),
+                            trainStatus = "P",
+                            stations = dynamicPlkRoute().stations.mapIndexed { index, station ->
+                                PlkOperationStationDto(
+                                    stationId = station.stationId,
+                                    plannedSequenceNumber = index + 1,
+                                    actualSequenceNumber = index + 1,
+                                    plannedArrival = null,
+                                    plannedDeparture = dynamicPlkDateTime(index + 4),
+                                    arrivalDelayMinutes = null,
+                                    departureDelayMinutes = if (index == 0) 2 else 0,
+                                    actualArrival = null,
+                                    actualDeparture = dynamicPlkDateTime(index + 6),
+                                    isConfirmed = true,
+                                    isCancelled = false,
+                                )
+                            },
+                        ),
+                    ),
+                    stations = stationIdsByName.entries.associate { (name, id) -> id.toString() to name },
+                )
+
+            override suspend fun getRoute(scheduleId: Int, orderId: Int): PlkRouteDto = dynamicPlkRoute()
         }
 
     private fun mockHttpClient(vararg responses: Pair<String, MockResponse>): HttpClient {
@@ -487,3 +577,47 @@ private val gdyniaGtfsZipBytes = byteArrayOf(
     111, 112, 95, 116, 105, 109, 101, 115, 46, 116, 120, 116, 80, 75, 5, 6, 0, 0, 0, 0,
     2, 0, 2, 0, 116, 0, 0, 0, 43, 1, 0, 0, 0, 0,
 )
+
+private val stationIdsByName = mapOf(
+    "Gdańsk Śródmieście" to 258458,
+    "Gdańsk Główny" to 7500,
+    "Gdańsk Wrzeszcz" to 7534,
+    "Sopot" to 5942,
+    "Gdynia Główna" to 5900,
+    "Wejherowo" to 6304,
+)
+
+private fun dynamicPlkRoute(): PlkRouteDto =
+    PlkRouteDto(
+        scheduleId = 25,
+        orderId = 501,
+        trainOrderId = 501,
+        name = "SKM do Gdyni",
+        carrierCode = "SKMT",
+        nationalNumber = "99450",
+        commercialCategorySymbol = "SKM",
+        operatingDates = listOf(dynamicOperatingDate()),
+        stations = listOf(
+            PlkStationOnRouteDto(stationId = 258458, orderNumber = 1, departureDay = 0, departureTime = dynamicRouteTime(4)),
+            PlkStationOnRouteDto(stationId = 7500, orderNumber = 2, departureDay = 0, departureTime = dynamicRouteTime(8)),
+            PlkStationOnRouteDto(stationId = 7534, orderNumber = 3, departureDay = 0, departureTime = dynamicRouteTime(15)),
+            PlkStationOnRouteDto(stationId = 5942, orderNumber = 4, departureDay = 0, departureTime = dynamicRouteTime(22)),
+            PlkStationOnRouteDto(stationId = 5900, orderNumber = 5, departureDay = 0, departureTime = dynamicRouteTime(30)),
+            PlkStationOnRouteDto(stationId = 6304, orderNumber = 6, departureDay = 0, departureTime = dynamicRouteTime(42)),
+        ),
+    )
+
+private fun dynamicOperatingDate(): String =
+    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
+
+private fun dynamicRouteTime(minutesFromNow: Int): String {
+    val target = Clock.System.now().plus(minutesFromNow.minutes)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+    return "%02d:%02d:%02d".format(target.hour, target.minute, target.second)
+}
+
+private fun dynamicPlkDateTime(minutesFromNow: Int): String {
+    val target = Clock.System.now().plus(minutesFromNow.minutes)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+    return "${target.date}T%02d:%02d:%02d".format(target.hour, target.minute, target.second)
+}

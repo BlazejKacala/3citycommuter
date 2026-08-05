@@ -1,0 +1,370 @@
+[
+  {
+    "plkStationId": 5256,
+    "name": "Lębork",
+    "latitude": 54.5336204,
+    "longitude": 17.7502364,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 254531,
+    "name": "Lębork Mosty",
+    "latitude": 54.550085,
+    "longitude": 17.7928846,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5413,
+    "name": "Godętowo",
+    "latitude": 54.581917,
+    "longitude": 17.8632338,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5421,
+    "name": "Bożepole Wielkie",
+    "latitude": 54.5688524,
+    "longitude": 17.9677613,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5439,
+    "name": "Strzebielino Morskie",
+    "latitude": 54.5628928,
+    "longitude": 18.028786,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5447,
+    "name": "Luzino",
+    "latitude": 54.5669472,
+    "longitude": 18.1025716,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6593,
+    "name": "Gościcino Wejherowskie",
+    "latitude": 54.60506,
+    "longitude": 18.1610766,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6312,
+    "name": "Wejherowo Śmiechowo",
+    "latitude": 54.6019278,
+    "longitude": 18.2756241,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6320,
+    "name": "Wejherowo-Nanice",
+    "latitude": 54.6036834,
+    "longitude": 18.2469598,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6304,
+    "name": "Wejherowo",
+    "latitude": 54.6057529,
+    "longitude": 18.2296473,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6114,
+    "name": "Reda Pieleszewo",
+    "latitude": 54.6026799,
+    "longitude": 18.3176103,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6106,
+    "name": "Reda",
+    "latitude": 54.59495,
+    "longitude": 18.353264,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6098,
+    "name": "Rumia",
+    "latitude": 54.5691391,
+    "longitude": 18.3866641,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6080,
+    "name": "Rumia Janowo",
+    "latitude": 54.5595683,
+    "longitude": 18.4045381,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 178829,
+    "name": "Gdynia Cisowa",
+    "latitude": 54.5498083,
+    "longitude": 18.4471926,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6031,
+    "name": "Gdynia Chylonia",
+    "latitude": 54.5457503,
+    "longitude": 18.4636617,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6064,
+    "name": "Gdynia Leszczynki",
+    "latitude": 54.5413453,
+    "longitude": 18.4785103,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6056,
+    "name": "Gdynia Grabówek",
+    "latitude": 54.5340423,
+    "longitude": 18.4966486,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6049,
+    "name": "Gdynia Stocznia-Uniwersytet Morski",
+    "latitude": 54.5255488,
+    "longitude": 18.5192576,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5900,
+    "name": "Gdynia Główna",
+    "latitude": 54.5217877,
+    "longitude": 18.5268255,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5926,
+    "name": "Gdynia Wzgórze Św.Maksymiliana",
+    "latitude": 54.5076246,
+    "longitude": 18.535489,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5918,
+    "name": "Gdynia Redłowo",
+    "latitude": 54.4915771,
+    "longitude": 18.538351,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5934,
+    "name": "Gdynia Orłowo",
+    "latitude": 54.4766459,
+    "longitude": 18.5486299,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5959,
+    "name": "Sopot Kamienny Potok",
+    "latitude": 54.4576401,
+    "longitude": 18.5535799,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5942,
+    "name": "Sopot",
+    "latitude": 54.4400569,
+    "longitude": 18.5623141,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 5967,
+    "name": "Sopot Wyścigi",
+    "latitude": 54.4312893,
+    "longitude": 18.5652352,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 7617,
+    "name": "Gdańsk Żabianka-AWFiS",
+    "latitude": 54.4207672,
+    "longitude": 18.5684877,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 7583,
+    "name": "Gdańsk Oliwa",
+    "latitude": 54.4094881,
+    "longitude": 18.5719775,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 7567,
+    "name": "Gdańsk Przymorze-Uniwersytet",
+    "latitude": 54.4007278,
+    "longitude": 18.5766182,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 7559,
+    "name": "Gdańsk Zaspa",
+    "latitude": 54.3897726,
+    "longitude": 18.591526,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 7534,
+    "name": "Gdańsk Wrzeszcz",
+    "latitude": 54.3817696,
+    "longitude": 18.6055111,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 7526,
+    "name": "Gdańsk Politechnika",
+    "latitude": 54.3741905,
+    "longitude": 18.6274077,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 7518,
+    "name": "Gdańsk Stocznia",
+    "latitude": 54.3646358,
+    "longitude": 18.6417851,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 7500,
+    "name": "Gdańsk Główny",
+    "latitude": 54.3564345,
+    "longitude": 18.6441946,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 258458,
+    "name": "Gdańsk Śródmieście",
+    "latitude": 54.3468793,
+    "longitude": 18.6443526,
+    "network": "SKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 257535,
+    "name": "Gdańsk Strzyża",
+    "latitude": 54.3916687,
+    "longitude": 18.5787096,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 257534,
+    "name": "Gdańsk Niedźwiednik",
+    "latitude": 54.3780951,
+    "longitude": 18.5720736,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 257533,
+    "name": "Gdańsk Brętowo",
+    "latitude": 54.3651261,
+    "longitude": 18.5735495,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 257532,
+    "name": "Gdańsk Jasień",
+    "latitude": 54.3536528,
+    "longitude": 18.5500148,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 257542,
+    "name": "Gdańsk Kiełpinek",
+    "latitude": 54.3553612,
+    "longitude": 18.5285628,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 257531,
+    "name": "Gdańsk Matarnia",
+    "latitude": 54.3734866,
+    "longitude": 18.5063816,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 257530,
+    "name": "Gdańsk Port Lotniczy",
+    "latitude": 54.3827282,
+    "longitude": 18.4665403,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 257521,
+    "name": "Gdańsk Rębiechowo",
+    "latitude": 54.3860872,
+    "longitude": 18.4514793,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 6122,
+    "name": "Gdańsk Osowa",
+    "latitude": 54.4223889,
+    "longitude": 18.4528085,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 260711,
+    "name": "Gdynia Karwiny",
+    "latitude": 54.4698847,
+    "longitude": 18.508883,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
+    "plkStationId": 260710,
+    "name": "Gdynia Stadion",
+    "latitude": 54.4961412,
+    "longitude": 18.5332467,
+    "network": "PKM",
+    "isActive": true
+  }
+]

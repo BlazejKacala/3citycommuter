@@ -28,8 +28,8 @@ Gdynia sources:
 - stops, delays, routes metadata, trips, GTFS: `api.zdiz.gdynia.pl`
 
 SKM sources:
-- static stops, departures, and route seed data: in-repo mock feed based on public reference data
-- planned realtime integration target: PLK API authenticated with `PLK_KEY`
+- station geometry: in-repo static station definitions for map coordinates
+- realtime departures and route order: PLK API authenticated with `PLK_KEY`
 
 Provider differences are normalized before the UI sees them:
 - all providers map into the same `BusStopData`, `Departure`, and `Route` domain models
@@ -37,7 +37,7 @@ Provider differences are normalized before the UI sees them:
 - Gdynia line labels come from `/pt/routes.routeShortName`
 - Gdynia route geometry comes from `gtfs.zip`, not from a direct route-shape endpoint
 - Gdynia does not currently expose a public live GPS feed compatible with the Gdansk feed
-- SKM currently runs on mock data so it can later switch to PLK-backed data without changing UI-facing models
+- SKM uses PLK-backed departures and route metadata while keeping local station coordinates for map rendering
 
 ## Tech stack
 
@@ -166,6 +166,7 @@ Expected keys in `secrets.properties`:
 PASS=keystore_password
 ALIAS=key_alias
 ALIAS_PASS=key_password
+PLK_KEY=your_plk_api_key
 ```
 
 CI can use environment variables instead:
@@ -174,6 +175,7 @@ CI can use environment variables instead:
 - `ANDROID_SIGNING_STORE_PASSWORD`
 - `ANDROID_SIGNING_KEY_ALIAS`
 - `ANDROID_SIGNING_KEY_PASSWORD`
+- `PLK_KEY`
 - optional: `ANDROID_VERSION_CODE`
 - optional: `ANDROID_VERSION_NAME`
 

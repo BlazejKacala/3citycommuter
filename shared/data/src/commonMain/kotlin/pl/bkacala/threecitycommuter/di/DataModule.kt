@@ -4,6 +4,7 @@ import com.russhwolf.settings.Settings
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import pl.bkacala.threecitycommuter.client.TransitDataSource
+import pl.bkacala.threecitycommuter.repository.rail.RailStationsSeedSeeder
 import pl.bkacala.threecitycommuter.repository.routes.RealRoutesRepository
 import pl.bkacala.threecitycommuter.repository.routes.RoutesRepository
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
@@ -22,5 +23,6 @@ val dataModule = module {
     single<BusStopsRepository> { RealBusStopsRepository(get<TransitDataSource>(), get(), get(), get()) }
     single<VehiclesRepository> { RealVehiclesRepository(get(), get<TransitDataSource>(), get()) }
     single<RoutesRepository> { RealRoutesRepository(get()) }
+    single { RailStationsSeedSeeder(get(), get()) }
     single { GetDeparturesUseCase(get(), get()) }
 }

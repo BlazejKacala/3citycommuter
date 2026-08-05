@@ -14,4 +14,5 @@ val databaseModule: Module = module {
     single { get<CommuterDatabase>().busStopsDao }
     single { get<CommuterDatabase>().vehiclesDao }
     single { get<CommuterDatabase>().busStopTypeDao }
+    single { get<CommuterDatabase>().railStationsDao }
 }

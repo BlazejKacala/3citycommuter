@@ -69,7 +69,7 @@ internal class RealBusStopsRepository(
     override fun getDepartures(stopKey: TransitStopKey): Flow<List<Departure>> {
         return flow {
             emit(transitDataSource.getDepartures(stopKey))
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     override suspend fun storeBusStopsTypes(types: List<BusStopType>) {

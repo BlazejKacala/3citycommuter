@@ -15,7 +15,7 @@ It displays public transport stops on a map, real-time departures, vehicle track
 Data sources:
 - **Gdansk**: open data from [Otwarte Dane Gdanska](https://ckan.multimediagdansk.pl) and companion feeds from `ckan2.multimediagdansk.pl` and `files.cloudgdansk.pl`
 - **Gdynia**: public API from `api.zdiz.gdynia.pl`
-- **SKM**: current in-repo mock feed built from public reference data, with a planned PLK API integration behind the same provider boundary
+- **SKM**: PLK API for departures and route order, plus local station geometry for map coordinates
 
 **Note:** Active map support uses **MapLibre**. Mapbox dependencies are deprecated and commented out.
 
@@ -166,7 +166,7 @@ Transport data is normalized through a provider layer:
 - `Departure.lineNumber` is the UI-facing line label:
   - Gdansk uses `routeId.toString()`
   - Gdynia uses `/pt/routes.routeShortName`
-  - SKM uses the line label provided by the mock feed and later by the PLK-backed provider
+  - SKM uses the line label provided by the PLK-backed provider
 - `Departure.routeId` remains the provider-internal route identifier and must still be used for route lookup.
 - Gdynia route geometry is parsed from GTFS:
   - `/pt/trips` provides `tripId -> shapeId`
@@ -176,8 +176,8 @@ Transport data is normalized through a provider layer:
 - Gdynia does not expose a public live GPS feed compatible with the Gdansk one:
   - route drawing works
   - live vehicle tracking is disabled in UI behavior
-- SKM currently uses mock static and realtime data because `PLK_KEY` is not active yet:
-  - the mock source is structured to be easily replaced by the real PLK API
+- SKM uses the PLK API authenticated with `PLK_KEY` for departures and planned route metadata:
+  - local station geometry is still kept in-repo because PLK does not expose stop coordinates
   - SKM stops are intentionally not clustered on the map
   - SKM stops use a dedicated visual style distinct from bus and tram stops
 - Android allows cleartext HTTP specifically for `api.zdiz.gdynia.pl` through `composeApp/android/src/main/res/xml/network_security_config.xml`
@@ -277,6 +277,7 @@ Local release builds use `secrets.properties` and `signing/key.jks`.
 PASS=keystore_password
 ALIAS=key_alias
 ALIAS_PASS=key_password
+PLK_KEY=your_plk_api_key
 ```
 
 CI can use environment variables instead:
@@ -286,6 +287,7 @@ ANDROID_SIGNING_STORE_FILE=/path/to/key.jks
 ANDROID_SIGNING_STORE_PASSWORD=...
 ANDROID_SIGNING_KEY_ALIAS=...
 ANDROID_SIGNING_KEY_PASSWORD=...
+PLK_KEY=...
 ANDROID_VERSION_CODE=123
 ANDROID_VERSION_NAME=2.1+123
 ```

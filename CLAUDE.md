@@ -164,8 +164,8 @@ Data normalization rules:
   - `GdyniaGtfsStore` caches the parsed result in memory with a 1-day TTL
   - Android preloads the cache during startup in `MainActivity`
 - Gdynia does not support live GPS tracking in the same way as Gdansk
-- SKM currently uses mock static and realtime data derived from public reference data because the PLK key is not active yet
-- the intended live SKM integration point is the PLK API authenticated with `PLK_KEY`
+- SKM uses PLK-backed realtime departures and planned route metadata authenticated with `PLK_KEY`
+- SKM still keeps local station coordinates because the PLK station dictionary does not expose map geometry
 - SKM markers remain visually distinct from bus and tram stops and are not clustered
 
 Debugging notes:
@@ -207,6 +207,7 @@ Expected properties:
 PASS=keystore_password
 ALIAS=key_alias
 ALIAS_PASS=key_password
+PLK_KEY=your_plk_api_key
 ```
 
 CI can provide signing through:
@@ -214,6 +215,7 @@ CI can provide signing through:
 - `ANDROID_SIGNING_STORE_PASSWORD`
 - `ANDROID_SIGNING_KEY_ALIAS`
 - `ANDROID_SIGNING_KEY_PASSWORD`
+- `PLK_KEY`
 - optional `ANDROID_VERSION_CODE`
 - optional `ANDROID_VERSION_NAME`
 

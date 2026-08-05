@@ -17,6 +17,7 @@ import org.koin.android.ext.android.inject
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsPreloader
 import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.model.stops.BusStopType
+import pl.bkacala.threecitycommuter.repository.rail.RailStationsSeedSeeder
 import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
 import pl.bkacala.threecitycommuter.ui.App
 
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
 
     private val busStopsRepository: BusStopsRepository by inject()
     private val gdyniaGtfsPreloader: GdyniaGtfsPreloader by inject()
+    private val railStationsSeedSeeder: RailStationsSeedSeeder by inject()
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                railStationsSeedSeeder.seedIfEmpty()
                 loadBusStopsTypes()
             } catch (throwable: Throwable) {
                 logError(LOG_TAG, "Failed to load startup data", throwable)
