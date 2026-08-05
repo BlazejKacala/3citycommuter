@@ -1,7 +1,6 @@
 package pl.bkacala.threecitycommuter.client
 
 import kotlinx.serialization.json.Json
-import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
@@ -12,7 +11,7 @@ internal class SkmStaticFeed(
     json: Json,
 ) {
     private val stations = loadRailStationsSeed(json)
-        .filter { it.network == RailNetwork.SKM && it.isActive }
+        .filter { it.isActive }
 
     val stops: List<BusStopData> = stations.map { station ->
         BusStopData(

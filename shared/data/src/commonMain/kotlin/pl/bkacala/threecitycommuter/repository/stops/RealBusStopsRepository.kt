@@ -22,7 +22,7 @@ import pl.bkacala.threecitycommuter.utils.isOlderThenOneDay
 
 private const val BUS_STOPS_KEY = "bus_stops"
 private const val BUS_STOPS_CACHE_VERSION_KEY = "bus_stops_cache_version"
-private const val BUS_STOPS_CACHE_VERSION = 3L
+private const val BUS_STOPS_CACHE_VERSION = 4L
 
 internal class RealBusStopsRepository(
     private val transitDataSource: TransitDataSource,

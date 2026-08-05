@@ -328,6 +328,14 @@
     "isActive": true
   },
   {
+    "plkStationId": 257540,
+    "name": "Gdańsk Firoga",
+    "latitude": 54.3782822,
+    "longitude": 18.4874256,
+    "network": "PKM",
+    "isActive": true
+  },
+  {
     "plkStationId": 257530,
     "name": "Gdańsk Port Lotniczy",
     "latitude": 54.3827282,

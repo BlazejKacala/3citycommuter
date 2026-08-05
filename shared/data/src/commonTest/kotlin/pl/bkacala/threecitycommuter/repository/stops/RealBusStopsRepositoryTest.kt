@@ -56,7 +56,7 @@ class RealBusStopsRepositoryTest {
         }
 
         assertEquals(1, transitDataSource.getStopsCalls)
-        assertEquals(3L, lastUpdateRepository.values["bus_stops_cache_version"])
+        assertEquals(4L, lastUpdateRepository.values["bus_stops_cache_version"])
     }
 
     @Test
