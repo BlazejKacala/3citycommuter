@@ -20,7 +20,6 @@ import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
-import pl.bkacala.threecitycommuter.model.stops.BusStopType
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
@@ -343,7 +342,6 @@ class MapScreenViewModelTest {
             emit(departures)
         }
 
-        override suspend fun storeBusStopsTypes(types: List<BusStopType>) = Unit
     }
 
     private inner class FakeLocationRepository(

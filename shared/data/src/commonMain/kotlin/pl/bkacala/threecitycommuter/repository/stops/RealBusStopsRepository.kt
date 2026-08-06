@@ -7,27 +7,23 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.dao.BusStopsDao
-import pl.bkacala.threecitycommuter.dao.BusStopsTypesDao
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
-import pl.bkacala.threecitycommuter.model.stops.BusStopType
-import pl.bkacala.threecitycommuter.model.stops.toData
 import pl.bkacala.threecitycommuter.model.stops.toEntity
 import pl.bkacala.threecitycommuter.model.stops.toStopData
-import pl.bkacala.threecitycommuter.model.stops.toType
-import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
-import pl.bkacala.threecitycommuter.utils.isOlderThenOneDay
+import pl.bkacala.threecitycommuter.logging.logError
+import pl.bkacala.threecitycommuter.utils.isOlderThan
 
 private const val BUS_STOPS_KEY = "bus_stops"
 private const val BUS_STOPS_CACHE_VERSION_KEY = "bus_stops_cache_version"
-private const val BUS_STOPS_CACHE_VERSION = 4L
+private const val BUS_STOPS_CACHE_VERSION = 5L
+private const val LOG_TAG = "RealBusStopsRepository"
 
 internal class RealBusStopsRepository(
     private val transitDataSource: TransitDataSource,
     private val busStopsDao: BusStopsDao,
-    private val busStopsTypesDao: BusStopsTypesDao,
     private val lastUpdateRepository: LastUpdateRepository,
 ) : BusStopsRepository {
 
@@ -35,35 +31,35 @@ internal class RealBusStopsRepository(
         return flow {
             val lastUpdateTimestamp = lastUpdateRepository.getLastUpdateTimeStamp(BUS_STOPS_KEY)
             val cachedVersion = lastUpdateRepository.getLong(BUS_STOPS_CACHE_VERSION_KEY, 0)
+            val hasStoredStops = busStopsDao.getRealBusStations().isNotEmpty()
+            val cacheNeedsSeeding = !hasStoredStops || cachedVersion < BUS_STOPS_CACHE_VERSION
 
-            if (lastUpdateTimestamp.isOlderThenOneDay() || cachedVersion < BUS_STOPS_CACHE_VERSION) {
-                val stops = transitDataSource.getStops()
-                busStopsDao.upsertBusStations(stops.map { it.toEntity() })
-                busStopsTypesDao.upsertBusStopsTypes(
-                    stops.filter { it.provider == TransitProvider.GDYNIA }.map { it.toType().toEntity() },
-                )
-                lastUpdateRepository.storeLastUpdateCurrentTimeStamp(BUS_STOPS_KEY)
+            if (cacheNeedsSeeding) {
+                val bundledStops = transitDataSource.getBundledStops()
+                if (bundledStops.isNotEmpty()) {
+                    storeStops(bundledStops)
+                }
+            }
+
+            if (cacheNeedsSeeding || lastUpdateTimestamp.isOlderThan(StopCatalogCacheConfig.refreshInterval)) {
+                try {
+                    storeStops(transitDataSource.getStops())
+                    lastUpdateRepository.storeLastUpdateCurrentTimeStamp(BUS_STOPS_KEY)
+                } catch (throwable: Throwable) {
+                    if (busStopsDao.getRealBusStations().isEmpty()) {
+                        throw throwable
+                    }
+                    logError(LOG_TAG, "Failed to refresh stop catalog; using cached data", throwable)
+                }
                 lastUpdateRepository.putLong(BUS_STOPS_CACHE_VERSION_KEY, BUS_STOPS_CACHE_VERSION)
             }
-            val relationsByStopId = busStopsTypesDao.getBusStopsTypes()
-                .map { it.toData() }
-                .associateBy { it.stopKey }
             val storedStops = busStopsDao.getRealBusStations()
-            emit(
-                storedStops
-                    .map { entity ->
-                        val stopData = entity.toStopData(isForBuses = false, isForTrams = false)
-                        val relation = relationsByStopId[stopData.stopKey]
-                        if (relation != null) {
-                            entity.toStopData(relation.isForBuses, relation.isForTrams)
-                        } else if (TransitProvider.valueOf(entity.provider) == TransitProvider.GDANSK) {
-                            entity.toStopData(isForBuses = true, isForTrams = false)
-                        } else {
-                            entity.toStopData(isForBuses = false, isForTrams = false)
-                        }
-                    },
-            )
+            emit(storedStops.map { it.toStopData() })
         }.flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun storeStops(stops: List<BusStopData>) {
+        busStopsDao.upsertBusStations(stops.map { it.toEntity() })
     }
 
     override fun getDepartures(stopKey: TransitStopKey): Flow<List<Departure>> {
@@ -72,7 +68,4 @@ internal class RealBusStopsRepository(
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun storeBusStopsTypes(types: List<BusStopType>) {
-        busStopsTypesDao.upsertBusStopsTypes(types.map { it.toEntity() })
-    }
 }

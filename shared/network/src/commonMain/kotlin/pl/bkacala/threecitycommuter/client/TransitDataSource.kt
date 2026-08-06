@@ -13,6 +13,8 @@ interface TransitDataSource {
 
     suspend fun getStops(): List<BusStopData>
 
+    suspend fun getBundledStops(): List<BusStopData> = emptyList()
+
     suspend fun getDepartures(stopKey: TransitStopKey): List<Departure>
 
     suspend fun getRouteShape(

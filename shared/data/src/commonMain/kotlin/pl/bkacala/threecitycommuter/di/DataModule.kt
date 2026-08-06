@@ -20,7 +20,7 @@ expect val platformDataModule: Module
 val dataModule = module {
     single<Settings> { Settings() }
     single<LastUpdateRepository> { RealLastUpdateRepository(get()) }
-    single<BusStopsRepository> { RealBusStopsRepository(get<TransitDataSource>(), get(), get(), get()) }
+    single<BusStopsRepository> { RealBusStopsRepository(get<TransitDataSource>(), get(), get()) }
     single<VehiclesRepository> { RealVehiclesRepository(get(), get<TransitDataSource>(), get()) }
     single<RoutesRepository> { RealRoutesRepository(get()) }
     single { RailStationsSeedSeeder(get(), get()) }

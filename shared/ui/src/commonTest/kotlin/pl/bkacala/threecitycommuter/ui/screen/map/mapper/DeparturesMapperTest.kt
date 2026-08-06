@@ -2,6 +2,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map.mapper
 
 import kotlinx.datetime.Clock
 import pl.bkacala.threecitycommuter.model.departures.Departure
+import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
@@ -23,6 +24,20 @@ class DeparturesMapperTest {
 
         assertEquals(1, model.departures.size)
         assertNull(model.departures.single().statusLabel)
+    }
+
+    @Test
+    fun `uses rail network name instead of line number for rail departures`() {
+        val model = DeparturesMapper.mapToBottomSheetModel(
+            busStopData = busStopData().copy(
+                stopKey = TransitStopKey(TransitProvider.SKM, 257540),
+                railNetwork = RailNetwork.PKM,
+            ),
+            departures = listOf(departure(delayInSeconds = 0) to null),
+            selectedDepartureKey = null,
+        )
+
+        assertEquals("pkm", model.departures.single().lineNumber)
     }
 
     private fun busStopData(): BusStopData =

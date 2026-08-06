@@ -174,7 +174,7 @@ class TransitDataSourceTest {
 
     @Test
     fun `Gdansk and Gdynia providers expose a consistent domain model for UI fields`() = runTest {
-        val gdanskDataSource = GdanskTransitDataSource(fakeGdanskApiClient())
+        val gdanskDataSource = GdanskTransitDataSource(fakeGdanskApiClient(), testJson)
         val gdyniaHttpClient = mockHttpClient(
             "http://api.zdiz.gdynia.pl/pt/stops" to MockResponse.Text(gdyniaStopsBody),
             "http://api.zdiz.gdynia.pl/pt/delays?stopId=1015" to MockResponse.Text(gdyniaDelaysBody),

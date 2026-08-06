@@ -3,10 +3,12 @@ package pl.bkacala.threecitycommuter.client
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteShapeResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
+import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehicleResponse
 import pl.bkacala.threecitycommuter.model.route.Route
@@ -19,10 +21,12 @@ import pl.bkacala.threecitycommuter.model.transit.supportsRouteShapes
 import pl.bkacala.threecitycommuter.model.transit.supportsVehicleMetadata
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
+import pl.bkacala.threecitycommuter.resource.readBundledResourceText
 import pl.bkacala.threecitycommuter.utils.toddMMyyyyString
 
 internal class GdanskTransitDataSource(
     private val gdanskApiClient: GdanskApiClient,
+    private val json: Json,
 ) : TransitDataSource {
 
     override fun features(provider: TransitProvider): TransitFeatures =
@@ -35,6 +39,17 @@ internal class GdanskTransitDataSource(
 
     override suspend fun getStops(): List<BusStopData> =
         gdanskApiClient.getStops().stops.map { it.toBusStopData(isForBuses = true, isForTrams = true) }
+
+    override suspend fun getBundledStops(): List<BusStopData> {
+        val payload = json.decodeFromString<Map<String, GdanskStopsResponse>>(
+            readBundledResourceText("gdansk_stops.json"),
+        )
+        return payload.values
+            .maxByOrNull { it.lastUpdate }
+            ?.stops
+            .orEmpty()
+            .map { it.toBusStopData(isForBuses = true, isForTrams = true) }
+    }
 
     override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> =
         gdanskApiClient.getDepartures(stopKey.sourceStopId).departures.map { it.toDepartureData() }

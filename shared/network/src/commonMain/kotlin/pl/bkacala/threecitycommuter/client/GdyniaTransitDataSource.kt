@@ -30,6 +30,7 @@ import pl.bkacala.threecitycommuter.model.transit.supportsRouteShapes
 import pl.bkacala.threecitycommuter.model.transit.supportsVehicleMetadata
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
+import pl.bkacala.threecitycommuter.resource.readBundledResourceText
 import kotlin.time.Duration.Companion.hours
 
 internal class GdyniaTransitDataSource(
@@ -79,6 +80,12 @@ internal class GdyniaTransitDataSource(
                 isForTrams = false,
             )
         }
+    }
+
+    override suspend fun getBundledStops(): List<BusStopData> {
+        val body = readBundledResourceText("gdynia_stops.json")
+        val decoded = json.decodeFromString<List<GdyniaStopNetworkData>>(body)
+        return decoded.map { it.toBusStopData() }
     }
 
     override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> {
@@ -154,6 +161,34 @@ internal class GdyniaTransitDataSource(
         return candidate
     }
 }
+
+private fun GdyniaStopNetworkData.toBusStopData(): BusStopData =
+    BusStopData(
+        stopKey = TransitStopKey(TransitProvider.GDYNIA, stopId),
+        stopCode = stopCode,
+        stopName = stopName,
+        stopShortName = stopName,
+        stopDesc = stopDesc,
+        subName = null,
+        date = null,
+        zoneId = zoneId.toIntOrNull() ?: -1,
+        zoneName = zoneId,
+        virtual = 0,
+        nonpassenger = 0,
+        depot = 0,
+        ticketZoneBorder = ticketZoneBorder?.toIntOrNull() ?: 0,
+        onDemand = false,
+        activationDate = null,
+        stopLat = stopLat.toDouble(),
+        stopLon = stopLon.toDouble(),
+        stopUrl = stopUrl,
+        locationType = locationType,
+        parentStation = parentStation,
+        stopTimezone = stopTimezone,
+        wheelchairBoarding = wheelchairBoarding,
+        isForBuses = false,
+        isForTrams = false,
+    )
 private const val STOPS_URL = "http://api.zdiz.gdynia.pl/pt/stops"
 private const val DELAYS_URL = "http://api.zdiz.gdynia.pl/pt/delays"
 private const val ROUTES_URL = "http://api.zdiz.gdynia.pl/pt/routes"

@@ -4,7 +4,7 @@ import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
-fun BusStopEntity.toStopData(isForBuses: Boolean, isForTrams: Boolean): BusStopData {
+fun BusStopEntity.toStopData(): BusStopData {
     return BusStopData(
         stopKey = TransitStopKey(
             provider = TransitProvider.valueOf(this.provider),
@@ -31,17 +31,20 @@ fun BusStopEntity.toStopData(isForBuses: Boolean, isForTrams: Boolean): BusStopD
         parentStation = this.parentStation,
         stopTimezone = this.stopTimezone,
         wheelchairBoarding = this.wheelchairBoarding,
-        isForBuses = isForBuses,
-        isForTrams = isForTrams,
+        isForBuses = this.isForBuses,
+        isForTrams = this.isForTrams,
     )
 }
 
 fun GdanskStopResponse.toBusStopData(
     isForBuses: Boolean,
     isForTrams: Boolean,
-): BusStopData = toEntity().toStopData(isForBuses, isForTrams)
+): BusStopData = toEntity(isForBuses, isForTrams).toStopData()
 
-fun GdanskStopResponse.toEntity(): BusStopEntity {
+fun GdanskStopResponse.toEntity(
+    isForBuses: Boolean = true,
+    isForTrams: Boolean = true,
+): BusStopEntity {
     return BusStopEntity(
         provider = TransitProvider.GDANSK.name,
         sourceStopId = this.stopId,
@@ -66,6 +69,8 @@ fun GdanskStopResponse.toEntity(): BusStopEntity {
         parentStation = this.parentStation,
         stopTimezone = this.stopTimezone,
         wheelchairBoarding = this.wheelchairBoarding,
+        isForBuses = isForBuses,
+        isForTrams = isForTrams,
     )
 }
 
@@ -94,32 +99,6 @@ fun BusStopData.toEntity(): BusStopEntity {
         parentStation = this.parentStation,
         stopTimezone = this.stopTimezone,
         wheelchairBoarding = this.wheelchairBoarding,
-    )
-}
-
-fun BusStopType.toEntity(): BusStopTypeEntity {
-    return BusStopTypeEntity(
-        provider = this.stopKey.provider.name,
-        sourceStopId = this.stopKey.sourceStopId,
-        isForBuses = this.isForBuses,
-        isForTrams = this.isForTrams,
-    )
-}
-
-fun BusStopData.toType(): BusStopType {
-    return BusStopType(
-        stopKey = this.stopKey,
-        isForBuses = this.isForBuses,
-        isForTrams = this.isForTrams,
-    )
-}
-
-fun BusStopTypeEntity.toData(): BusStopType {
-    return BusStopType(
-        stopKey = TransitStopKey(
-            provider = TransitProvider.valueOf(this.provider),
-            sourceStopId = this.sourceStopId,
-        ),
         isForBuses = this.isForBuses,
         isForTrams = this.isForTrams,
     )

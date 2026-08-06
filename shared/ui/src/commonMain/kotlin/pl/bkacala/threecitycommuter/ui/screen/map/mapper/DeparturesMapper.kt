@@ -3,6 +3,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map.mapper
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.model.departures.Departure
+import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.supportsLiveVehicleTracking
@@ -42,6 +43,7 @@ object DeparturesMapper {
                     selectedDepartureKey = selectedDepartureKey,
                     supportsLiveTracking = busStopData.provider.supportsLiveVehicleTracking,
                     provider = busStopData.provider,
+                    railNetwork = busStopData.railNetwork,
                 )
             },
         )
@@ -52,6 +54,7 @@ object DeparturesMapper {
         selectedDepartureKey: String?,
         supportsLiveTracking: Boolean,
         provider: TransitProvider,
+        railNetwork: RailNetwork?,
     ): DepartureRowModel {
         val now = Clock.System.now().epochSeconds
         val minutesToArrival = minutesToArrival(this.estimatedTime, now)
@@ -62,7 +65,7 @@ object DeparturesMapper {
             isNear = minutesToArrival == 0,
             vehicleType = vehicleType(provider),
             departureTime = departureTime(minutesToArrival),
-            lineNumber = this.lineNumber,
+                    lineNumber = railNetwork?.displayName ?: this.lineNumber,
             direction = this.headsign ?: "",
             disabledFriendly = vehicle?.wheelchairsRamp ?: false,
             bikesAllowed = vehicle?.bikeHolders == 1,
@@ -114,4 +117,7 @@ object DeparturesMapper {
         } else {
             "$minutesToArrival min"
         }
+
+    private val RailNetwork.displayName: String
+        get() = name.lowercase()
 }

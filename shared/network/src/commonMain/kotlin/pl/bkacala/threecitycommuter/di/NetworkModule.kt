@@ -61,8 +61,8 @@ val networkModule = module {
     single<GdyniaGtfsPreloader> { get<GdyniaGtfsStore>() }
     single<PlkApiClient> { KtorPlkApiClient(get(), get()) }
     single { SkmStaticFeed(get()) }
-    single { GdanskTransitDataSource(get()) }
+    single { GdanskTransitDataSource(get(), get()) }
     single { GdyniaTransitDataSource(get(), get(), get()) }
     single { SkmTransitDataSource(get(), get()) }
-    single<TransitDataSource> { CombinedTransitDataSource(get(), get(), get()) }
+    single<TransitDataSource> { CombinedTransitDataSource(get(), get(), get(), get()) }
 }

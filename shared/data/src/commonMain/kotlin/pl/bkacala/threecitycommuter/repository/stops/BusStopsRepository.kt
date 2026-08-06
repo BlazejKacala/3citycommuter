@@ -3,7 +3,6 @@ package pl.bkacala.threecitycommuter.repository.stops
 import kotlinx.coroutines.flow.Flow
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.stops.BusStopData
-import pl.bkacala.threecitycommuter.model.stops.BusStopType
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
 interface BusStopsRepository {
@@ -11,5 +10,4 @@ interface BusStopsRepository {
 
     fun getDepartures(stopKey: TransitStopKey): Flow<List<Departure>>
 
-    suspend fun storeBusStopsTypes(types: List<BusStopType>)
 }

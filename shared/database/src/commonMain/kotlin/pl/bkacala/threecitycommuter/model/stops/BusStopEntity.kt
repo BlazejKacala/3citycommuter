@@ -30,4 +30,6 @@ data class BusStopEntity(
     val parentStation: String?,
     val stopTimezone: String?,
     val wheelchairBoarding: String?,
+    val isForBuses: Boolean,
+    val isForTrams: Boolean,
 )
