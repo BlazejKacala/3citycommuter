@@ -1,7 +1,8 @@
 package pl.bkacala.threecitycommuter.client
 
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
@@ -13,6 +14,7 @@ import pl.bkacala.threecitycommuter.model.plk.PlkOperationStationDto
 import pl.bkacala.threecitycommuter.model.plk.PlkRouteDto
 import pl.bkacala.threecitycommuter.model.plk.PlkStationOnRouteDto
 import pl.bkacala.threecitycommuter.model.plk.PlkTrainOperationDto
+import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
@@ -23,6 +25,7 @@ import pl.bkacala.threecitycommuter.model.transit.supportsRouteShapes
 import pl.bkacala.threecitycommuter.model.transit.supportsVehicleMetadata
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
+import pl.bkacala.threecitycommuter.logging.logError
 
 internal class SkmTransitDataSource(
     private val plkApiClient: PlkApiClient,
@@ -45,29 +48,42 @@ internal class SkmTransitDataSource(
         val today = Clock.System.now().toLocalDateInSystemZone()
         val now = Clock.System.now()
         val stationId = stopKey.sourceStopId.toString()
-        val (schedules, operations) = coroutineScope {
+        val carrierCode = carrierCodeFor(stopKey.sourceStopId)
+        val lineLabel = lineLabelFor(stopKey.sourceStopId)
+        val (schedules, operations) = supervisorScope {
             val schedulesDeferred = async {
                 plkApiClient.getSchedules(
                     dateFrom = today.toString(),
                     dateTo = today.toString(),
                     stations = stationId,
-                    carriersInclude = PlkApiConfig.skmTricityCarrierCode,
+                    carriersInclude = carrierCode,
+                    fullRoutes = false,
                 )
             }
             val operationsDeferred = async {
                 plkApiClient.getOperations(
                     stations = stationId,
-                    carriersInclude = PlkApiConfig.skmTricityCarrierCode,
+                    carriersInclude = carrierCode,
+                    fullRoutes = false,
                 )
             }
-            schedulesDeferred.await() to operationsDeferred.await()
+            val operations = try {
+                operationsDeferred.await()
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) {
+                    throw throwable
+                }
+                logError(LOG_TAG, "Failed to load PLK operations; using scheduled departures", throwable)
+                null
+            }
+            schedulesDeferred.await() to operations
         }
-        val operationsByKey = operations.trains.associateBy(::routeKey)
+        val operationsByKey = operations?.trains.orEmpty().associateBy(::routeKey)
         val stationNames = scheduleStationNamesById(schedules)
 
-        return schedules.routes
+        val scheduledDepartures = schedules.routes
             .asSequence()
-            .filter { route -> route.carrierCode.equals(PlkApiConfig.skmTricityCarrierCode, ignoreCase = true) }
+            .filter { route -> route.carrierCode.equals(carrierCode, ignoreCase = true) }
             .mapNotNull { route ->
                 val routeStation = route.stations.firstOrNull { it.stationId == stopKey.sourceStopId } ?: return@mapNotNull null
                 val operation = operationsByKey[routeKey(route)]
@@ -77,6 +93,30 @@ internal class SkmTransitDataSource(
                     operationStation = operation?.stations?.firstOrNull { it.stationId == stopKey.sourceStopId },
                     stationNames = stationNames,
                     operatingDate = operation?.operatingDate ?: today.toString(),
+                    lineLabel = lineLabel,
+                )
+            }
+            .filter { departure ->
+                val departureInstant = departure.estimatedTime ?: departure.theoreticalTime
+                departureInstant != null && departureInstant >= now.minus(2.minutes)
+            }
+            .sortedBy { it.estimatedTime ?: it.theoreticalTime }
+            .toList()
+
+        if (scheduledDepartures.isNotEmpty()) {
+            return scheduledDepartures
+        }
+
+        return operations?.trains
+            .orEmpty()
+            .asSequence()
+            .mapNotNull { train ->
+                val station = train.stations.firstOrNull { it.stationId == stopKey.sourceStopId }
+                    ?: return@mapNotNull null
+                train.toDeparture(
+                    station = station,
+                    stationNames = stationNames,
+                    lineLabel = lineLabel,
                 )
             }
             .filter { departure ->
@@ -86,6 +126,18 @@ internal class SkmTransitDataSource(
             .sortedBy { it.estimatedTime ?: it.theoreticalTime }
             .toList()
     }
+
+    private fun carrierCodeFor(stationId: Int): String =
+        when (skmStaticFeed.railNetworksById[stationId]) {
+            RailNetwork.PKM -> PlkApiConfig.pkmCarrierCode
+            RailNetwork.SKM, null -> PlkApiConfig.skmTricityCarrierCode
+        }
+
+    private fun lineLabelFor(stationId: Int): String =
+        when (skmStaticFeed.railNetworksById[stationId]) {
+            RailNetwork.PKM -> "PKM"
+            RailNetwork.SKM, null -> "SKM"
+        }
 
     override suspend fun getRouteShape(provider: TransitProvider, routeId: Int, tripId: Int): Route {
         val route = plkApiClient.getRoute(scheduleId = routeId, orderId = tripId)
@@ -122,15 +174,14 @@ internal class SkmTransitDataSource(
             merged
         }
 
-    private fun routeKey(route: PlkRouteDto): String = routeKey(route.scheduleId, route.orderId, route.trainOrderId)
+    private fun routeKey(route: PlkRouteDto): String = routeKey(route.scheduleId, route.orderId)
 
-    private fun routeKey(route: PlkTrainOperationDto): String = routeKey(route.scheduleId, route.orderId, route.trainOrderId)
+    private fun routeKey(route: PlkTrainOperationDto): String = routeKey(route.scheduleId, route.orderId)
 
     private fun routeKey(
         scheduleId: Int,
         orderId: Int,
-        trainOrderId: Int?,
-    ): String = "$scheduleId|$orderId|${trainOrderId ?: orderId}"
+    ): String = "$scheduleId|$orderId"
 
     private fun PlkRouteDto.toDeparture(
         routeStation: PlkStationOnRouteDto,
@@ -138,6 +189,7 @@ internal class SkmTransitDataSource(
         operationStation: PlkOperationStationDto?,
         stationNames: Map<Int, String>,
         operatingDate: String,
+        lineLabel: String,
     ): Departure {
         val firstStation = stations.minByOrNull { it.orderNumber }
         val destinationStationId = resolveDestinationStationId(
@@ -157,7 +209,7 @@ internal class SkmTransitDataSource(
             delayInSeconds = operationStation?.departureDelayMinutes?.times(60),
             estimatedTime = estimatedTime,
             headsign = destinationStationId?.let(stationNames::get) ?: name,
-            lineNumber = nationalNumber ?: name ?: commercialCategorySymbol ?: "SKM",
+            lineNumber = lineLabel,
             routeId = scheduleId,
             scheduledTripStartTime = firstStation?.departureTime?.toPlkRouteInstant(operatingDate, firstStation.departureDay ?: 0),
             tripId = orderId,
@@ -202,4 +254,37 @@ internal class SkmTransitDataSource(
     }
 
     private fun PlkOperationStationDto.sequenceNumber(): Int = plannedSequenceNumber ?: actualSequenceNumber
+
+    private fun PlkTrainOperationDto.toDeparture(
+        station: PlkOperationStationDto,
+        stationNames: Map<Int, String>,
+        lineLabel: String,
+    ): Departure {
+        val theoreticalTime = station.plannedDeparture?.toPlkOperationInstant()
+            ?: station.plannedArrival?.toPlkOperationInstant()
+        val estimatedTime = station.actualDeparture?.toPlkOperationInstant()
+            ?: station.actualArrival?.toPlkOperationInstant()
+            ?: theoreticalTime
+        val stationName = stationNames[station.stationId]
+
+        return Departure(
+            id = listOf(scheduleId, orderId, trainOrderId ?: orderId, operatingDate, station.stationId).joinToString("-"),
+            delayInSeconds = station.departureDelayMinutes?.times(60),
+            estimatedTime = estimatedTime,
+            headsign = stationName,
+            lineNumber = lineLabel,
+            routeId = scheduleId,
+            scheduledTripStartTime = null,
+            tripId = orderId,
+            status = if (station.isCancelled) "X" else null,
+            theoreticalTime = theoreticalTime,
+            timestamp = Clock.System.now(),
+            trip = (trainOrderId ?: orderId).toLong(),
+            vehicleCode = null,
+            vehicleId = null,
+            vehicleService = lineLabel,
+        )
+    }
 }
+
+private const val LOG_TAG = "SkmTransitDataSource"

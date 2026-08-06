@@ -32,6 +32,7 @@ val generatePlkApiConfig by tasks.registering {
                 const val baseUrl = "https://pdp-api.plk-sa.pl"
                 const val apiKey = "${plkKey.replace("\\", "\\\\").replace("\"", "\\\"")}"
                 const val skmTricityCarrierCode = "SKMT"
+                const val pkmCarrierCode = "PR"
             }
             """.trimIndent(),
         )

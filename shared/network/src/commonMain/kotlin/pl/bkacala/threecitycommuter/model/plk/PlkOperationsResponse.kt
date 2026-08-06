@@ -5,7 +5,7 @@ import kotlinx.datetime.Instant
 
 @Serializable
 internal data class PlkOperationsResponse(
-    val generatedAt: Instant,
+    val generatedAt: Instant? = null,
     val trains: List<PlkTrainOperationDto> = emptyList(),
     val stations: Map<String, String> = emptyMap(),
 )

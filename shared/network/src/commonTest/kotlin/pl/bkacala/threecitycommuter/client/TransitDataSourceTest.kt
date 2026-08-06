@@ -151,7 +151,7 @@ class TransitDataSourceTest {
 
     @Test
     fun `Gdansk route shape includes ordered passenger stops for selected trip`() = runTest {
-        val dataSource = GdanskTransitDataSource(fakeGdanskApiClient())
+        val dataSource = GdanskTransitDataSource(fakeGdanskApiClient(), testJson)
 
         val route = dataSource.getRouteShape(TransitProvider.GDANSK, routeId = 6, tripId = 42)
 
@@ -249,7 +249,7 @@ class TransitDataSourceTest {
         assertEquals(TransitProvider.SKM, selectedStop.provider)
         assertEquals(258458, selectedStop.sourceStopId)
         assertTrue(departures.isNotEmpty())
-        assertEquals("99450", departures.first().lineNumber)
+        assertEquals("SKM", departures.first().lineNumber)
         assertEquals(null, departures.first().vehicleId)
         assertNotNull(route)
         assertTrue(route.shape.isNotEmpty())
@@ -257,6 +257,80 @@ class TransitDataSourceTest {
         assertEquals(false, dataSource.features(TransitProvider.SKM).supportsLiveVehicleTracking)
         assertEquals(false, dataSource.features(TransitProvider.SKM).supportsVehicleMetadata)
         assertEquals(null, dataSource.getVehiclePosition(TransitProvider.SKM, 1))
+    }
+
+    @Test
+    fun `PKM station requests Polregio departures from PLK`() = runTest {
+        val requestedCarriers = mutableListOf<String>()
+        val dataSource = SkmTransitDataSource(
+            plkApiClient = fakePlkApiClient(requestedCarriers),
+            skmStaticFeed = SkmStaticFeed(testJson),
+        )
+
+        val pkmStop = dataSource.getStops().first { it.sourceStopId == 257535 }
+        dataSource.getDepartures(pkmStop.stopKey)
+
+        assertEquals(listOf("PR", "PR"), requestedCarriers)
+    }
+
+    @Test
+    fun `scheduled rail departures remain available when operations request fails`() = runTest {
+        val dataSource = SkmTransitDataSource(
+            plkApiClient = fakePlkApiClient(failOperations = true),
+            skmStaticFeed = SkmStaticFeed(testJson),
+        )
+
+        val railStop = dataSource.getStops().first { it.sourceStopId == 258458 }
+        val departures = dataSource.getDepartures(railStop.stopKey)
+
+        assertTrue(departures.isNotEmpty())
+    }
+
+    @Test
+    fun `rail operation is matched when train order id differs from schedule`() = runTest {
+        val dataSource = SkmTransitDataSource(
+            plkApiClient = fakePlkApiClientWithDifferentTrainOrderIds(),
+            skmStaticFeed = SkmStaticFeed(testJson),
+        )
+
+        val railStop = dataSource.getStops().first { it.sourceStopId == 258458 }
+        val departures = dataSource.getDepartures(railStop.stopKey)
+
+        assertEquals(120, departures.single().delayInSeconds)
+    }
+
+    @Test
+    fun `operations provide departures when schedules are empty`() = runTest {
+        val dataSource = SkmTransitDataSource(
+            plkApiClient = object : PlkApiClient by fakePlkApiClient() {
+                override suspend fun getSchedules(
+                    dateFrom: String,
+                    dateTo: String,
+                    stations: String,
+                    carriersInclude: String,
+                    fullRoutes: Boolean,
+                ): PlkScheduleResponse = PlkScheduleResponse()
+            },
+            skmStaticFeed = SkmStaticFeed(testJson),
+        )
+
+        val railStop = dataSource.getStops().first { it.sourceStopId == 258458 }
+        val departures = dataSource.getDepartures(railStop.stopKey)
+
+        assertTrue(departures.isNotEmpty())
+    }
+
+    @Test
+    fun `rail departure uses network label instead of train number`() = runTest {
+        val dataSource = SkmTransitDataSource(
+            plkApiClient = fakePlkApiClient(),
+            skmStaticFeed = SkmStaticFeed(testJson),
+        )
+
+        val skmStop = dataSource.getStops().first { it.sourceStopId == 258458 }
+        val departures = dataSource.getDepartures(skmStop.stopKey)
+
+        assertEquals("SKM", departures.first().lineNumber)
     }
 
     private fun fakeGdanskApiClient(): GdanskApiClient =
@@ -366,7 +440,10 @@ class TransitDataSourceTest {
                 )
         }
 
-    private fun fakePlkApiClient(): PlkApiClient =
+    private fun fakePlkApiClient(
+        requestedCarriers: MutableList<String> = mutableListOf(),
+        failOperations: Boolean = false,
+    ): PlkApiClient =
         object : PlkApiClient {
             override suspend fun getStations(search: String, pageSize: Int): PlkStationsResponse =
                 PlkStationsResponse(
@@ -387,11 +464,12 @@ class TransitDataSourceTest {
                 stations: String,
                 carriersInclude: String,
                 fullRoutes: Boolean,
-            ): PlkScheduleResponse =
-                PlkScheduleResponse(
+            ): PlkScheduleResponse {
+                requestedCarriers += carriersInclude
+                return PlkScheduleResponse(
                     generatedAt = kotlinx.datetime.Instant.parse("2026-08-04T10:00:00Z"),
                     routes = listOf(
-                        dynamicPlkRoute(),
+                        dynamicPlkRoute(carrierCode = carriersInclude),
                     ),
                     dictionaries = PlkScheduleDictionaries(
                         stations = stationIdsByName.entries.associate { (name, id) ->
@@ -399,14 +477,19 @@ class TransitDataSourceTest {
                         },
                     ),
                 )
+            }
 
             override suspend fun getOperations(
                 stations: String,
                 carriersInclude: String,
                 fullRoutes: Boolean,
                 withPlanned: Boolean,
-            ): PlkOperationsResponse =
-                PlkOperationsResponse(
+            ): PlkOperationsResponse {
+                requestedCarriers += carriersInclude
+                if (failOperations) {
+                    error("operations unavailable")
+                }
+                return PlkOperationsResponse(
                     generatedAt = kotlinx.datetime.Instant.parse("2026-08-04T10:00:00Z"),
                     trains = listOf(
                         PlkTrainOperationDto(
@@ -434,8 +517,52 @@ class TransitDataSourceTest {
                     ),
                     stations = stationIdsByName.entries.associate { (name, id) -> id.toString() to name },
                 )
+            }
 
             override suspend fun getRoute(scheduleId: Int, orderId: Int): PlkRouteDto = dynamicPlkRoute()
+        }
+
+    private fun fakePlkApiClientWithDifferentTrainOrderIds(): PlkApiClient =
+        object : PlkApiClient by fakePlkApiClient() {
+            override suspend fun getSchedules(
+                dateFrom: String,
+                dateTo: String,
+                stations: String,
+                carriersInclude: String,
+                fullRoutes: Boolean,
+            ): PlkScheduleResponse =
+                PlkScheduleResponse(
+                    generatedAt = kotlinx.datetime.Instant.parse("2026-08-04T10:00:00Z"),
+                    routes = listOf(dynamicPlkRoute().copy(trainOrderId = 9001)),
+                )
+
+            override suspend fun getOperations(
+                stations: String,
+                carriersInclude: String,
+                fullRoutes: Boolean,
+                withPlanned: Boolean,
+            ): PlkOperationsResponse =
+                PlkOperationsResponse(
+                    generatedAt = kotlinx.datetime.Instant.parse("2026-08-04T10:00:00Z"),
+                    trains = listOf(
+                        PlkTrainOperationDto(
+                            scheduleId = 25,
+                            orderId = 501,
+                            trainOrderId = 9002,
+                            operatingDate = dynamicOperatingDate(),
+                            stations = listOf(
+                                PlkOperationStationDto(
+                                    stationId = 258458,
+                                    actualSequenceNumber = 1,
+                                    plannedDeparture = dynamicPlkDateTime(4),
+                                    departureDelayMinutes = 2,
+                                    actualDeparture = dynamicPlkDateTime(4),
+                                    isConfirmed = true,
+                                ),
+                            ),
+                        ),
+                    ),
+                )
         }
 
     private fun mockHttpClient(vararg responses: Pair<String, MockResponse>): HttpClient {
@@ -644,13 +771,13 @@ private val stationIdsByName = mapOf(
     "Wejherowo" to 6304,
 )
 
-private fun dynamicPlkRoute(): PlkRouteDto =
+private fun dynamicPlkRoute(carrierCode: String = "SKMT"): PlkRouteDto =
     PlkRouteDto(
         scheduleId = 25,
         orderId = 501,
         trainOrderId = 501,
         name = "SKM do Gdyni",
-        carrierCode = "SKMT",
+        carrierCode = carrierCode,
         nationalNumber = "99450",
         commercialCategorySymbol = "SKM",
         operatingDates = listOf(dynamicOperatingDate()),

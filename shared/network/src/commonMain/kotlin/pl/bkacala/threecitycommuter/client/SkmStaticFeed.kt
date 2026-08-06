@@ -45,6 +45,7 @@ internal class SkmStaticFeed(
     }
 
     private val stopsById = stops.associateBy { it.sourceStopId }
+    val railNetworksById: Map<Int, RailNetwork> = stops.associate { it.sourceStopId to requireNotNull(it.railNetwork) }
     val stopNamesById: Map<Int, String> = stops.associate { it.sourceStopId to it.name }
 
     fun routeFor(stopIds: List<Int>): Route =

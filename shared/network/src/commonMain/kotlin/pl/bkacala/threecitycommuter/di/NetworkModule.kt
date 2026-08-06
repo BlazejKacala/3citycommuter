@@ -47,7 +47,7 @@ val networkModule = module {
                             println("KTOR $message")
                         }
                     }
-                level = LogLevel.HEADERS
+                level = LogLevel.BODY
             }
         }
     }
