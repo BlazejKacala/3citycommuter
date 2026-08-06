@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.Logger
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
@@ -15,8 +16,9 @@ import pl.bkacala.threecitycommuter.client.GdyniaGtfsPreloader
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsStore
 import pl.bkacala.threecitycommuter.client.GdyniaTransitDataSource
 import pl.bkacala.threecitycommuter.client.KtorGdanskApiClient
-import pl.bkacala.threecitycommuter.client.MockSkmRealtimeDataSource
-import pl.bkacala.threecitycommuter.client.SkmRealtimeDataSource
+import pl.bkacala.threecitycommuter.client.KtorPlkApiClient
+import pl.bkacala.threecitycommuter.client.PlkApiClient
+import pl.bkacala.threecitycommuter.client.SkmStaticFeed
 import pl.bkacala.threecitycommuter.client.SkmTransitDataSource
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.client.ZipEntryReader
@@ -39,6 +41,12 @@ val networkModule = module {
                 json(json)
             }
             install(Logging) {
+                logger =
+                    object : Logger {
+                        override fun log(message: String) {
+                            println("KTOR $message")
+                        }
+                    }
                 level = LogLevel.HEADERS
             }
         }
@@ -51,9 +59,10 @@ val networkModule = module {
     single { ZipEntryReader() }
     single { GdyniaGtfsStore(get(), get(), get(), get(), get()) }
     single<GdyniaGtfsPreloader> { get<GdyniaGtfsStore>() }
-    single { GdanskTransitDataSource(get()) }
+    single<PlkApiClient> { KtorPlkApiClient(get(), get()) }
+    single { SkmStaticFeed(get()) }
+    single { GdanskTransitDataSource(get(), get()) }
     single { GdyniaTransitDataSource(get(), get(), get()) }
-    single<SkmRealtimeDataSource> { MockSkmRealtimeDataSource() }
-    single { SkmTransitDataSource(get()) }
-    single<TransitDataSource> { CombinedTransitDataSource(get(), get(), get()) }
+    single { SkmTransitDataSource(get(), get()) }
+    single<TransitDataSource> { CombinedTransitDataSource(get(), get(), get(), get()) }
 }

@@ -4,7 +4,7 @@ This file provides guidance to Mistral Vibe when working with code in this repos
 
 ## Project Overview
 
-**3citycommuter** is a **Kotlin Multiplatform** app for commuters in Gdansk, Sopot, and Gdynia (Tri-City area, Poland).
+**3citycommuter** is a **Kotlin Multiplatform** app for commuters in Gdansk, Sopot, Gdynia, and the Tri-City SKM rail network.
 It displays public transport stops on a map, real-time departures, vehicle tracking, and route visualization.
 
 **Targets:**
@@ -13,8 +13,9 @@ It displays public transport stops on a map, real-time departures, vehicle track
 - **iOS** (configured via KMP targets `iosX64`, `iosArm64`, `iosSimulatorArm64`; `iosApp/` exists but has no app entry point yet)
 
 Data sources:
-- **Gdańsk**: open data from [Otwarte Dane Gdanska](https://ckan.multimediagdansk.pl) and companion feeds from `ckan2.multimediagdansk.pl` and `files.cloudgdansk.pl`
+- **Gdansk**: open data from [Otwarte Dane Gdanska](https://ckan.multimediagdansk.pl) and companion feeds from `ckan2.multimediagdansk.pl` and `files.cloudgdansk.pl`
 - **Gdynia**: public API from `api.zdiz.gdynia.pl`
+- **SKM**: PLK API for departures and route order, plus local station geometry for map coordinates
 
 **Note:** Active map support uses **MapLibre**. Mapbox dependencies are deprecated and commented out.
 
@@ -127,7 +128,7 @@ Repository interfaces live in `shared/data/commonMain`.
 All repositories return `Flow<T>`.
 
 Main repositories:
-- `BusStopsRepository`
+- `TransitStopsRepository`
 - `LocationRepository`
 - `VehiclesRepository`
 - `RoutesRepository`
@@ -142,37 +143,43 @@ Koin modules:
 | `databaseModule` | `shared/database` | Room DB, DAOs |
 | `networkModule` | `shared/network` | Ktor client, JSON config, transport providers |
 | `platformNetworkModule` | `shared/network` | Platform HTTP engine |
-| `dataModule` | `shared/data` | Repositories, use cases, settings |
-| `platformDataModule` | `shared/data` | Platform location and permissions |
-| `uiModule` | `shared/ui` | ViewModels |
+| `dataModule` | `shared:data` | Repositories, use cases, settings |
+| `platformDataModule` | `shared:data` | Platform location and permissions |
+| `uiModule` | `shared:ui` | ViewModels |
 
 ### Network Layer
 
-`KtorNetworkClient` implements the legacy Gdańsk-specific `NetworkClient`.
+`KtorNetworkClient` implements the legacy Gdansk-specific `NetworkClient`.
 
 Transport data is normalized through a provider layer:
 - `GdanskTransitDataSource`
 - `GdyniaTransitDataSource`
+- `SkmTransitDataSource`
 - `CombinedTransitDataSource`
 
-`CombinedTransitDataSource` is the application-facing source. It merges Gdańsk and Gdynia stops and routes later lookups by provider based on app-level stop IDs.
+`CombinedTransitDataSource` is the application-facing source. It merges Gdansk, Gdynia, and SKM data and routes later lookups by provider based on app-level stop keys.
 
 #### Data parsing and normalization
 
-- App-level stop IDs are globally unique. `TransitStopId` offsets Gdynia native stop IDs and leaves Gdańsk IDs unchanged.
-- `BusStopData.provider` and `BusStopData.sourceStopId` are derived from the app-level stop ID.
+- App-level stop identity is represented by `TransitStopKey(provider, sourceStopId)`.
+- `TransitStopData.provider` and `TransitStopData.sourceStopId` are first-class fields and are also used by persistence.
 - `Departure.lineNumber` is the UI-facing line label:
-  - Gdańsk uses `routeId.toString()`
+  - Gdansk uses `routeId.toString()`
   - Gdynia uses `/pt/routes.routeShortName`
+  - SKM uses the line label provided by the PLK-backed provider
 - `Departure.routeId` remains the provider-internal route identifier and must still be used for route lookup.
 - Gdynia route geometry is parsed from GTFS:
   - `/pt/trips` provides `tripId -> shapeId`
   - `shapes.txt` from `gtfs.zip` provides `shapeId -> ordered coordinates`
   - `GdyniaGtfsStore` caches the parsed route index in memory with a 1-day TTL
   - Android preloads the Gdynia GTFS cache during startup in the same background phase that loads `relations.json`
-- Gdynia does not expose a public live GPS feed compatible with the Gdańsk one:
+- Gdynia does not expose a public live GPS feed compatible with the Gdansk one:
   - route drawing works
   - live vehicle tracking is disabled in UI behavior
+- SKM uses the PLK API authenticated with `PLK_KEY` for departures and planned route metadata:
+  - local station geometry is still kept in-repo because PLK does not expose stop coordinates
+  - SKM stops are intentionally not clustered on the map
+  - SKM stops use a dedicated visual style distinct from bus and tram stops
 - Android allows cleartext HTTP specifically for `api.zdiz.gdynia.pl` through `composeApp/android/src/main/res/xml/network_security_config.xml`
 
 #### Error logging
@@ -217,9 +224,9 @@ Room KMP 2.7.2 with `@ConstructedBy(CommuterDatabaseConstructor::class)`.
 
 ### Adding a New Repository
 
-1. Create interface in `shared/data/.../repository/[Name]Repository.kt`
+1. Create interface in `shared:data/.../repository/[Name]Repository.kt`
 2. Create `Real[Name]Repository.kt`
-3. Register it in `shared/data/.../di/DataModule.kt`
+3. Register it in `shared:data/.../di/DataModule.kt`
 
 ### Adding a New API Endpoint
 
@@ -240,7 +247,7 @@ Important network/provider tests:
 - `TransitDataSourceTest`
   - verifies Gdynia GTFS route parsing preserves point order
   - verifies Gdynia maps `routeId` to user-facing `lineNumber`
-  - verifies Gdańsk and Gdynia providers populate a consistent shared domain model for stops and departures
+  - verifies Gdansk, Gdynia, and SKM providers populate a consistent shared domain model for stops and departures
 - `GdyniaRouteNetworkDataSerializationTest`
   - verifies `/pt/routes` payload deserialization
 
@@ -270,6 +277,7 @@ Local release builds use `secrets.properties` and `signing/key.jks`.
 PASS=keystore_password
 ALIAS=key_alias
 ALIAS_PASS=key_password
+PLK_KEY=your_plk_api_key
 ```
 
 CI can use environment variables instead:
@@ -279,6 +287,7 @@ ANDROID_SIGNING_STORE_FILE=/path/to/key.jks
 ANDROID_SIGNING_STORE_PASSWORD=...
 ANDROID_SIGNING_KEY_ALIAS=...
 ANDROID_SIGNING_KEY_PASSWORD=...
+PLK_KEY=...
 ANDROID_VERSION_CODE=123
 ANDROID_VERSION_NAME=2.1+123
 ```

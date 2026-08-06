@@ -55,6 +55,7 @@ jobs:
       - name: Build signed release APK
         if: ${{ steps.signing.outputs.available == 'true' }}
         env:
+          PLK_KEY: ${{ secrets.PLK_KEY }}
           ANDROID_SIGNING_STORE_FILE: ${{ runner.temp }}/android-signing/key.jks
           ANDROID_SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}

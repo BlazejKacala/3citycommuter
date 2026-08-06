@@ -21,7 +21,7 @@ import pl.bkacala.threecitycommuter.model.gdynia.GdyniaDelayResponse
 import pl.bkacala.threecitycommuter.model.gdynia.GdyniaRouteNetworkData
 import pl.bkacala.threecitycommuter.model.gdynia.GdyniaStopNetworkData
 import pl.bkacala.threecitycommuter.model.route.Route
-import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
@@ -30,6 +30,7 @@ import pl.bkacala.threecitycommuter.model.transit.supportsRouteShapes
 import pl.bkacala.threecitycommuter.model.transit.supportsVehicleMetadata
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
+import pl.bkacala.threecitycommuter.resource.readBundledResourceText
 import kotlin.time.Duration.Companion.hours
 
 internal class GdyniaTransitDataSource(
@@ -48,11 +49,11 @@ internal class GdyniaTransitDataSource(
             supportsVehicleMetadata = TransitProvider.GDYNIA.supportsVehicleMetadata,
         )
 
-    override suspend fun getStops(): List<BusStopData> {
+    override suspend fun getStops(): List<TransitStopData> {
         val body = httpClient.get(STOPS_URL).body<String>()
         val decoded = json.decodeFromString<List<GdyniaStopNetworkData>>(body)
         return decoded.map { stop ->
-            BusStopData(
+            TransitStopData(
                 stopKey = TransitStopKey(TransitProvider.GDYNIA, stop.stopId),
                 stopCode = stop.stopCode,
                 stopName = stop.stopName,
@@ -79,6 +80,12 @@ internal class GdyniaTransitDataSource(
                 isForTrams = false,
             )
         }
+    }
+
+    override suspend fun getBundledStops(): List<TransitStopData> {
+        val body = readBundledResourceText("gdynia_stops.json")
+        val decoded = json.decodeFromString<List<GdyniaStopNetworkData>>(body)
+        return decoded.map { it.toTransitStopData() }
     }
 
     override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> {
@@ -154,6 +161,34 @@ internal class GdyniaTransitDataSource(
         return candidate
     }
 }
+
+private fun GdyniaStopNetworkData.toTransitStopData(): TransitStopData =
+    TransitStopData(
+        stopKey = TransitStopKey(TransitProvider.GDYNIA, stopId),
+        stopCode = stopCode,
+        stopName = stopName,
+        stopShortName = stopName,
+        stopDesc = stopDesc,
+        subName = null,
+        date = null,
+        zoneId = zoneId.toIntOrNull() ?: -1,
+        zoneName = zoneId,
+        virtual = 0,
+        nonpassenger = 0,
+        depot = 0,
+        ticketZoneBorder = ticketZoneBorder?.toIntOrNull() ?: 0,
+        onDemand = false,
+        activationDate = null,
+        stopLat = stopLat.toDouble(),
+        stopLon = stopLon.toDouble(),
+        stopUrl = stopUrl,
+        locationType = locationType,
+        parentStation = parentStation,
+        stopTimezone = stopTimezone,
+        wheelchairBoarding = wheelchairBoarding,
+        isForBuses = false,
+        isForTrams = false,
+    )
 private const val STOPS_URL = "http://api.zdiz.gdynia.pl/pt/stops"
 private const val DELAYS_URL = "http://api.zdiz.gdynia.pl/pt/delays"
 private const val ROUTES_URL = "http://api.zdiz.gdynia.pl/pt/routes"

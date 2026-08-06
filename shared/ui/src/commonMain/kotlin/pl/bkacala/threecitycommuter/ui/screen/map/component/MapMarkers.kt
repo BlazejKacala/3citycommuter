@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun StationIcon(type: BusStopMapItem.Type, isSelected: Boolean) {
+fun StationIcon(type: TransitStopMapItem.Type, isSelected: Boolean) {
     val busIcon = remember { Icons.Outlined.DirectionsBus }
     val tramIcon = remember { Icons.Outlined.Tram }
     val color =
@@ -35,7 +35,7 @@ fun StationIcon(type: BusStopMapItem.Type, isSelected: Boolean) {
     MapMarkerBackground(color) {
         Row {
             Icon(
-                imageVector = if (type == BusStopMapItem.Type.Tram) tramIcon else busIcon,
+                imageVector = if (type == TransitStopMapItem.Type.Tram) tramIcon else busIcon,
                 contentDescription = "Przystanek",
                 tint = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
             )

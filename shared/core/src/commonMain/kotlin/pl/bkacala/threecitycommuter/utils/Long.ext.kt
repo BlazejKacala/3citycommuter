@@ -1,7 +1,10 @@
 package pl.bkacala.threecitycommuter.utils
 
 import kotlinx.datetime.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
-private const val SECONDS_IN_DAY = 86400
+fun Long.isOlderThan(duration: Duration): Boolean =
+    Clock.System.now().epochSeconds - this > duration.inWholeSeconds
 
-fun Long.isOlderThenOneDay() = Clock.System.now().epochSeconds - this > SECONDS_IN_DAY
+fun Long.isOlderThenOneDay(): Boolean = isOlderThan(1.days)

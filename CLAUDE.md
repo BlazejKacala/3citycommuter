@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ## Project overview
 
-`3citycommuter` is a Kotlin Multiplatform app for commuters in Gdansk, Sopot, and Gdynia. It displays stops on a map, real-time departures, vehicle tracking, and route visualization.
+`3citycommuter` is a Kotlin Multiplatform app for commuters in Gdansk, Sopot, Gdynia, and the Tri-City SKM rail network. It displays stops on a map, real-time departures, vehicle tracking, and route visualization.
 
 Targets:
 - Android
@@ -124,7 +124,7 @@ sealed interface UiState<out T> {
 Repositories expose `Flow<T>`.
 
 Main repositories:
-- `BusStopsRepository`
+- `TransitStopsRepository`
 - `LocationRepository`
 - `VehiclesRepository`
 - `RoutesRepository`
@@ -144,16 +144,17 @@ Android starts Koin in `composeApp/android`. Desktop starts Koin in `composeApp/
 
 ### Network layer
 
-`KtorNetworkClient` implements the legacy Gdańsk-specific `NetworkClient`.
+`KtorNetworkClient` implements the legacy Gdansk-specific `NetworkClient`.
 
 Transport provider architecture:
-- `GdanskTransitDataSource` adapts the legacy Gdańsk feeds
+- `GdanskTransitDataSource` adapts the legacy Gdansk feeds
 - `GdyniaTransitDataSource` adapts the Gdynia API
-- `CombinedTransitDataSource` merges both into one application-facing source
+- `SkmTransitDataSource` adapts the current SKM mock feed and is designed to switch to PLK API data later
+- `CombinedTransitDataSource` merges all providers into one application-facing source
 
 Data normalization rules:
-- app-level stop IDs are globally unique via `TransitStopId`
-- `BusStopData.provider` and `BusStopData.sourceStopId` are derived from the app-level ID
+- app-level stop IDs are represented by `TransitStopKey(provider, sourceStopId)`
+- `TransitStopData.provider` and `TransitStopData.sourceStopId` are persisted and used directly
 - `Departure.lineNumber` is the display label used by UI
 - `Departure.routeId` remains the provider-internal route identifier for route lookup
 - Gdynia line labels must come from `/pt/routes.routeShortName`, not from raw `routeId`
@@ -162,11 +163,15 @@ Data normalization rules:
   - `shapes.txt` provides `shapeId -> ordered coordinates`
   - `GdyniaGtfsStore` caches the parsed result in memory with a 1-day TTL
   - Android preloads the cache during startup in `MainActivity`
-- Gdynia does not support live GPS tracking in the same way as Gdańsk
+- Gdynia does not support live GPS tracking in the same way as Gdansk
+- SKM uses PLK-backed realtime departures and planned route metadata authenticated with `PLK_KEY`
+- SKM still keeps local station coordinates because the PLK station dictionary does not expose map geometry
+- SKM markers remain visually distinct from bus and tram stops and are not clustered
 
 Debugging notes:
 - stop/departure/route/vehicle-loading failures are logged from `MapScreenViewModel`
 - GTFS download and parse failures are logged from `GdyniaGtfsStore`
+- keep the SKM provider swap behind the same repository and datasource boundary so UI code does not depend on mock vs live data
 - Android cleartext HTTP is enabled specifically for `api.zdiz.gdynia.pl`
 
 Platform engines:
@@ -202,6 +207,7 @@ Expected properties:
 PASS=keystore_password
 ALIAS=key_alias
 ALIAS_PASS=key_password
+PLK_KEY=your_plk_api_key
 ```
 
 CI can provide signing through:
@@ -209,6 +215,7 @@ CI can provide signing through:
 - `ANDROID_SIGNING_STORE_PASSWORD`
 - `ANDROID_SIGNING_KEY_ALIAS`
 - `ANDROID_SIGNING_KEY_PASSWORD`
+- `PLK_KEY`
 - optional `ANDROID_VERSION_CODE`
 - optional `ANDROID_VERSION_NAME`
 

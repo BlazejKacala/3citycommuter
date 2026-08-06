@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
-import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 
@@ -25,12 +25,12 @@ actual fun PlatformMapView(
     modifier: Modifier,
     cameraTarget: LatLng?,
     cameraZoom: Float,
-    busStops: List<BusStopMapItem>,
-    selectedBusStop: BusStopMapItem?,
+    transitStops: List<TransitStopMapItem>,
+    selectedTransitStop: TransitStopMapItem?,
     trackedVehicle: TrackedVehicle?,
     route: List<LatLng>?,
     userLocation: UserLocation?,
-    onBusStopSelected: (BusStopMapItem) -> Unit,
+    onTransitStopSelected: (TransitStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
     mapBottomPadding: Dp,
     mapStyle: MapStyle,
@@ -51,7 +51,7 @@ actual fun PlatformMapView(
             },
     ) {
         Text(
-            text = "iOS MapLibre Map — ${busStops.size} przystankow\n" +
+            text = "iOS MapLibre Map — ${transitStops.size} przystankow\n" +
                 "(Requires MapLibre Native CocoaPods integration)",
             modifier = Modifier.align(Alignment.Center).padding(16.dp),
             style = MaterialTheme.typography.bodyLarge,
