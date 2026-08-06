@@ -1,6 +1,6 @@
 # 3citycommuter
 
-Kotlin Multiplatform app for public transport commuters in Gdansk, Sopot, and Gdynia. The app shows stops on a map, real-time departures, vehicle positions, and route shapes.
+Kotlin Multiplatform app for public transport commuters in Gdansk, Sopot, Gdynia, and the Tri-City SKM rail network. The app shows stops on a map, real-time departures, vehicle positions, and route shapes.
 
 ## Platforms
 
@@ -19,7 +19,7 @@ Android target details:
 
 The app aggregates multiple provider APIs into one shared transport model.
 
-Gdańsk sources:
+Gdansk sources:
 - stops: `ckan.multimediagdansk.pl`
 - real-time departures and route shapes: `ckan2.multimediagdansk.pl`
 - vehicles and metadata: `files.cloudgdansk.pl`
@@ -27,12 +27,17 @@ Gdańsk sources:
 Gdynia sources:
 - stops, delays, routes metadata, trips, GTFS: `api.zdiz.gdynia.pl`
 
+SKM sources:
+- station geometry: in-repo static station definitions for map coordinates
+- realtime departures and route order: PLK API authenticated with `PLK_KEY`
+
 Provider differences are normalized before the UI sees them:
-- both cities map into the same `BusStopData`, `Departure`, and `Route` domain models
-- app-level stop IDs are globally unique even though provider-native IDs differ
+- all providers map into the same `TransitStopData`, `Departure`, and `Route` domain models
+- app-level stop IDs are represented by `TransitStopKey(provider, sourceStopId)`
 - Gdynia line labels come from `/pt/routes.routeShortName`
 - Gdynia route geometry comes from `gtfs.zip`, not from a direct route-shape endpoint
-- Gdynia does not currently expose a public live GPS feed compatible with the Gdańsk feed
+- Gdynia does not currently expose a public live GPS feed compatible with the Gdansk feed
+- SKM uses PLK-backed departures and route metadata while keeping local station coordinates for map rendering
 
 ## Tech stack
 
@@ -76,13 +81,14 @@ shared:network  shared:database
 `shared:core` contains domain models and utilities. The remaining shared modules cover networking, database, repositories, and Compose UI. Android and Desktop bootstrap Koin and consume `shared:ui`.
 
 Transport provider architecture:
-- `GdanskTransitDataSource` adapts the Gdańsk feeds
+- `GdanskTransitDataSource` adapts the Gdansk feeds
 - `GdyniaTransitDataSource` adapts the Gdynia API
-- `CombinedTransitDataSource` merges both into one application-facing source
+- `SkmTransitDataSource` adapts the current SKM mock feed
+- `CombinedTransitDataSource` merges all providers into one application-facing source
 
 Important normalization rules:
-- `TransitStopId` converts provider-native stop IDs into globally unique app IDs
-- `BusStopData.provider` and `BusStopData.sourceStopId` are derived from the app-level stop ID
+- `TransitStopKey` stores the provider plus the provider-native stop ID
+- `TransitStopData.provider` and `TransitStopData.sourceStopId` are first-class fields used directly by the app and persistence layer
 - `Departure.lineNumber` is the display label shown in UI
 - `Departure.routeId` remains the internal provider route identifier used for route lookup
 
@@ -91,6 +97,12 @@ Gdynia route parsing:
 - it loads route coordinates from `shapes.txt` inside `gtfs.zip`
 - the parsed route cache is kept in memory with a 1-day TTL
 - Android preloads that cache during startup so the first route selection does not need to parse GTFS on click
+
+SKM integration notes:
+- the current implementation uses mock data because the PLK key is not active yet
+- the mock provider is intentionally shaped like a real datasource so the switch to live PLK data stays localized
+- SKM stops are rendered without clustering and use a dedicated visual style distinct from bus and tram stops
+
 
 ## Requirements
 
@@ -154,6 +166,7 @@ Expected keys in `secrets.properties`:
 PASS=keystore_password
 ALIAS=key_alias
 ALIAS_PASS=key_password
+PLK_KEY=your_plk_api_key
 ```
 
 CI can use environment variables instead:
@@ -162,6 +175,7 @@ CI can use environment variables instead:
 - `ANDROID_SIGNING_STORE_PASSWORD`
 - `ANDROID_SIGNING_KEY_ALIAS`
 - `ANDROID_SIGNING_KEY_PASSWORD`
+- `PLK_KEY`
 - optional: `ANDROID_VERSION_CODE`
 - optional: `ANDROID_VERSION_NAME`
 

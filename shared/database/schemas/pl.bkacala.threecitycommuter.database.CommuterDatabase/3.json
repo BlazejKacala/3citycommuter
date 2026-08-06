@@ -1,0 +1,410 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "22be5a610879afa0ddb548948ef43db6",
+    "entities": [
+      {
+        "tableName": "bus_stops",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`provider` TEXT NOT NULL, `sourceStopId` INTEGER NOT NULL, `stopCode` TEXT, `stopName` TEXT, `stopShortName` TEXT, `stopDesc` TEXT, `subName` TEXT, `date` TEXT, `zoneId` INTEGER NOT NULL, `zoneName` TEXT, `virtual` INTEGER NOT NULL, `nonpassenger` INTEGER NOT NULL, `depot` INTEGER NOT NULL, `ticketZoneBorder` INTEGER NOT NULL, `onDemand` INTEGER NOT NULL, `activationDate` TEXT, `stopLat` REAL NOT NULL, `stopLon` REAL NOT NULL, `stopUrl` TEXT, `locationType` TEXT, `parentStation` TEXT, `stopTimezone` TEXT, `wheelchairBoarding` TEXT, PRIMARY KEY(`provider`, `sourceStopId`))",
+        "fields": [
+          {
+            "fieldPath": "provider",
+            "columnName": "provider",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceStopId",
+            "columnName": "sourceStopId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopCode",
+            "columnName": "stopCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "stopName",
+            "columnName": "stopName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "stopShortName",
+            "columnName": "stopShortName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "stopDesc",
+            "columnName": "stopDesc",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "subName",
+            "columnName": "subName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "zoneId",
+            "columnName": "zoneId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "zoneName",
+            "columnName": "zoneName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "virtual",
+            "columnName": "virtual",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nonpassenger",
+            "columnName": "nonpassenger",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "depot",
+            "columnName": "depot",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ticketZoneBorder",
+            "columnName": "ticketZoneBorder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "onDemand",
+            "columnName": "onDemand",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "activationDate",
+            "columnName": "activationDate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "stopLat",
+            "columnName": "stopLat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopLon",
+            "columnName": "stopLon",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopUrl",
+            "columnName": "stopUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "locationType",
+            "columnName": "locationType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "parentStation",
+            "columnName": "parentStation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "stopTimezone",
+            "columnName": "stopTimezone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "wheelchairBoarding",
+            "columnName": "wheelchairBoarding",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "provider",
+            "sourceStopId"
+          ]
+        }
+      },
+      {
+        "tableName": "vehicles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`photo` TEXT NOT NULL, `vehicleCode` TEXT NOT NULL, `carrirer` TEXT NOT NULL, `transportationType` TEXT NOT NULL, `vehicleCharacteristics` TEXT NOT NULL, `bidirectional` INTEGER NOT NULL, `historicVehicle` INTEGER NOT NULL, `length` REAL NOT NULL, `brand` TEXT NOT NULL, `model` TEXT NOT NULL, `productionYear` INTEGER NOT NULL, `seats` INTEGER NOT NULL, `standingPlaces` INTEGER NOT NULL, `airConditioning` INTEGER NOT NULL, `monitoring` INTEGER NOT NULL, `internalMonitor` INTEGER NOT NULL, `floorHeight` TEXT NOT NULL, `kneelingMechanism` INTEGER NOT NULL, `wheelchairsRamp` INTEGER NOT NULL, `usb` INTEGER NOT NULL, `voiceAnnouncements` INTEGER NOT NULL, `aed` INTEGER NOT NULL, `bikeHolders` INTEGER NOT NULL, `ticketMachine` INTEGER NOT NULL, `patron` TEXT NOT NULL, `url` TEXT NOT NULL, `passengersDoors` INTEGER NOT NULL, PRIMARY KEY(`vehicleCode`))",
+        "fields": [
+          {
+            "fieldPath": "photo",
+            "columnName": "photo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vehicleCode",
+            "columnName": "vehicleCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "carrirer",
+            "columnName": "carrirer",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transportationType",
+            "columnName": "transportationType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vehicleCharacteristics",
+            "columnName": "vehicleCharacteristics",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bidirectional",
+            "columnName": "bidirectional",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "historicVehicle",
+            "columnName": "historicVehicle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "length",
+            "columnName": "length",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brand",
+            "columnName": "brand",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "model",
+            "columnName": "model",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productionYear",
+            "columnName": "productionYear",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seats",
+            "columnName": "seats",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "standingPlaces",
+            "columnName": "standingPlaces",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "airConditioning",
+            "columnName": "airConditioning",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "monitoring",
+            "columnName": "monitoring",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "internalMonitor",
+            "columnName": "internalMonitor",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "floorHeight",
+            "columnName": "floorHeight",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kneelingMechanism",
+            "columnName": "kneelingMechanism",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wheelchairsRamp",
+            "columnName": "wheelchairsRamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usb",
+            "columnName": "usb",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "voiceAnnouncements",
+            "columnName": "voiceAnnouncements",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aed",
+            "columnName": "aed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bikeHolders",
+            "columnName": "bikeHolders",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ticketMachine",
+            "columnName": "ticketMachine",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "patron",
+            "columnName": "patron",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "passengersDoors",
+            "columnName": "passengersDoors",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "vehicleCode"
+          ]
+        }
+      },
+      {
+        "tableName": "bus_stops_types",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`provider` TEXT NOT NULL, `sourceStopId` INTEGER NOT NULL, `isForBuses` INTEGER NOT NULL, `isForTrams` INTEGER NOT NULL, PRIMARY KEY(`provider`, `sourceStopId`))",
+        "fields": [
+          {
+            "fieldPath": "provider",
+            "columnName": "provider",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceStopId",
+            "columnName": "sourceStopId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isForBuses",
+            "columnName": "isForBuses",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isForTrams",
+            "columnName": "isForTrams",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "provider",
+            "sourceStopId"
+          ]
+        }
+      },
+      {
+        "tableName": "rail_stations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`plkStationId` INTEGER NOT NULL, `name` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `network` TEXT NOT NULL, `isActive` INTEGER NOT NULL, PRIMARY KEY(`plkStationId`))",
+        "fields": [
+          {
+            "fieldPath": "plkStationId",
+            "columnName": "plkStationId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "network",
+            "columnName": "network",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "plkStationId"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '22be5a610879afa0ddb548948ef43db6')"
+    ]
+  }
+}

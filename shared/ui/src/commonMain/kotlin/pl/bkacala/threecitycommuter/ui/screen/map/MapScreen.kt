@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.ui.common.UiState
-import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
@@ -61,23 +61,23 @@ fun MapScreen(
         TraceLifecycleEvents(viewModel)
         HandleEffects(viewModel, snackbarHostState, cameraTarget)
 
-        when (val busStops = state.busStops) {
-            is UiState.Error -> ErrorSnackbar(busStops, snackbarHostState, viewModel)
+        when (val transitStops = state.transitStops) {
+            is UiState.Error -> ErrorSnackbar(transitStops, snackbarHostState, viewModel)
             UiState.Loading -> Unit
             is UiState.Success -> Unit
         }
 
-        val busStops = if (state.busStops is UiState.Success) state.busStops.data else emptyList()
+        val transitStops = if (state.transitStops is UiState.Success) state.transitStops.data else emptyList()
 
         PlatformMapView(
             modifier = Modifier.fillMaxSize(),
             cameraTarget = cameraTarget.value,
             cameraZoom = 6.0f,
-            busStops = busStops,
-            selectedBusStop = state.selectedBusStop,
+            transitStops = transitStops,
+            selectedTransitStop = state.selectedTransitStop,
             trackedVehicle = state.trackedVehicle,
             userLocation = state.userLocation,
-            onBusStopSelected = { viewModel.onAction(MapAction.StopSelected(it.key)) },
+            onTransitStopSelected = { viewModel.onAction(MapAction.StopSelected(it.key)) },
             onMapClicked = { viewModel.onAction(MapAction.MapClicked) },
             route = state.route,
             mapBottomPadding = if (state.departures == null) 0.dp else mapBottomPadding.value,
@@ -100,7 +100,7 @@ fun MapScreen(
             onResultClick = { viewModel.onAction(MapAction.SearchResultClicked(it)) },
         )
 
-        if (state.busStops is UiState.Loading) {
+        if (state.transitStops is UiState.Loading) {
             LinearProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -116,11 +116,11 @@ fun MapScreen(
 
 @Composable
 private fun ErrorSnackbar(
-    busStops: UiState<List<BusStopMapItem>>,
+    transitStops: UiState<List<TransitStopMapItem>>,
     snackbarHostState: SnackbarHostState,
     viewModel: MapScreenViewModel,
 ) {
-    LaunchedEffect(busStops) {
+    LaunchedEffect(transitStops) {
         val result = snackbarHostState.showSnackbar(
             message = STOPS_LOADING_ERROR_MESSAGE,
             actionLabel = RETRY_ACTION_LABEL,

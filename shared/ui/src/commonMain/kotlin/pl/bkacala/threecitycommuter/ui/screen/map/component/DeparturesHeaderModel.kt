@@ -13,7 +13,7 @@ import pl.bkacala.threecitycommuter.ui.theme.Padding
 
 @Stable
 data class DeparturesHeaderModel(
-    val busStopName: String,
+    val transitStopName: String,
     val isForDemand: Boolean,
 )
 
@@ -25,7 +25,7 @@ fun DeparturesHeaderModel.Widget(accentColor: Color) {
             .padding(Padding.big),
     ) {
         Text(
-            text = busStopName,
+            text = transitStopName,
             style = MaterialTheme.typography.headlineSmall,
             color = accentColor,
         )

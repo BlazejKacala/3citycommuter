@@ -2,7 +2,7 @@ package pl.bkacala.threecitycommuter.client
 
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.route.Route
-import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
@@ -11,7 +11,9 @@ import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 interface TransitDataSource {
     fun features(provider: pl.bkacala.threecitycommuter.model.transit.TransitProvider): TransitFeatures
 
-    suspend fun getStops(): List<BusStopData>
+    suspend fun getStops(): List<TransitStopData>
+
+    suspend fun getBundledStops(): List<TransitStopData> = emptyList()
 
     suspend fun getDepartures(stopKey: TransitStopKey): List<Departure>
 
