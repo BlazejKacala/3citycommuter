@@ -3,7 +3,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map.mapper
 import kotlinx.datetime.Clock
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.rail.RailNetwork
-import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import kotlin.test.Test
@@ -15,7 +15,7 @@ class DeparturesMapperTest {
     @Test
     fun `does not expose delay label when delay is below one minute`() {
         val model = DeparturesMapper.mapToBottomSheetModel(
-            busStopData = busStopData(),
+            transitStopData = transitStopData(),
             departures = listOf(
                 departure(delayInSeconds = 59) to null,
             ),
@@ -29,7 +29,7 @@ class DeparturesMapperTest {
     @Test
     fun `uses rail network name instead of line number for rail departures`() {
         val model = DeparturesMapper.mapToBottomSheetModel(
-            busStopData = busStopData().copy(
+            transitStopData = transitStopData().copy(
                 stopKey = TransitStopKey(TransitProvider.SKM, 257540),
                 railNetwork = RailNetwork.PKM,
             ),
@@ -40,8 +40,8 @@ class DeparturesMapperTest {
         assertEquals("pkm", model.departures.single().lineNumber)
     }
 
-    private fun busStopData(): BusStopData =
-        BusStopData(
+    private fun transitStopData(): TransitStopData =
+        TransitStopData(
             stopKey = TransitStopKey(TransitProvider.GDANSK, 1234),
             stopCode = "01",
             stopName = "Test Stop",

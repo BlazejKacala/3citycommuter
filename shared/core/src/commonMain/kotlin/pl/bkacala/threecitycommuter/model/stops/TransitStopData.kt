@@ -1,14 +1,11 @@
 package pl.bkacala.threecitycommuter.model.stops
 
-import androidx.room.Entity
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
+import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 
-@Entity(
-    tableName = "bus_stops",
-    primaryKeys = ["provider", "sourceStopId"],
-)
-data class BusStopEntity(
-    val provider: String,
-    val sourceStopId: Int,
+data class TransitStopData(
+    val stopKey: TransitStopKey,
     val stopCode: String?,
     val stopName: String?,
     val stopShortName: String?,
@@ -21,7 +18,7 @@ data class BusStopEntity(
     val nonpassenger: Int,
     val depot: Int,
     val ticketZoneBorder: Int,
-    val onDemand: Int,
+    val onDemand: Boolean,
     val activationDate: String?,
     val stopLat: Double,
     val stopLon: Double,
@@ -32,4 +29,12 @@ data class BusStopEntity(
     val wheelchairBoarding: String?,
     val isForBuses: Boolean,
     val isForTrams: Boolean,
-)
+    val name: String = stopName ?: stopShortName ?: stopDesc ?: "",
+    val railNetwork: RailNetwork? = null,
+) {
+    val provider: TransitProvider
+        get() = stopKey.provider
+
+    val sourceStopId: Int
+        get() = stopKey.sourceStopId
+}

@@ -3,10 +3,10 @@ package pl.bkacala.threecitycommuter.repository.stops
 import app.cash.turbine.test
 import kotlinx.coroutines.test.runTest
 import pl.bkacala.threecitycommuter.client.TransitDataSource
-import pl.bkacala.threecitycommuter.dao.BusStopsDao
+import pl.bkacala.threecitycommuter.dao.TransitStopsDao
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.route.Route
-import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.stops.toEntity
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
@@ -16,49 +16,49 @@ import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class RealBusStopsRepositoryTest {
+class RealTransitStopsRepositoryTest {
 
     @Test
     fun `refreshes bus stops when cache version is outdated even if timestamp is fresh`() = runTest {
         val gdanskStop = createStop(101, TransitProvider.GDANSK, isForBuses = false, isForTrams = true)
         val gdyniaStop = createStop(202, TransitProvider.GDYNIA, isForBuses = true, isForTrams = false)
         val transitDataSource = FakeTransitDataSource(listOf(gdanskStop, gdyniaStop))
-        val busStopsDao = FakeBusStopsDao(
+        val transitStopsDao = FakeTransitStopsDao(
             mutableListOf(createStop(101, TransitProvider.GDANSK, isForBuses = false, isForTrams = true).toEntity()),
         )
         val lastUpdateRepository = FakeLastUpdateRepository(
-            timestamps = mutableMapOf("bus_stops" to Long.MAX_VALUE),
-            values = mutableMapOf("bus_stops_cache_version" to 0),
+            timestamps = mutableMapOf("transit_stops" to Long.MAX_VALUE),
+            values = mutableMapOf("transit_stops_cache_version" to 0),
         )
-        val repository = RealBusStopsRepository(
+        val repository = RealTransitStopsRepository(
             transitDataSource = transitDataSource,
-            busStopsDao = busStopsDao,
+            transitStopsDao = transitStopsDao,
             lastUpdateRepository = lastUpdateRepository,
         )
 
-        repository.getBusStops().test {
+        repository.getTransitStops().test {
             val stops = awaitItem()
             assertEquals(listOf(gdanskStop.stopKey, gdyniaStop.stopKey), stops.map { it.stopKey })
             awaitComplete()
         }
 
         assertEquals(1, transitDataSource.getStopsCalls)
-        assertEquals(5L, lastUpdateRepository.values["bus_stops_cache_version"])
+        assertEquals(5L, lastUpdateRepository.values["transit_stops_cache_version"])
     }
 
     @Test
     fun `persists bus and tram flags with the stop`() = runTest {
         val gdanskStop = createStop(1001, TransitProvider.GDANSK, isForBuses = false, isForTrams = false)
-        val repository = RealBusStopsRepository(
+        val repository = RealTransitStopsRepository(
             transitDataSource = FakeTransitDataSource(listOf(gdanskStop)),
-            busStopsDao = FakeBusStopsDao(mutableListOf(gdanskStop.toEntity())),
+            transitStopsDao = FakeTransitStopsDao(mutableListOf(gdanskStop.toEntity())),
             lastUpdateRepository = FakeLastUpdateRepository(
-                timestamps = mutableMapOf("bus_stops" to Long.MAX_VALUE),
-                values = mutableMapOf("bus_stops_cache_version" to 2),
+                timestamps = mutableMapOf("transit_stops" to Long.MAX_VALUE),
+                values = mutableMapOf("transit_stops_cache_version" to 2),
             ),
         )
 
-        repository.getBusStops().test {
+        repository.getTransitStops().test {
             val stops = awaitItem()
             assertEquals(1, stops.size)
             assertEquals(false, stops.single().isForBuses)
@@ -75,20 +75,20 @@ class RealBusStopsRepositoryTest {
             bundledStops = listOf(bundledStop),
             networkError = IllegalStateException("network unavailable"),
         )
-        val busStopsDao = FakeBusStopsDao(mutableListOf())
-        val repository = RealBusStopsRepository(
+        val transitStopsDao = FakeTransitStopsDao(mutableListOf())
+        val repository = RealTransitStopsRepository(
             transitDataSource = transitDataSource,
-            busStopsDao = busStopsDao,
+            transitStopsDao = transitStopsDao,
             lastUpdateRepository = FakeLastUpdateRepository(),
         )
 
-        repository.getBusStops().test {
+        repository.getTransitStops().test {
             assertEquals(listOf(bundledStop.stopKey), awaitItem().map { it.stopKey })
             awaitComplete()
         }
 
         assertEquals(1, transitDataSource.getStopsCalls)
-        assertEquals(1, busStopsDao.getRealBusStations().size)
+        assertEquals(1, transitStopsDao.getRealTransitStops().size)
     }
 
     @Test
@@ -98,16 +98,16 @@ class RealBusStopsRepositoryTest {
             stops = emptyList(),
             networkError = IllegalStateException("network unavailable"),
         )
-        val repository = RealBusStopsRepository(
+        val repository = RealTransitStopsRepository(
             transitDataSource = transitDataSource,
-            busStopsDao = FakeBusStopsDao(mutableListOf(storedStop.toEntity())),
+            transitStopsDao = FakeTransitStopsDao(mutableListOf(storedStop.toEntity())),
             lastUpdateRepository = FakeLastUpdateRepository(
-                timestamps = mutableMapOf("bus_stops" to 0),
-                values = mutableMapOf("bus_stops_cache_version" to 5),
+                timestamps = mutableMapOf("transit_stops" to 0),
+                values = mutableMapOf("transit_stops_cache_version" to 5),
             ),
         )
 
-        repository.getBusStops().test {
+        repository.getTransitStops().test {
             assertEquals(listOf(storedStop.stopKey), awaitItem().map { it.stopKey })
             awaitComplete()
         }
@@ -118,8 +118,8 @@ class RealBusStopsRepositoryTest {
         provider: TransitProvider,
         isForBuses: Boolean,
         isForTrams: Boolean,
-    ): BusStopData {
-        return BusStopData(
+    ): TransitStopData {
+        return TransitStopData(
             stopKey = TransitStopKey(provider, sourceStopId),
             stopCode = sourceStopId.toString(),
             stopName = "Stop $sourceStopId",
@@ -148,18 +148,18 @@ class RealBusStopsRepositoryTest {
     }
 }
 
-private class FakeBusStopsDao(
-    private val entities: MutableList<pl.bkacala.threecitycommuter.model.stops.BusStopEntity>,
-) : BusStopsDao {
+private class FakeTransitStopsDao(
+    private val entities: MutableList<pl.bkacala.threecitycommuter.model.stops.TransitStopEntity>,
+) : TransitStopsDao {
 
-    override suspend fun upsertBusStations(stops: List<pl.bkacala.threecitycommuter.model.stops.BusStopEntity>) {
+    override suspend fun upsertTransitStops(stops: List<pl.bkacala.threecitycommuter.model.stops.TransitStopEntity>) {
         stops.forEach { stop ->
             entities.removeAll { it.provider == stop.provider && it.sourceStopId == stop.sourceStopId }
             entities.add(stop)
         }
     }
 
-    override suspend fun getRealBusStations(): List<pl.bkacala.threecitycommuter.model.stops.BusStopEntity> {
+    override suspend fun getRealTransitStops(): List<pl.bkacala.threecitycommuter.model.stops.TransitStopEntity> {
         return entities.sortedWith(compareBy({ it.provider }, { it.sourceStopId }))
     }
 }
@@ -187,8 +187,8 @@ private class FakeLastUpdateRepository(
 }
 
 private class FakeTransitDataSource(
-    private val stops: List<BusStopData>,
-    private val bundledStops: List<BusStopData> = emptyList(),
+    private val stops: List<TransitStopData>,
+    private val bundledStops: List<TransitStopData> = emptyList(),
     private val networkError: Throwable? = null,
 ) : TransitDataSource {
     var getStopsCalls: Int = 0
@@ -196,13 +196,13 @@ private class FakeTransitDataSource(
 
     override fun features(provider: TransitProvider) = error("Not needed in test")
 
-    override suspend fun getStops(): List<BusStopData> {
+    override suspend fun getStops(): List<TransitStopData> {
         getStopsCalls += 1
         networkError?.let { throw it }
         return stops
     }
 
-    override suspend fun getBundledStops(): List<BusStopData> = bundledStops
+    override suspend fun getBundledStops(): List<TransitStopData> = bundledStops
 
     override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> = emptyList()
 

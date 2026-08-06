@@ -12,7 +12,7 @@ import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehicleResponse
 import pl.bkacala.threecitycommuter.model.route.Route
-import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
@@ -37,10 +37,10 @@ internal class GdanskTransitDataSource(
             supportsVehicleMetadata = TransitProvider.GDANSK.supportsVehicleMetadata,
         )
 
-    override suspend fun getStops(): List<BusStopData> =
-        gdanskApiClient.getStops().stops.map { it.toBusStopData(isForBuses = true, isForTrams = true) }
+    override suspend fun getStops(): List<TransitStopData> =
+        gdanskApiClient.getStops().stops.map { it.toTransitStopData(isForBuses = true, isForTrams = true) }
 
-    override suspend fun getBundledStops(): List<BusStopData> {
+    override suspend fun getBundledStops(): List<TransitStopData> {
         val payload = json.decodeFromString<Map<String, GdanskStopsResponse>>(
             readBundledResourceText("gdansk_stops.json"),
         )
@@ -48,7 +48,7 @@ internal class GdanskTransitDataSource(
             .maxByOrNull { it.lastUpdate }
             ?.stops
             .orEmpty()
-            .map { it.toBusStopData(isForBuses = true, isForTrams = true) }
+            .map { it.toTransitStopData(isForBuses = true, isForTrams = true) }
     }
 
     override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> =
@@ -69,11 +69,11 @@ internal class GdanskTransitDataSource(
         gdanskApiClient.getVehicles().results.map { it.toVehicle() }
 }
 
-private fun GdanskStopResponse.toBusStopData(
+private fun GdanskStopResponse.toTransitStopData(
     isForBuses: Boolean,
     isForTrams: Boolean,
-): BusStopData {
-    return BusStopData(
+): TransitStopData {
+    return TransitStopData(
         stopKey = TransitStopKey(TransitProvider.GDANSK, stopId),
         stopCode = stopCode,
         stopName = stopName,

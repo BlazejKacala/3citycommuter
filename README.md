@@ -32,7 +32,7 @@ SKM sources:
 - realtime departures and route order: PLK API authenticated with `PLK_KEY`
 
 Provider differences are normalized before the UI sees them:
-- all providers map into the same `BusStopData`, `Departure`, and `Route` domain models
+- all providers map into the same `TransitStopData`, `Departure`, and `Route` domain models
 - app-level stop IDs are represented by `TransitStopKey(provider, sourceStopId)`
 - Gdynia line labels come from `/pt/routes.routeShortName`
 - Gdynia route geometry comes from `gtfs.zip`, not from a direct route-shape endpoint
@@ -88,7 +88,7 @@ Transport provider architecture:
 
 Important normalization rules:
 - `TransitStopKey` stores the provider plus the provider-native stop ID
-- `BusStopData.provider` and `BusStopData.sourceStopId` are first-class fields used directly by the app and persistence layer
+- `TransitStopData.provider` and `TransitStopData.sourceStopId` are first-class fields used directly by the app and persistence layer
 - `Departure.lineNumber` is the display label shown in UI
 - `Departure.routeId` remains the internal provider route identifier used for route lookup
 

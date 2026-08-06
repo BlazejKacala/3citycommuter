@@ -4,8 +4,8 @@ import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
-fun BusStopEntity.toStopData(): BusStopData {
-    return BusStopData(
+fun TransitStopEntity.toStopData(): TransitStopData {
+    return TransitStopData(
         stopKey = TransitStopKey(
             provider = TransitProvider.valueOf(this.provider),
             sourceStopId = this.sourceStopId,
@@ -36,16 +36,16 @@ fun BusStopEntity.toStopData(): BusStopData {
     )
 }
 
-fun GdanskStopResponse.toBusStopData(
+fun GdanskStopResponse.toTransitStopData(
     isForBuses: Boolean,
     isForTrams: Boolean,
-): BusStopData = toEntity(isForBuses, isForTrams).toStopData()
+): TransitStopData = toEntity(isForBuses, isForTrams).toStopData()
 
 fun GdanskStopResponse.toEntity(
     isForBuses: Boolean = true,
     isForTrams: Boolean = true,
-): BusStopEntity {
-    return BusStopEntity(
+): TransitStopEntity {
+    return TransitStopEntity(
         provider = TransitProvider.GDANSK.name,
         sourceStopId = this.stopId,
         stopCode = this.stopCode,
@@ -74,8 +74,8 @@ fun GdanskStopResponse.toEntity(
     )
 }
 
-fun BusStopData.toEntity(): BusStopEntity {
-    return BusStopEntity(
+fun TransitStopData.toEntity(): TransitStopEntity {
+    return TransitStopEntity(
         provider = this.provider.name,
         sourceStopId = this.sourceStopId,
         stopCode = this.stopCode,

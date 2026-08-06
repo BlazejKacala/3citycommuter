@@ -11,7 +11,7 @@ val databaseModule: Module = module {
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
     }
-    single { get<CommuterDatabase>().busStopsDao }
+    single { get<CommuterDatabase>().transitStopsDao }
     single { get<CommuterDatabase>().vehiclesDao }
     single { get<CommuterDatabase>().railStationsDao }
 }

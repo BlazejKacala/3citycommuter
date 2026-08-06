@@ -31,7 +31,7 @@ class TransitStopKey:
 
 
 @dataclass
-class BusStop:
+class TransitStop:
     stopKey: TransitStopKey
     isForBuses: bool
     isForTrams: bool
@@ -50,29 +50,29 @@ source = StopData(
     stopsInTrip=[Stop(**stop) for stop in latest_version["stopsInTrip"]]
 ).stopsInTrip
 
-bus_stops_dict = {}
+transit_stops_dict = {}
     
 for stop in source:
     stop_id = stop.stopId
     route_id = stop.routeId
         
-    if stop_id not in bus_stops_dict:
-        bus_stops_dict[stop_id] = {
+    if stop_id not in transit_stops_dict:
+        transit_stops_dict[stop_id] = {
             'isForBuses': False,
             'isForTrams': False
         }
         
     if route_id > 99:
-        bus_stops_dict[stop_id]['isForBuses'] = True
+        transit_stops_dict[stop_id]['isForBuses'] = True
     else:
-        bus_stops_dict[stop_id]['isForTrams'] = True
+        transit_stops_dict[stop_id]['isForTrams'] = True
     
 output = []
-for stop_id, info in sorted(bus_stops_dict.items()):
+for stop_id, info in sorted(transit_stops_dict.items()):
     is_for_buses = info['isForBuses']
     is_for_trams = info['isForTrams']
     output.append(
-        BusStop(
+        TransitStop(
             stopKey=TransitStopKey(provider="GDANSK", sourceStopId=stop_id),
             isForBuses=is_for_buses,
             isForTrams=is_for_trams,

@@ -128,7 +128,7 @@ Repository interfaces live in `shared/data/commonMain`.
 All repositories return `Flow<T>`.
 
 Main repositories:
-- `BusStopsRepository`
+- `TransitStopsRepository`
 - `LocationRepository`
 - `VehiclesRepository`
 - `RoutesRepository`
@@ -162,7 +162,7 @@ Transport data is normalized through a provider layer:
 #### Data parsing and normalization
 
 - App-level stop identity is represented by `TransitStopKey(provider, sourceStopId)`.
-- `BusStopData.provider` and `BusStopData.sourceStopId` are first-class fields and are also used by persistence.
+- `TransitStopData.provider` and `TransitStopData.sourceStopId` are first-class fields and are also used by persistence.
 - `Departure.lineNumber` is the UI-facing line label:
   - Gdansk uses `routeId.toString()`
   - Gdynia uses `/pt/routes.routeShortName`

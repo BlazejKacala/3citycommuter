@@ -7,8 +7,8 @@ import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.repository.rail.RailStationsSeedSeeder
 import pl.bkacala.threecitycommuter.repository.routes.RealRoutesRepository
 import pl.bkacala.threecitycommuter.repository.routes.RoutesRepository
-import pl.bkacala.threecitycommuter.repository.stops.BusStopsRepository
-import pl.bkacala.threecitycommuter.repository.stops.RealBusStopsRepository
+import pl.bkacala.threecitycommuter.repository.stops.TransitStopsRepository
+import pl.bkacala.threecitycommuter.repository.stops.RealTransitStopsRepository
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
 import pl.bkacala.threecitycommuter.repository.update.RealLastUpdateRepository
 import pl.bkacala.threecitycommuter.repository.vehicles.RealVehiclesRepository
@@ -20,7 +20,7 @@ expect val platformDataModule: Module
 val dataModule = module {
     single<Settings> { Settings() }
     single<LastUpdateRepository> { RealLastUpdateRepository(get()) }
-    single<BusStopsRepository> { RealBusStopsRepository(get<TransitDataSource>(), get(), get()) }
+    single<TransitStopsRepository> { RealTransitStopsRepository(get<TransitDataSource>(), get(), get()) }
     single<VehiclesRepository> { RealVehiclesRepository(get(), get<TransitDataSource>(), get()) }
     single<RoutesRepository> { RealRoutesRepository(get()) }
     single { RailStationsSeedSeeder(get(), get()) }

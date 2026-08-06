@@ -29,7 +29,7 @@ import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
-import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 import pl.bkacala.threecitycommuter.ui.theme.MapVehicleColor
@@ -42,12 +42,12 @@ actual fun PlatformMapView(
     modifier: Modifier,
     cameraTarget: LatLng?,
     cameraZoom: Float,
-    busStops: List<BusStopMapItem>,
-    selectedBusStop: BusStopMapItem?,
+    transitStops: List<TransitStopMapItem>,
+    selectedTransitStop: TransitStopMapItem?,
     trackedVehicle: TrackedVehicle?,
     route: List<LatLng>?,
     userLocation: UserLocation?,
-    onBusStopSelected: (BusStopMapItem) -> Unit,
+    onTransitStopSelected: (TransitStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
     mapBottomPadding: Dp,
     mapStyle: MapStyle,
@@ -67,11 +67,11 @@ actual fun PlatformMapView(
     val tertiary = MaterialTheme.colorScheme.tertiary
     val coroutineScope = rememberCoroutineScope()
     val stopsZoom = cameraState.position.zoom.roundToInt()
-    val stopMarkers = remember(busStops, stopsZoom) {
-        busStops.toStopMapMarkers(stopsZoom)
+    val stopMarkers = remember(transitStops, stopsZoom) {
+        transitStops.toStopMapMarkers(stopsZoom)
     }
     val currentStopMarkers = rememberUpdatedState(stopMarkers)
-    val currentOnBusStopSelected = rememberUpdatedState(onBusStopSelected)
+    val currentOnTransitStopSelected = rememberUpdatedState(onTransitStopSelected)
     val currentOnMapClicked = rememberUpdatedState(onMapClicked)
 
     LaunchedEffect(cameraTarget, cameraZoom) {
@@ -97,7 +97,7 @@ actual fun PlatformMapView(
                 )
                 when {
                     marker?.stop != null -> {
-                        currentOnBusStopSelected.value(marker.stop)
+                        currentOnTransitStopSelected.value(marker.stop)
                         ClickResult.Consume
                     }
                     marker != null -> {
@@ -144,7 +144,7 @@ actual fun PlatformMapView(
             modifier = Modifier.fillMaxSize(),
             cameraState = cameraState,
             stopMarkers = stopMarkers,
-            selectedBusStop = selectedBusStop,
+            selectedTransitStop = selectedTransitStop,
             trackedVehicle = trackedVehicle,
             vehicleColor = MapVehicleColor,
         )
@@ -177,5 +177,5 @@ private fun List<LatLng>.toRouteGeoJson() = buildString {
 private fun UserLocation.toLocationGeoJson() =
     "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[$longitude,$latitude]},\"properties\":{}}"
 
-private fun BusStopMapItem.toPointGeoJson(properties: String) =
+private fun TransitStopMapItem.toPointGeoJson(properties: String) =
     "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[${position.longitude},${position.latitude}]},\"properties\":{$properties}}"

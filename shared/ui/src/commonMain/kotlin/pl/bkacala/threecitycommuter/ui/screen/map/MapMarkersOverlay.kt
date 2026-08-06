@@ -36,7 +36,7 @@ import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.sphericalDistance
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.ui.screen.map.component.BusStopMapItem
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
 import pl.bkacala.threecitycommuter.ui.theme.stopMarkerColor
@@ -47,12 +47,12 @@ import kotlin.math.pow
 
 internal data class StopMapMarker(
     val position: LatLng,
-    val stop: BusStopMapItem?,
+    val stop: TransitStopMapItem?,
     val count: Int,
     val provider: TransitProvider?,
 )
 
-internal fun List<BusStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapMarker> {
+internal fun List<TransitStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapMarker> {
     val stopsWithIndex = withIndex().toList()
     val (skmStops, otherStops) = stopsWithIndex.partition { it.value.data.provider == TransitProvider.SKM }
     val groups = if (zoom >= STOPS_UNCLUSTERED_ZOOM) {
@@ -123,7 +123,7 @@ internal fun MapMarkersOverlay(
     modifier: Modifier,
     cameraState: CameraState,
     stopMarkers: List<StopMapMarker>,
-    selectedBusStop: BusStopMapItem?,
+    selectedTransitStop: TransitStopMapItem?,
     trackedVehicle: TrackedVehicle?,
     vehicleColor: Color,
 ) {
@@ -168,7 +168,7 @@ internal fun MapMarkersOverlay(
         val projection = cameraState.projection ?: return@Canvas
 
         stopMarkers.forEach { marker ->
-            if (marker.stop != null && marker.stop.key == selectedBusStop?.key) return@forEach
+            if (marker.stop != null && marker.stop.key == selectedTransitStop?.key) return@forEach
 
             val location = projection.screenLocationFromPosition(marker.position.toPosition())
             val center = Offset(location.x.toPx(), location.y.toPx())
@@ -203,8 +203,8 @@ internal fun MapMarkersOverlay(
                 )
             } else {
                 val painter = when (marker.stop.getStationType()) {
-                    BusStopMapItem.Type.Tram -> tramPainter
-                    BusStopMapItem.Type.Train -> trainPainter
+                    TransitStopMapItem.Type.Tram -> tramPainter
+                    TransitStopMapItem.Type.Train -> trainPainter
                     else -> busPainter
                 }
                 val iconSize = STOP_ICON_SIZE.toPx()
@@ -222,7 +222,7 @@ internal fun MapMarkersOverlay(
             }
         }
 
-        selectedBusStop?.let { stop ->
+        selectedTransitStop?.let { stop ->
             val location = projection.screenLocationFromPosition(stop.position.toPosition())
             val center = Offset(location.x.toPx(), location.y.toPx())
             if (center.isInside(size)) {
@@ -234,8 +234,8 @@ internal fun MapMarkersOverlay(
                     center = center,
                 )
                 val painter = when (stop.getStationType()) {
-                    BusStopMapItem.Type.Tram -> tramPainter
-                    BusStopMapItem.Type.Train -> trainPainter
+                    TransitStopMapItem.Type.Tram -> tramPainter
+                    TransitStopMapItem.Type.Train -> trainPainter
                     else -> busPainter
                 }
                 val iconSize = SELECTED_STOP_ICON_SIZE.toPx()

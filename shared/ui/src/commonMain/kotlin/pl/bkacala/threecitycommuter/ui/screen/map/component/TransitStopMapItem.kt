@@ -2,13 +2,13 @@ package pl.bkacala.threecitycommuter.ui.screen.map.component
 
 import androidx.compose.runtime.Stable
 import pl.bkacala.threecitycommuter.model.LatLng
-import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
 @Stable
-class BusStopMapItem(
-    busStopItem: BusStopData,
+class TransitStopMapItem(
+    transitStopItem: TransitStopData,
 ) {
 
     enum class Type {
@@ -18,11 +18,11 @@ class BusStopMapItem(
         Train,
     }
 
-    val position = LatLng(busStopItem.stopLat, busStopItem.stopLon)
+    val position = LatLng(transitStopItem.stopLat, transitStopItem.stopLon)
 
-    val key: TransitStopKey = busStopItem.stopKey
+    val key: TransitStopKey = transitStopItem.stopKey
 
-    val data = busStopItem
+    val data = transitStopItem
 
     fun getStationType(): Type {
         return if (data.provider == TransitProvider.SKM) {

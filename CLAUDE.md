@@ -124,7 +124,7 @@ sealed interface UiState<out T> {
 Repositories expose `Flow<T>`.
 
 Main repositories:
-- `BusStopsRepository`
+- `TransitStopsRepository`
 - `LocationRepository`
 - `VehiclesRepository`
 - `RoutesRepository`
@@ -154,7 +154,7 @@ Transport provider architecture:
 
 Data normalization rules:
 - app-level stop IDs are represented by `TransitStopKey(provider, sourceStopId)`
-- `BusStopData.provider` and `BusStopData.sourceStopId` are persisted and used directly
+- `TransitStopData.provider` and `TransitStopData.sourceStopId` are persisted and used directly
 - `Departure.lineNumber` is the display label used by UI
 - `Departure.routeId` remains the provider-internal route identifier for route lookup
 - Gdynia line labels must come from `/pt/routes.routeShortName`, not from raw `routeId`

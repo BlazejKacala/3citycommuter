@@ -5,7 +5,7 @@
     "identityHash": "648ef949df4f4d6fff59b97b5f480c7f",
     "entities": [
       {
-        "tableName": "bus_stops",
+        "tableName": "transit_stops",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`provider` TEXT NOT NULL, `sourceStopId` INTEGER NOT NULL, `stopCode` TEXT, `stopName` TEXT, `stopShortName` TEXT, `stopDesc` TEXT, `subName` TEXT, `date` TEXT, `zoneId` INTEGER NOT NULL, `zoneName` TEXT, `virtual` INTEGER NOT NULL, `nonpassenger` INTEGER NOT NULL, `depot` INTEGER NOT NULL, `ticketZoneBorder` INTEGER NOT NULL, `onDemand` INTEGER NOT NULL, `activationDate` TEXT, `stopLat` REAL NOT NULL, `stopLon` REAL NOT NULL, `stopUrl` TEXT, `locationType` TEXT, `parentStation` TEXT, `stopTimezone` TEXT, `wheelchairBoarding` TEXT, `isForBuses` INTEGER NOT NULL, `isForTrams` INTEGER NOT NULL, PRIMARY KEY(`provider`, `sourceStopId`))",
         "fields": [
           {

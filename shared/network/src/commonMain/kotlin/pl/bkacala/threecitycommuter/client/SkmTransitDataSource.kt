@@ -14,7 +14,7 @@ import pl.bkacala.threecitycommuter.model.plk.PlkRouteDto
 import pl.bkacala.threecitycommuter.model.plk.PlkStationOnRouteDto
 import pl.bkacala.threecitycommuter.model.plk.PlkTrainOperationDto
 import pl.bkacala.threecitycommuter.model.route.Route
-import pl.bkacala.threecitycommuter.model.stops.BusStopData
+import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
@@ -39,7 +39,7 @@ internal class SkmTransitDataSource(
             supportsVehicleMetadata = TransitProvider.SKM.supportsVehicleMetadata,
         )
 
-    override suspend fun getStops(): List<BusStopData> = skmStaticFeed.stops
+    override suspend fun getStops(): List<TransitStopData> = skmStaticFeed.stops
 
     override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> {
         val today = Clock.System.now().toLocalDateInSystemZone()

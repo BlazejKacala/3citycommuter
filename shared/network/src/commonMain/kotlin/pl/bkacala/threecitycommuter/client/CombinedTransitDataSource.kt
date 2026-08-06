@@ -3,8 +3,8 @@ package pl.bkacala.threecitycommuter.client
 import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.route.Route
-import pl.bkacala.threecitycommuter.model.stops.BusStopData
-import pl.bkacala.threecitycommuter.model.stops.BusStopType
+import pl.bkacala.threecitycommuter.model.stops.TransitStopData
+import pl.bkacala.threecitycommuter.model.stops.TransitStopType
 import pl.bkacala.threecitycommuter.model.transit.TransitFeatures
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
@@ -18,26 +18,26 @@ internal class CombinedTransitDataSource(
     private val skmDataSource: SkmTransitDataSource,
     private val json: Json,
 ) : TransitDataSource {
-    private val stopTypesByKey: Map<TransitStopKey, BusStopType> by lazy {
-        json.decodeFromString<List<BusStopType>>(readBundledResourceText("relations.json"))
+    private val stopTypesByKey: Map<TransitStopKey, TransitStopType> by lazy {
+        json.decodeFromString<List<TransitStopType>>(readBundledResourceText("relations.json"))
             .associateBy { it.stopKey }
     }
 
     override fun features(provider: TransitProvider): TransitFeatures =
         dataSourceFor(provider).features(provider)
 
-    override suspend fun getStops(): List<BusStopData> =
+    override suspend fun getStops(): List<TransitStopData> =
         enrichStopTypes(
             gdanskDataSource.getStops() + gdyniaDataSource.getStops() + skmDataSource.getStops(),
         )
 
-    override suspend fun getBundledStops(): List<BusStopData> =
+    override suspend fun getBundledStops(): List<TransitStopData> =
         enrichStopTypes(
             gdanskDataSource.getBundledStops() + gdyniaDataSource.getBundledStops() +
                 skmDataSource.getBundledStops(),
         )
 
-    private fun enrichStopTypes(stops: List<BusStopData>): List<BusStopData> =
+    private fun enrichStopTypes(stops: List<TransitStopData>): List<TransitStopData> =
         stops.map { stop ->
             stopTypesByKey[stop.stopKey]?.let { type ->
                 stop.copy(
