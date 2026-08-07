@@ -176,16 +176,36 @@ internal fun MapMarkersOverlay(
 
             val isCluster = marker.stop == null
             val markerColor = stopMarkerColor(marker.provider)
-            drawCircle(
-                color = Color.White,
-                radius = (if (isCluster) CLUSTER_OUTER_RADIUS else STOP_OUTER_RADIUS).toPx(),
-                center = center,
-            )
-            drawCircle(
-                color = markerColor,
-                radius = (if (isCluster) CLUSTER_INNER_RADIUS else STOP_INNER_RADIUS).toPx(),
-                center = center,
-            )
+            if (isCluster) {
+                drawCircle(
+                    color = Color.White,
+                    radius = CLUSTER_OUTER_RADIUS.toPx(),
+                    center = center,
+                )
+                drawCircle(
+                    color = markerColor,
+                    radius = CLUSTER_INNER_RADIUS.toPx(),
+                    center = center,
+                )
+            } else {
+                val isRailStation = marker.stop?.getStationType() == TransitStopMapItem.Type.Train
+                val markerSize = if (isRailStation) RAIL_STOP_MARKER_SIZE else STOP_MARKER_SIZE
+                val outerSize = Size(markerSize.toPx(), markerSize.toPx())
+                val innerMarkerSize = markerSize - STOP_MARKER_BORDER
+                val innerSize = Size(innerMarkerSize.toPx(), innerMarkerSize.toPx())
+                drawRoundRect(
+                    color = Color.White,
+                    topLeft = center - Offset(outerSize.width / 2f, outerSize.height / 2f),
+                    size = outerSize,
+                    cornerRadius = CornerRadius(STOP_MARKER_CORNER_RADIUS.toPx()),
+                )
+                drawRoundRect(
+                    color = markerColor,
+                    topLeft = center - Offset(innerSize.width / 2f, innerSize.height / 2f),
+                    size = innerSize,
+                    cornerRadius = CornerRadius(STOP_MARKER_CORNER_RADIUS.toPx()),
+                )
+            }
 
             if (isCluster) {
                 val count = if (marker.count < CLUSTER_COUNT_OVERFLOW_THRESHOLD) {
@@ -207,7 +227,11 @@ internal fun MapMarkersOverlay(
                     TransitStopMapItem.Type.Train -> trainPainter
                     else -> busPainter
                 }
-                val iconSize = STOP_ICON_SIZE.toPx()
+                val iconSize = if (marker.stop.getStationType() == TransitStopMapItem.Type.Train) {
+                    RAIL_STOP_ICON_SIZE
+                } else {
+                    STOP_ICON_SIZE
+                }.toPx()
                 translate(
                     left = center.x - iconSize / 2f,
                     top = center.y - iconSize / 2f,
@@ -227,18 +251,33 @@ internal fun MapMarkersOverlay(
             val center = Offset(location.x.toPx(), location.y.toPx())
             if (center.isInside(size)) {
                 val selectedStopColor = stopMarkerColor(stop.data.provider, isSelected = true)
-                drawCircle(Color.White, radius = SELECTED_STOP_OUTER_RADIUS.toPx(), center = center)
-                drawCircle(
+                val isRailStation = stop.getStationType() == TransitStopMapItem.Type.Train
+                val markerSize = if (isRailStation) {
+                    SELECTED_RAIL_STOP_MARKER_SIZE
+                } else {
+                    SELECTED_STOP_MARKER_SIZE
+                }
+                val outerSize = Size(markerSize.toPx(), markerSize.toPx())
+                val innerMarkerSize = markerSize - STOP_MARKER_BORDER
+                val innerSize = Size(innerMarkerSize.toPx(), innerMarkerSize.toPx())
+                drawRoundRect(
+                    color = Color.White,
+                    topLeft = center - Offset(outerSize.width / 2f, outerSize.height / 2f),
+                    size = outerSize,
+                    cornerRadius = CornerRadius(SELECTED_STOP_MARKER_CORNER_RADIUS.toPx()),
+                )
+                drawRoundRect(
                     color = selectedStopColor,
-                    radius = SELECTED_STOP_INNER_RADIUS.toPx(),
-                    center = center,
+                    topLeft = center - Offset(innerSize.width / 2f, innerSize.height / 2f),
+                    size = innerSize,
+                    cornerRadius = CornerRadius(SELECTED_STOP_MARKER_CORNER_RADIUS.toPx()),
                 )
                 val painter = when (stop.getStationType()) {
                     TransitStopMapItem.Type.Tram -> tramPainter
                     TransitStopMapItem.Type.Train -> trainPainter
                     else -> busPainter
                 }
-                val iconSize = SELECTED_STOP_ICON_SIZE.toPx()
+                val iconSize = (if (isRailStation) SELECTED_RAIL_STOP_ICON_SIZE else SELECTED_STOP_ICON_SIZE).toPx()
                 translate(
                     left = center.x - iconSize / 2f,
                     top = center.y - iconSize / 2f,
@@ -343,12 +382,17 @@ private const val CLUSTER_COUNT_OVERFLOW_THRESHOLD = 100
 private const val CLUSTER_COUNT_OVERFLOW_LABEL = "99+"
 
 // Stop markers
-private val STOP_OUTER_RADIUS = 18.dp
-private val STOP_INNER_RADIUS = 13.dp
+private val STOP_MARKER_SIZE = 28.dp
+private val RAIL_STOP_MARKER_SIZE = 34.dp
+private val STOP_MARKER_BORDER = 4.dp
+private val STOP_MARKER_CORNER_RADIUS = 6.dp
 private val STOP_ICON_SIZE = 20.dp
-private val SELECTED_STOP_OUTER_RADIUS = 20.dp
-private val SELECTED_STOP_INNER_RADIUS = 15.dp
+private val SELECTED_STOP_MARKER_SIZE = 32.dp
+private val SELECTED_RAIL_STOP_MARKER_SIZE = 38.dp
+private val SELECTED_STOP_MARKER_CORNER_RADIUS = 7.dp
 private val SELECTED_STOP_ICON_SIZE = STOP_ICON_SIZE
+private val RAIL_STOP_ICON_SIZE = 24.dp
+private val SELECTED_RAIL_STOP_ICON_SIZE = 26.dp
 
 // Vehicle markers
 private val VEHICLE_MARKER_HEIGHT = 36.dp
