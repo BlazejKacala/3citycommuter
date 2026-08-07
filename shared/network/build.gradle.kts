@@ -22,17 +22,15 @@ val generatePlkApiConfig by tasks.registering {
         val plkKey = providers.environmentVariable("PLK_KEY").orNull
             ?: secrets.getProperty("PLK_KEY")
             ?: ""
-        val packagePath = outputDir.get().file("pl/bkacala/threecitycommuter/client/PlkApiConfig.kt").asFile
+        outputDir.get().file("pl/bkacala/threecitycommuter/client/PlkApiConfig.kt").asFile.delete()
+        val packagePath = outputDir.get().file("pl/bkacala/threecitycommuter/client/PlkApiKey.kt").asFile
         packagePath.parentFile.mkdirs()
         packagePath.writeText(
             """
             package pl.bkacala.threecitycommuter.client
 
-            internal object PlkApiConfig {
-                const val baseUrl = "https://pdp-api.plk-sa.pl"
-                const val apiKey = "${plkKey.replace("\\", "\\\\").replace("\"", "\\\"")}"
-                const val skmTricityCarrierCode = "SKMT"
-                const val pkmCarrierCode = "PR"
+            internal object PlkApiKey {
+                const val value = "${plkKey.replace("\\", "\\\\").replace("\"", "\\\"")}"
             }
             """.trimIndent(),
         )

@@ -57,14 +57,14 @@ internal class SkmTransitDataSource(
                     dateTo = today.toString(),
                     stations = stationId,
                     carriersInclude = carrierCode,
-                    fullRoutes = false,
+                    fullRoutes = true,
                 )
             }
             val operationsDeferred = async {
                 plkApiClient.getOperations(
                     stations = stationId,
                     carriersInclude = carrierCode,
-                    fullRoutes = false,
+                    fullRoutes = true,
                 )
             }
             val operations = try {
@@ -233,27 +233,40 @@ internal class SkmTransitDataSource(
         val currentOperationStation = operation?.stations?.firstOrNull { it.stationId == routeStation.stationId }
         val destinationFromOperation = currentOperationStation
             ?.let { current ->
-                operation.stations
-                    .filter { station -> station.sequenceNumber() > current.sequenceNumber() }
-                    .maxByOrNull { it.sequenceNumber() }
-                    ?.stationId
+                operation.stations.destinationOperationStationId(current.sequenceNumber())
             }
         if (destinationFromOperation != null) {
             return destinationFromOperation
         }
 
-        val destinationFromRoute = stations
-            .filter { it.orderNumber > routeStation.orderNumber }
-            .maxByOrNull { it.orderNumber }
-            ?.stationId
+        val destinationFromRoute = stations.destinationRouteStationId(routeStation.orderNumber)
         if (destinationFromRoute != null) {
             return destinationFromRoute
         }
 
-        return stations.maxByOrNull { it.orderNumber }?.stationId
+        return stations
+            .filter { it.stationId != routeStation.stationId }
+            .minByOrNull { it.orderNumber }
+            ?.stationId
     }
 
     private fun PlkOperationStationDto.sequenceNumber(): Int = plannedSequenceNumber ?: actualSequenceNumber
+
+    private fun List<PlkOperationStationDto>.destinationOperationStationId(currentSequenceNumber: Int): Int? {
+        val stationsAfterCurrent = filter { it.sequenceNumber() > currentSequenceNumber }
+        return stationsAfterCurrent.maxByOrNull { it.sequenceNumber() }?.stationId
+            ?: filter { it.sequenceNumber() < currentSequenceNumber }
+                .minByOrNull { it.sequenceNumber() }
+                ?.stationId
+    }
+
+    private fun List<PlkStationOnRouteDto>.destinationRouteStationId(currentOrderNumber: Int): Int? {
+        val stationsAfterCurrent = filter { it.orderNumber > currentOrderNumber }
+        return stationsAfterCurrent.maxByOrNull { it.orderNumber }?.stationId
+            ?: filter { it.orderNumber < currentOrderNumber }
+                .minByOrNull { it.orderNumber }
+                ?.stationId
+    }
 
     private fun PlkTrainOperationDto.toDeparture(
         station: PlkOperationStationDto,
