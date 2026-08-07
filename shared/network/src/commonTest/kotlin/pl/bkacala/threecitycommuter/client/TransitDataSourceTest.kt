@@ -39,11 +39,41 @@ import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 import pl.bkacala.threecitycommuter.resource.loadRailStationsSeed
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
 class TransitDataSourceTest {
+
+    @Test
+    fun `PLK schedules request uses singular fullRoute parameter`() = runTest {
+        var requestedUrl = ""
+        val httpClient = HttpClient(MockEngine { request ->
+            requestedUrl = request.url.toString()
+            respond(
+                content = "{}",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }) {
+            install(ContentNegotiation) {
+                json(testJson)
+            }
+        }
+        val apiClient = KtorPlkApiClient(httpClient, testJson)
+
+        apiClient.getSchedules(
+            dateFrom = "2026-08-07",
+            dateTo = "2026-08-07",
+            stations = "7617",
+            carriersInclude = "SKMT",
+            fullRoutes = true,
+        )
+
+        assertTrue(requestedUrl.contains("fullRoute=true"))
+        assertFalse(requestedUrl.contains("fullRoutes=true"))
+    }
 
     private fun testRailStationCatalog(): RailStationCatalog = object : RailStationCatalog {
         override suspend fun getActiveStations() = loadRailStationsSeed(testJson) +
@@ -338,6 +368,7 @@ class TransitDataSourceTest {
         val departures = dataSource.getDepartures(railStop.stopKey)
 
         assertTrue(departures.isNotEmpty())
+        assertEquals("Wejherowo", departures.single().headsign)
     }
 
     @Test
@@ -535,7 +566,9 @@ class TransitDataSourceTest {
                             },
                         ),
                     ),
-                    stations = stationIdsByName.entries.associate { (name, id) -> id.toString() to name },
+                    stations = stationIdsByName.entries.associate { (name, id) ->
+                        id.toString() to name.takeUnless { id == 6304 }.orEmpty()
+                    },
                 )
             }
 

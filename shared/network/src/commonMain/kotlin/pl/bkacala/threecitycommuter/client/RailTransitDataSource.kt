@@ -3,8 +3,6 @@ package pl.bkacala.threecitycommuter.client
 import kotlinx.coroutines.async
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -32,8 +30,6 @@ internal class RailTransitDataSource(
     private val railStaticCatalog: RailStaticCatalog,
 ) : ProviderTransitDataSource {
     override val provider: TransitProvider = TransitProvider.PLK
-    private val stationNamesMutex = Mutex()
-    private var stationNamesById: Map<Int, String>? = null
     private var catalogLoaded = false
 
     override fun features(): TransitFeatures =
@@ -82,7 +78,7 @@ internal class RailTransitDataSource(
             schedulesDeferred.await() to operations
         }
         val operationsByKey = operations?.trains.orEmpty().associateBy(::routeKey)
-        val stationNames = scheduleStationNamesById(schedules)
+        val stationNames = resolveStationNames(schedules, operations)
 
         val scheduledDepartures = schedules.routes
             .asSequence()
@@ -163,28 +159,27 @@ internal class RailTransitDataSource(
         return railStaticCatalog.stops
     }
 
-    private suspend fun scheduleStationNamesById(
+    private fun resolveStationNames(
         schedules: pl.bkacala.threecitycommuter.model.plk.PlkScheduleResponse,
-    ): Map<Int, String> =
-        stationNamesMutex.withLock {
-            stationNamesById?.let { cached ->
-                if (cached.isNotEmpty()) {
-                    return cached
-                }
+        operations: pl.bkacala.threecitycommuter.model.plk.PlkOperationsResponse?,
+    ): Map<Int, String> {
+        val scheduleNames = schedules.dictionaries?.stations
+            ?.mapNotNull { (key, value) ->
+                val stationId = key.toIntOrNull() ?: return@mapNotNull null
+                val stationName = value.name ?: return@mapNotNull null
+                stationId to stationName
             }
-
-            val resolved = schedules.dictionaries?.stations
-                ?.mapNotNull { (key, value) ->
-                    val stationId = key.toIntOrNull() ?: return@mapNotNull null
-                    val stationName = value.name ?: return@mapNotNull null
-                    stationId to stationName
-                }
-                ?.toMap()
-                .orEmpty()
-            val merged = railStaticCatalog.stopNamesById + resolved
-            stationNamesById = merged
-            merged
-        }
+            ?.toMap()
+            .orEmpty()
+        val operationNames = operations?.stations
+            ?.mapNotNull { (key, value) ->
+                val stationId = key.toIntOrNull() ?: return@mapNotNull null
+                value.takeIf { it.isNotBlank() }?.let { stationId to it }
+            }
+            ?.toMap()
+            .orEmpty()
+        return scheduleNames + operationNames + railStaticCatalog.stopNamesById
+    }
 
     private fun routeKey(route: PlkRouteDto): String = routeKey(route.scheduleId, route.orderId)
 
@@ -290,13 +285,13 @@ internal class RailTransitDataSource(
         val estimatedTime = station.actualDeparture?.toPlkOperationInstant()
             ?: station.actualArrival?.toPlkOperationInstant()
             ?: theoreticalTime
-        val stationName = stationNames[station.stationId]
+        val destinationStationId = stations.destinationOperationStationId(station.sequenceNumber())
 
         return Departure(
             id = listOf(scheduleId, orderId, trainOrderId ?: orderId, operatingDate, station.stationId).joinToString("-"),
             delayInSeconds = station.departureDelayMinutes?.times(60),
             estimatedTime = estimatedTime,
-            headsign = stationName,
+            headsign = destinationStationId?.let(stationNames::get),
             lineNumber = lineLabel,
             routeId = scheduleId,
             scheduledTripStartTime = null,

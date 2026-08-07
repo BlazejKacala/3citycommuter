@@ -40,7 +40,7 @@ internal class KtorPlkApiClient(
         parameter("dateTo", dateTo)
         parameter("stations", stations)
         parameter("carriersInclude", carriersInclude)
-        parameter("fullRoutes", fullRoutes)
+        parameter("fullRoute", fullRoutes)
         parameter("dictionaries", true)
     }.body()
 
@@ -56,7 +56,7 @@ internal class KtorPlkApiClient(
         parameter("fullRoutes", fullRoutes)
         parameter("withPlanned", withPlanned)
         parameter("page", 1)
-        parameter("pageSize", 200)
+        parameter("pageSize", 5000)
     }.body()
 
     override suspend fun getRoute(
