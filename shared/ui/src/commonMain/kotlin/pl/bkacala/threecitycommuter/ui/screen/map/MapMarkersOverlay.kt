@@ -36,8 +36,8 @@ import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.sphericalDistance
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
 import pl.bkacala.threecitycommuter.ui.theme.stopMarkerColor
 import kotlin.math.PI

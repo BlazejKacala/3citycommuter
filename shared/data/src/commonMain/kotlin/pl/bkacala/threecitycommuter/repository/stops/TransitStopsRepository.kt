@@ -9,5 +9,4 @@ interface TransitStopsRepository {
     fun getTransitStops(): Flow<List<TransitStopData>>
 
     fun getDepartures(stopKey: TransitStopKey): Flow<List<Departure>>
-
 }

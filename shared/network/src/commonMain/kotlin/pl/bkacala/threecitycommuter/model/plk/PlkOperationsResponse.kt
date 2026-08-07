@@ -1,7 +1,7 @@
 package pl.bkacala.threecitycommuter.model.plk
 
-import kotlinx.serialization.Serializable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class PlkOperationsResponse(

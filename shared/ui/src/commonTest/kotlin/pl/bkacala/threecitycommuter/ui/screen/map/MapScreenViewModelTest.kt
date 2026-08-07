@@ -342,7 +342,6 @@ class MapScreenViewModelTest {
             departuresError?.let { throw it }
             emit(departures)
         }
-
     }
 
     private inner class FakeLocationRepository(

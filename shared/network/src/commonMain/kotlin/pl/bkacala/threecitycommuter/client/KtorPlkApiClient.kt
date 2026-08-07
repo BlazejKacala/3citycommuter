@@ -21,8 +21,8 @@ internal class KtorPlkApiClient(
     override suspend fun getStations(
         search: String,
         pageSize: Int,
-    ): PlkStationsResponse = httpClient.get("${PlkApiConfig.baseUrl}/api/v1/dictionaries/stations") {
-        header("X-API-Key", PlkApiConfig.apiKey)
+    ): PlkStationsResponse = httpClient.get("${PlkApiConfig.BASE_URL}/api/v1/dictionaries/stations") {
+        header("X-API-Key", PlkApiConfig.API_KEY)
         parameter("search", search)
         parameter("page", 1)
         parameter("pageSize", pageSize)
@@ -34,8 +34,8 @@ internal class KtorPlkApiClient(
         stations: String,
         carriersInclude: String,
         fullRoutes: Boolean,
-    ): PlkScheduleResponse = httpClient.get("${PlkApiConfig.baseUrl}/api/v1/schedules") {
-        header("X-API-Key", PlkApiConfig.apiKey)
+    ): PlkScheduleResponse = httpClient.get("${PlkApiConfig.BASE_URL}/api/v1/schedules") {
+        header("X-API-Key", PlkApiConfig.API_KEY)
         parameter("dateFrom", dateFrom)
         parameter("dateTo", dateTo)
         parameter("stations", stations)
@@ -49,8 +49,8 @@ internal class KtorPlkApiClient(
         carriersInclude: String,
         fullRoutes: Boolean,
         withPlanned: Boolean,
-    ): PlkOperationsResponse = httpClient.get("${PlkApiConfig.baseUrl}/api/v1/operations") {
-        header("X-API-Key", PlkApiConfig.apiKey)
+    ): PlkOperationsResponse = httpClient.get("${PlkApiConfig.BASE_URL}/api/v1/operations") {
+        header("X-API-Key", PlkApiConfig.API_KEY)
         parameter("stations", stations)
         parameter("carriersInclude", carriersInclude)
         parameter("fullRoutes", fullRoutes)
@@ -62,8 +62,8 @@ internal class KtorPlkApiClient(
     override suspend fun getRoute(
         scheduleId: Int,
         orderId: Int,
-    ): PlkRouteDto = httpClient.get("${PlkApiConfig.baseUrl}/api/v1/schedules/route/$scheduleId/$orderId") {
-        header("X-API-Key", PlkApiConfig.apiKey)
+    ): PlkRouteDto = httpClient.get("${PlkApiConfig.BASE_URL}/api/v1/schedules/route/$scheduleId/$orderId") {
+        header("X-API-Key", PlkApiConfig.API_KEY)
         header(HttpHeaders.Accept, "application/json")
     }.body()
 }

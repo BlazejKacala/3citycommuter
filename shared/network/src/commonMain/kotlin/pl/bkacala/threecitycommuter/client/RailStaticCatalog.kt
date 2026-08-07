@@ -1,11 +1,11 @@
 package pl.bkacala.threecitycommuter.client
 
 import pl.bkacala.threecitycommuter.model.rail.RailNetwork
+import pl.bkacala.threecitycommuter.model.rail.RailStationCatalog
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
-import pl.bkacala.threecitycommuter.model.rail.RailStationCatalog
 
 internal class RailStaticCatalog(
     private val stationCatalog: RailStationCatalog,

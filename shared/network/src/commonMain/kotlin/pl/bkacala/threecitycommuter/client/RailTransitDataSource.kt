@@ -1,12 +1,10 @@
 package pl.bkacala.threecitycommuter.client
 
-import kotlinx.coroutines.async
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
-import kotlin.time.Duration.Companion.minutes
+import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.plk.PlkOperationStationDto
 import pl.bkacala.threecitycommuter.model.plk.PlkRouteDto
@@ -23,7 +21,7 @@ import pl.bkacala.threecitycommuter.model.transit.supportsRouteShapes
 import pl.bkacala.threecitycommuter.model.transit.supportsVehicleMetadata
 import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
-import pl.bkacala.threecitycommuter.logging.logError
+import kotlin.time.Duration.Companion.minutes
 
 internal class RailTransitDataSource(
     private val plkApiClient: PlkApiClient,
@@ -128,8 +126,8 @@ internal class RailTransitDataSource(
 
     private fun carrierCodeFor(stationId: Int): String =
         when (railStaticCatalog.railNetworksById[stationId]) {
-            RailNetwork.PKM -> PlkApiConfig.pkmCarrierCode
-            RailNetwork.SKM, null -> PlkApiConfig.skmTricityCarrierCode
+            RailNetwork.PKM -> PlkApiConfig.PKM_CARRIER_CODE
+            RailNetwork.SKM, null -> PlkApiConfig.SKM_TRICITY_CARRIER_CODE
         }
 
     private fun lineLabelFor(stationId: Int): String =

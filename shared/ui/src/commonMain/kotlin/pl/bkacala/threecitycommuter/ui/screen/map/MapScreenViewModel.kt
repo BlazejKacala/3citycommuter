@@ -240,17 +240,19 @@ class MapScreenViewModel(
                                 state
                             } else {
                                 state.copy(
-                                    departures = UiState.Success(DeparturesMapper.mapToBottomSheetModel(
-                                        transitStopData = selected.data,
-                                        departures = departures
-                                            .distinctBy { departureIdentity(it.first) }
-                                            .sortedBy {
-                                                (it.first.estimatedTime ?: it.first.theoreticalTime)?.epochSeconds
-                                                    ?: Long.MAX_VALUE
-                                            }
-                                            .take(MAX_DEPARTURES_DISPLAYED),
-                                        selectedDepartureKey = state.selectedDeparture?.departureKey,
-                                    )),
+                                    departures = UiState.Success(
+                                        DeparturesMapper.mapToBottomSheetModel(
+                                            transitStopData = selected.data,
+                                            departures = departures
+                                                .distinctBy { departureIdentity(it.first) }
+                                                .sortedBy {
+                                                    (it.first.estimatedTime ?: it.first.theoreticalTime)?.epochSeconds
+                                                        ?: Long.MAX_VALUE
+                                                }
+                                                .take(MAX_DEPARTURES_DISPLAYED),
+                                            selectedDepartureKey = state.selectedDeparture?.departureKey,
+                                        ),
+                                    ),
                                 )
                             }
                         }

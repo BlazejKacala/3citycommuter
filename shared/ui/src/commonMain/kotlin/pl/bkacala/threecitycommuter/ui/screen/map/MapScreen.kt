@@ -40,10 +40,10 @@ import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.ui.common.UiState
-import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesHeaderModel
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 import pl.bkacala.threecitycommuter.ui.screen.map.search.BusSearchBar
 

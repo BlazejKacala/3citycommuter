@@ -3,10 +3,10 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.ui.common.UiState
-import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DepartureRowModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.search.SearchResultRowModel
 
 data class MapScreenUiState(

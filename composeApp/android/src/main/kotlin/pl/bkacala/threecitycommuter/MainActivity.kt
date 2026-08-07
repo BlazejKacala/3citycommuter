@@ -60,7 +60,6 @@ class MainActivity : ComponentActivity() {
             App()
         }
     }
-
 }
 
 private const val LOG_TAG = "MainActivity"

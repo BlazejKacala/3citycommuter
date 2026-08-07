@@ -65,7 +65,7 @@ object DeparturesMapper {
             isNear = minutesToArrival == 0,
             vehicleType = vehicleType(provider),
             departureTime = departureTime(minutesToArrival),
-                    lineNumber = railNetwork?.displayName ?: this.lineNumber,
+            lineNumber = railNetwork?.displayName ?: this.lineNumber,
             direction = this.headsign ?: "",
             disabledFriendly = vehicle?.wheelchairsRamp ?: false,
             bikesAllowed = vehicle?.bikeHolders == 1,

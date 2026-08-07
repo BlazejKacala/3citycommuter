@@ -29,6 +29,5 @@ object MockTransitStopsRepository {
             delay(100)
             emit(listOf(makeRandomInstance<Departure>()))
         }
-
     }
 }

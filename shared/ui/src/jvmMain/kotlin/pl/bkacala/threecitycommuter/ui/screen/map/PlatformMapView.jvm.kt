@@ -29,8 +29,8 @@ import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
-import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 import pl.bkacala.threecitycommuter.ui.theme.MapVehicleColor
 import kotlin.math.roundToInt

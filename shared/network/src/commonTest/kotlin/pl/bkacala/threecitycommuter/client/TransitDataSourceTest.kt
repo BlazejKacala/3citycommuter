@@ -8,10 +8,10 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDeparturesResponse
@@ -31,11 +31,11 @@ import pl.bkacala.threecitycommuter.model.plk.PlkStationDto
 import pl.bkacala.threecitycommuter.model.plk.PlkStationOnRouteDto
 import pl.bkacala.threecitycommuter.model.plk.PlkStationsResponse
 import pl.bkacala.threecitycommuter.model.plk.PlkTrainOperationDto
-import pl.bkacala.threecitycommuter.model.transit.TransitProvider
-import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
+import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 import pl.bkacala.threecitycommuter.model.rail.RailStationCatalog
 import pl.bkacala.threecitycommuter.model.rail.RailStationSeed
-import pl.bkacala.threecitycommuter.model.rail.RailNetwork
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.resource.loadRailStationsSeed
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,14 +49,16 @@ class TransitDataSourceTest {
     @Test
     fun `PLK schedules request uses singular fullRoute parameter`() = runTest {
         var requestedUrl = ""
-        val httpClient = HttpClient(MockEngine { request ->
-            requestedUrl = request.url.toString()
-            respond(
-                content = "{}",
-                status = HttpStatusCode.OK,
-                headers = headersOf(HttpHeaders.ContentType, "application/json"),
-            )
-        }) {
+        val httpClient = HttpClient(
+            MockEngine { request ->
+                requestedUrl = request.url.toString()
+                respond(
+                    content = "{}",
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(HttpHeaders.ContentType, "application/json"),
+                )
+            },
+        ) {
             install(ContentNegotiation) {
                 json(testJson)
             }
