@@ -15,7 +15,7 @@ import pl.bkacala.threecitycommuter.resource.readBundledResourceText
 internal class CombinedTransitDataSource(
     private val gdanskDataSource: GdanskTransitDataSource,
     private val gdyniaDataSource: GdyniaTransitDataSource,
-    private val skmDataSource: SkmTransitDataSource,
+    private val railDataSource: RailTransitDataSource,
     private val json: Json,
 ) : TransitDataSource {
     private val stopTypesByKey: Map<TransitStopKey, TransitStopType> by lazy {
@@ -24,17 +24,17 @@ internal class CombinedTransitDataSource(
     }
 
     override fun features(provider: TransitProvider): TransitFeatures =
-        dataSourceFor(provider).features(provider)
+        dataSourceFor(provider).features()
 
     override suspend fun getStops(): List<TransitStopData> =
         enrichStopTypes(
-            gdanskDataSource.getStops() + gdyniaDataSource.getStops() + skmDataSource.getStops(),
+            gdanskDataSource.getStops() + gdyniaDataSource.getStops() + railDataSource.getStops(),
         )
 
     override suspend fun getBundledStops(): List<TransitStopData> =
         enrichStopTypes(
             gdanskDataSource.getBundledStops() + gdyniaDataSource.getBundledStops() +
-                skmDataSource.getBundledStops(),
+                railDataSource.getBundledStops(),
         )
 
     private fun enrichStopTypes(stops: List<TransitStopData>): List<TransitStopData> =
@@ -54,21 +54,21 @@ internal class CombinedTransitDataSource(
         provider: TransitProvider,
         routeId: Int,
         tripId: Int,
-    ): Route? = dataSourceFor(provider).getRouteShape(provider, routeId, tripId)
+    ): Route? = dataSourceFor(provider).getRouteShape(routeId, tripId)
 
     override suspend fun getVehiclePosition(
         provider: TransitProvider,
         vehicleId: Int,
-    ): VehiclePosition? = dataSourceFor(provider).getVehiclePosition(provider, vehicleId)
+    ): VehiclePosition? = dataSourceFor(provider).getVehiclePosition(vehicleId)
 
     override suspend fun getVehicles(provider: TransitProvider): List<Vehicle> =
-        dataSourceFor(provider).getVehicles(provider)
+        dataSourceFor(provider).getVehicles()
 
-    private fun dataSourceFor(provider: TransitProvider): TransitDataSource {
+    private fun dataSourceFor(provider: TransitProvider): ProviderTransitDataSource {
         return when (provider) {
             TransitProvider.GDANSK -> gdanskDataSource
             TransitProvider.GDYNIA -> gdyniaDataSource
-            TransitProvider.SKM -> skmDataSource
+            TransitProvider.PLK -> railDataSource
         }
     }
 }

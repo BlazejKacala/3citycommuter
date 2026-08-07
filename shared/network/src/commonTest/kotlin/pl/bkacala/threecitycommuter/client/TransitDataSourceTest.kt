@@ -33,6 +33,10 @@ import pl.bkacala.threecitycommuter.model.plk.PlkStationsResponse
 import pl.bkacala.threecitycommuter.model.plk.PlkTrainOperationDto
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
+import pl.bkacala.threecitycommuter.model.rail.RailStationCatalog
+import pl.bkacala.threecitycommuter.model.rail.RailStationSeed
+import pl.bkacala.threecitycommuter.model.rail.RailNetwork
+import pl.bkacala.threecitycommuter.resource.loadRailStationsSeed
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -40,6 +44,19 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 
 class TransitDataSourceTest {
+
+    private fun testRailStationCatalog(): RailStationCatalog = object : RailStationCatalog {
+        override suspend fun getActiveStations() = loadRailStationsSeed(testJson) +
+            (101..105).map { id ->
+                RailStationSeed(
+                    plkStationId = id,
+                    name = "Test station $id",
+                    latitude = 54.0 + id / 1000.0,
+                    longitude = 18.0 + id / 1000.0,
+                    network = RailNetwork.SKM,
+                )
+            }
+    }
 
     @Test
     fun `Gdynia GTFS store parses ordered route points`() = runTest {
@@ -153,7 +170,7 @@ class TransitDataSourceTest {
     fun `Gdansk route shape includes ordered passenger stops for selected trip`() = runTest {
         val dataSource = GdanskTransitDataSource(fakeGdanskApiClient(), testJson)
 
-        val route = dataSource.getRouteShape(TransitProvider.GDANSK, routeId = 6, tripId = 42)
+        val route = dataSource.getRouteShape(routeId = 6, tripId = 42)
 
         assertEquals(listOf(8227, 8228), route.stops.map { it.key.sourceStopId })
         assertEquals(listOf(0, 1), route.stops.map { it.sequence })
@@ -235,39 +252,42 @@ class TransitDataSourceTest {
 
     @Test
     fun `SKM provider exposes stations departures and route shapes without live vehicle tracking`() = runTest {
-        val dataSource = SkmTransitDataSource(
+        val dataSource = RailTransitDataSource(
             plkApiClient = fakePlkApiClient(),
-            skmStaticFeed = SkmStaticFeed(testJson),
+            railStaticCatalog = RailStaticCatalog(testRailStationCatalog()),
         )
 
         val stops = dataSource.getStops()
         val selectedStop = stops.first { it.sourceStopId == 258458 }
         val departures = dataSource.getDepartures(selectedStop.stopKey)
-        val route = dataSource.getRouteShape(TransitProvider.SKM, departures.first().routeId, departures.first().tripId)
+        val route = dataSource.getRouteShape(departures.first().routeId, departures.first().tripId)
 
         assertTrue(stops.isNotEmpty())
-        assertEquals(TransitProvider.SKM, selectedStop.provider)
+        assertEquals(TransitProvider.PLK, selectedStop.provider)
         assertEquals(258458, selectedStop.sourceStopId)
         assertTrue(departures.isNotEmpty())
         assertEquals("SKM", departures.first().lineNumber)
         assertEquals(null, departures.first().vehicleId)
         assertNotNull(route)
         assertTrue(route.shape.isNotEmpty())
-        assertEquals(listOf(101, 102, 103, 104, 105), route.stops.map { it.key.sourceStopId })
-        assertEquals(false, dataSource.features(TransitProvider.SKM).supportsLiveVehicleTracking)
-        assertEquals(false, dataSource.features(TransitProvider.SKM).supportsVehicleMetadata)
-        assertEquals(null, dataSource.getVehiclePosition(TransitProvider.SKM, 1))
+        assertEquals(listOf(258458, 7500, 7534, 5942, 5900, 6304), route.stops.map { it.key.sourceStopId })
+        assertEquals(false, dataSource.features().supportsLiveVehicleTracking)
+        assertEquals(false, dataSource.features().supportsVehicleMetadata)
+        assertEquals(null, dataSource.getVehiclePosition(1))
     }
 
     @Test
     fun `PKM station requests Polregio departures from PLK`() = runTest {
         val requestedCarriers = mutableListOf<String>()
-        val dataSource = SkmTransitDataSource(
+        val dataSource = RailTransitDataSource(
             plkApiClient = fakePlkApiClient(requestedCarriers),
-            skmStaticFeed = SkmStaticFeed(testJson),
+            railStaticCatalog = RailStaticCatalog(testRailStationCatalog()),
         )
 
         val pkmStop = dataSource.getStops().first { it.sourceStopId == 257535 }
+        assertEquals("PKM", pkmStop.zoneName)
+        assertEquals("https://www.pkm-sa.pl/", pkmStop.stopUrl)
+        assertEquals(RailNetwork.PKM, pkmStop.railNetwork)
         dataSource.getDepartures(pkmStop.stopKey)
 
         assertEquals(listOf("PR", "PR"), requestedCarriers)
@@ -275,9 +295,9 @@ class TransitDataSourceTest {
 
     @Test
     fun `scheduled rail departures remain available when operations request fails`() = runTest {
-        val dataSource = SkmTransitDataSource(
+        val dataSource = RailTransitDataSource(
             plkApiClient = fakePlkApiClient(failOperations = true),
-            skmStaticFeed = SkmStaticFeed(testJson),
+            railStaticCatalog = RailStaticCatalog(testRailStationCatalog()),
         )
 
         val railStop = dataSource.getStops().first { it.sourceStopId == 258458 }
@@ -288,9 +308,9 @@ class TransitDataSourceTest {
 
     @Test
     fun `rail operation is matched when train order id differs from schedule`() = runTest {
-        val dataSource = SkmTransitDataSource(
+        val dataSource = RailTransitDataSource(
             plkApiClient = fakePlkApiClientWithDifferentTrainOrderIds(),
-            skmStaticFeed = SkmStaticFeed(testJson),
+            railStaticCatalog = RailStaticCatalog(testRailStationCatalog()),
         )
 
         val railStop = dataSource.getStops().first { it.sourceStopId == 258458 }
@@ -301,7 +321,7 @@ class TransitDataSourceTest {
 
     @Test
     fun `operations provide departures when schedules are empty`() = runTest {
-        val dataSource = SkmTransitDataSource(
+        val dataSource = RailTransitDataSource(
             plkApiClient = object : PlkApiClient by fakePlkApiClient() {
                 override suspend fun getSchedules(
                     dateFrom: String,
@@ -311,7 +331,7 @@ class TransitDataSourceTest {
                     fullRoutes: Boolean,
                 ): PlkScheduleResponse = PlkScheduleResponse()
             },
-            skmStaticFeed = SkmStaticFeed(testJson),
+            railStaticCatalog = RailStaticCatalog(testRailStationCatalog()),
         )
 
         val railStop = dataSource.getStops().first { it.sourceStopId == 258458 }
@@ -322,9 +342,9 @@ class TransitDataSourceTest {
 
     @Test
     fun `rail departure uses network label instead of train number`() = runTest {
-        val dataSource = SkmTransitDataSource(
+        val dataSource = RailTransitDataSource(
             plkApiClient = fakePlkApiClient(),
-            skmStaticFeed = SkmStaticFeed(testJson),
+            railStaticCatalog = RailStaticCatalog(testRailStationCatalog()),
         )
 
         val skmStop = dataSource.getStops().first { it.sourceStopId == 258458 }

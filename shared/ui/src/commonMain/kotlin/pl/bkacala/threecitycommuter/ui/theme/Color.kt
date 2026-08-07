@@ -39,7 +39,7 @@ fun stopMarkerColor(
     return when (provider) {
         TransitProvider.GDANSK -> if (isSelected) GdanskSelectedStopColor else GdanskStopColor
         TransitProvider.GDYNIA -> if (isSelected) GdyniaSelectedStopColor else GdyniaStopColor
-        TransitProvider.SKM -> if (isSelected) SkmSelectedStopColor else SkmStopColor
+        TransitProvider.PLK -> if (isSelected) SkmSelectedStopColor else SkmStopColor
         null -> if (isSelected) DarkPrimaryColor else PrimaryColor
     }
 }

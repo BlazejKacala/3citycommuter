@@ -28,9 +28,10 @@ import pl.bkacala.threecitycommuter.utils.toddMMyyyyString
 internal class GdanskTransitDataSource(
     private val gdanskApiClient: GdanskApiClient,
     private val json: Json,
-) : TransitDataSource {
+) : ProviderTransitDataSource {
+    override val provider: TransitProvider = TransitProvider.GDANSK
 
-    override fun features(provider: TransitProvider): TransitFeatures =
+    override fun features(): TransitFeatures =
         TransitFeatures(
             provider = TransitProvider.GDANSK,
             supportsLiveVehicleTracking = TransitProvider.GDANSK.supportsLiveVehicleTracking,
@@ -55,7 +56,7 @@ internal class GdanskTransitDataSource(
     override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> =
         gdanskApiClient.getDepartures(stopKey.sourceStopId).departures.map { it.toDepartureData() }
 
-    override suspend fun getRouteShape(provider: TransitProvider, routeId: Int, tripId: Int): Route {
+    override suspend fun getRouteShape(routeId: Int, tripId: Int): Route {
         val dateString =
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toddMMyyyyString()
         val shape = gdanskApiClient.getRouteShape(dateString, routeId, tripId)
@@ -77,12 +78,12 @@ internal class GdanskTransitDataSource(
         )
     }
 
-    override suspend fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): VehiclePosition? =
+    override suspend fun getVehiclePosition(vehicleId: Int): VehiclePosition? =
         gdanskApiClient.getVehiclePositions().vehiclePositions
             .firstOrNull { it.vehicleId == vehicleId }
             ?.toVehiclePosition()
 
-    override suspend fun getVehicles(provider: TransitProvider): List<Vehicle> =
+    override suspend fun getVehicles(): List<Vehicle> =
         gdanskApiClient.getVehicles().results.map { it.toVehicle() }
 }
 

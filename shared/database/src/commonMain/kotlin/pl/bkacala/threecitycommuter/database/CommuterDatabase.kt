@@ -13,7 +13,7 @@ import pl.bkacala.threecitycommuter.model.vehicles.VehicleEntity
 
 @Database(
     entities = [TransitStopEntity::class, VehicleEntity::class, RailStationEntity::class],
-    version = 4,
+    version = 5,
 )
 @ConstructedBy(CommuterDatabaseConstructor::class)
 abstract class CommuterDatabase : RoomDatabase() {

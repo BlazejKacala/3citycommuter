@@ -1,6 +1,7 @@
 package pl.bkacala.threecitycommuter.model.stops
 
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
+import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
@@ -33,6 +34,7 @@ fun TransitStopEntity.toStopData(): TransitStopData {
         wheelchairBoarding = this.wheelchairBoarding,
         isForBuses = this.isForBuses,
         isForTrams = this.isForTrams,
+        railNetwork = this.railNetwork?.let { runCatching { RailNetwork.valueOf(it) }.getOrNull() },
     )
 }
 
@@ -71,6 +73,7 @@ fun GdanskStopResponse.toEntity(
         wheelchairBoarding = this.wheelchairBoarding,
         isForBuses = isForBuses,
         isForTrams = isForTrams,
+        railNetwork = null,
     )
 }
 
@@ -101,5 +104,6 @@ fun TransitStopData.toEntity(): TransitStopEntity {
         wheelchairBoarding = this.wheelchairBoarding,
         isForBuses = this.isForBuses,
         isForTrams = this.isForTrams,
+        railNetwork = this.railNetwork?.name,
     )
 }

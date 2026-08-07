@@ -25,7 +25,7 @@ class TransitStopMapItem(
     val data = transitStopItem
 
     fun getStationType(): Type {
-        return if (data.provider == TransitProvider.SKM) {
+        return if (data.provider == TransitProvider.PLK) {
             Type.Train
         } else if (data.isForBuses && data.isForTrams) {
             Type.Both

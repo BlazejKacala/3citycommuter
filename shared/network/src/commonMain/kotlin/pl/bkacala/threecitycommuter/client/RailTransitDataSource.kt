@@ -27,24 +27,27 @@ import pl.bkacala.threecitycommuter.model.vehicles.Vehicle
 import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.logging.logError
 
-internal class SkmTransitDataSource(
+internal class RailTransitDataSource(
     private val plkApiClient: PlkApiClient,
-    private val skmStaticFeed: SkmStaticFeed,
-) : TransitDataSource {
+    private val railStaticCatalog: RailStaticCatalog,
+) : ProviderTransitDataSource {
+    override val provider: TransitProvider = TransitProvider.PLK
     private val stationNamesMutex = Mutex()
     private var stationNamesById: Map<Int, String>? = null
+    private var catalogLoaded = false
 
-    override fun features(provider: TransitProvider): TransitFeatures =
+    override fun features(): TransitFeatures =
         TransitFeatures(
-            provider = TransitProvider.SKM,
-            supportsLiveVehicleTracking = TransitProvider.SKM.supportsLiveVehicleTracking,
-            supportsRouteShapes = TransitProvider.SKM.supportsRouteShapes,
-            supportsVehicleMetadata = TransitProvider.SKM.supportsVehicleMetadata,
+            provider = TransitProvider.PLK,
+            supportsLiveVehicleTracking = TransitProvider.PLK.supportsLiveVehicleTracking,
+            supportsRouteShapes = TransitProvider.PLK.supportsRouteShapes,
+            supportsVehicleMetadata = TransitProvider.PLK.supportsVehicleMetadata,
         )
 
-    override suspend fun getStops(): List<TransitStopData> = skmStaticFeed.stops
+    override suspend fun getStops(): List<TransitStopData> = loadCatalog()
 
     override suspend fun getDepartures(stopKey: TransitStopKey): List<Departure> {
+        loadCatalog()
         val today = Clock.System.now().toLocalDateInSystemZone()
         val now = Clock.System.now()
         val stationId = stopKey.sourceStopId.toString()
@@ -128,28 +131,37 @@ internal class SkmTransitDataSource(
     }
 
     private fun carrierCodeFor(stationId: Int): String =
-        when (skmStaticFeed.railNetworksById[stationId]) {
+        when (railStaticCatalog.railNetworksById[stationId]) {
             RailNetwork.PKM -> PlkApiConfig.pkmCarrierCode
             RailNetwork.SKM, null -> PlkApiConfig.skmTricityCarrierCode
         }
 
     private fun lineLabelFor(stationId: Int): String =
-        when (skmStaticFeed.railNetworksById[stationId]) {
+        when (railStaticCatalog.railNetworksById[stationId]) {
             RailNetwork.PKM -> "PKM"
             RailNetwork.SKM, null -> "SKM"
         }
 
-    override suspend fun getRouteShape(provider: TransitProvider, routeId: Int, tripId: Int): Route {
+    override suspend fun getRouteShape(routeId: Int, tripId: Int): Route {
+        loadCatalog()
         val route = plkApiClient.getRoute(scheduleId = routeId, orderId = tripId)
         val orderedStopIds = route.stations
             .sortedBy { it.orderNumber }
             .map { it.stationId }
-        return skmStaticFeed.routeFor(orderedStopIds)
+        return railStaticCatalog.routeFor(orderedStopIds)
     }
 
-    override suspend fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): VehiclePosition? = null
+    override suspend fun getVehiclePosition(vehicleId: Int): VehiclePosition? = null
 
-    override suspend fun getVehicles(provider: TransitProvider): List<Vehicle> = emptyList()
+    override suspend fun getVehicles(): List<Vehicle> = emptyList()
+
+    private suspend fun loadCatalog(): List<TransitStopData> {
+        if (!catalogLoaded) {
+            railStaticCatalog.load()
+            catalogLoaded = true
+        }
+        return railStaticCatalog.stops
+    }
 
     private suspend fun scheduleStationNamesById(
         schedules: pl.bkacala.threecitycommuter.model.plk.PlkScheduleResponse,
@@ -169,7 +181,7 @@ internal class SkmTransitDataSource(
                 }
                 ?.toMap()
                 .orEmpty()
-            val merged = skmStaticFeed.stopNamesById + resolved
+            val merged = railStaticCatalog.stopNamesById + resolved
             stationNamesById = merged
             merged
         }
@@ -300,4 +312,4 @@ internal class SkmTransitDataSource(
     }
 }
 
-private const val LOG_TAG = "SkmTransitDataSource"
+private const val LOG_TAG = "RailTransitDataSource"

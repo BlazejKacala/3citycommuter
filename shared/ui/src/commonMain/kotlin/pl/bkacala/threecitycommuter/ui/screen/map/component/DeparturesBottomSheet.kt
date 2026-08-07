@@ -48,7 +48,7 @@ fun DeparturesBottomSheet(
             modifier = Modifier.verticalScroll(rememberScrollState()),
         ) {
             model.header.Widget(accentColor = accentColor)
-            if (model.provider == TransitProvider.SKM) {
+            if (model.provider == TransitProvider.PLK) {
                 Text(
                     text = "Pozycja pociagu nie jest publicznie dostepna. Pokazujemy trase i czasy odjazdow.",
                     style = MaterialTheme.typography.bodySmall,

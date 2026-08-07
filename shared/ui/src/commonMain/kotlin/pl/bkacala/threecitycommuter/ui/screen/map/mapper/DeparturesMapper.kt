@@ -81,7 +81,7 @@ object DeparturesMapper {
 
     private fun Departure.vehicleType(provider: TransitProvider): VehicleType =
         when (provider) {
-            TransitProvider.SKM -> VehicleType.Train
+            TransitProvider.PLK -> VehicleType.Train
             TransitProvider.GDANSK, TransitProvider.GDYNIA -> if (this.routeId < 100) VehicleType.Tram else VehicleType.Bus
         }
 

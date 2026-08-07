@@ -256,7 +256,7 @@ class MapScreenViewModel(
                         }
                     }
                 delay(
-                    if (selected.data.provider == TransitProvider.SKM) {
+                    if (selected.data.provider == TransitProvider.PLK) {
                         RAIL_DEPARTURES_REFRESH_INTERVAL
                     } else {
                         DEPARTURES_REFRESH_INTERVAL

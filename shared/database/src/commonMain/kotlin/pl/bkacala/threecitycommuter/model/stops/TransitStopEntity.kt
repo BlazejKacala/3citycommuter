@@ -32,4 +32,5 @@ data class TransitStopEntity(
     val wheelchairBoarding: String?,
     val isForBuses: Boolean,
     val isForTrams: Boolean,
+    val railNetwork: String?,
 )

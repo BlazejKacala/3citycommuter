@@ -37,11 +37,12 @@ internal class GdyniaTransitDataSource(
     private val httpClient: HttpClient,
     private val json: Json,
     private val gtfsStore: GdyniaGtfsStore,
-) : TransitDataSource {
+) : ProviderTransitDataSource {
+    override val provider: TransitProvider = TransitProvider.GDYNIA
     private val routeNamesMutex = kotlinx.coroutines.sync.Mutex()
     private var routeNamesById: Map<Int, String>? = null
 
-    override fun features(provider: TransitProvider): TransitFeatures =
+    override fun features(): TransitFeatures =
         TransitFeatures(
             provider = TransitProvider.GDYNIA,
             supportsLiveVehicleTracking = TransitProvider.GDYNIA.supportsLiveVehicleTracking,
@@ -125,12 +126,12 @@ internal class GdyniaTransitDataSource(
         }
     }
 
-    override suspend fun getRouteShape(provider: TransitProvider, routeId: Int, tripId: Int): Route? =
+    override suspend fun getRouteShape(routeId: Int, tripId: Int): Route? =
         gtfsStore.getRouteForTrip(tripId)
 
-    override suspend fun getVehiclePosition(provider: TransitProvider, vehicleId: Int): VehiclePosition? = null
+    override suspend fun getVehiclePosition(vehicleId: Int): VehiclePosition? = null
 
-    override suspend fun getVehicles(provider: TransitProvider): List<Vehicle> = emptyList()
+    override suspend fun getVehicles(): List<Vehicle> = emptyList()
 
     private suspend fun getRouteNames(): Map<Int, String> =
         routeNamesMutex.withLock {

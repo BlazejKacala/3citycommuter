@@ -187,7 +187,7 @@ class MapScreenViewModelTest {
 
     @Test
     fun `GIVEN SKM stop and departure WHEN departure is selected THEN route loads without GPS tracking`() = runTest {
-        val stop = transitStopData(stopId = 101, name = "Sopot", provider = TransitProvider.SKM)
+        val stop = transitStopData(stopId = 101, name = "Sopot", provider = TransitProvider.PLK)
         val departure = departure(lineNumber = "S1", routeId = 9001, tripId = 9101, vehicleId = null)
         val viewModel = createViewModel(
             stopsRepository = FakeTransitStopsRepository(stops = listOf(stop), departures = listOf(departure)),
@@ -202,7 +202,7 @@ class MapScreenViewModelTest {
         viewModel.onAction(MapAction.DepartureSelected(departureKey))
         advanceTimeBy(250.milliseconds)
 
-        viewModel.uiState.value.selectedTransitStop?.data?.provider shouldBe TransitProvider.SKM
+        viewModel.uiState.value.selectedTransitStop?.data?.provider shouldBe TransitProvider.PLK
         viewModel.uiState.value.selectedDeparture?.vehicleType shouldBe pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType.Train
         viewModel.uiState.value.selectedDeparture?.showGpsIndicator shouldBe false
         viewModel.uiState.value.trackedVehicle shouldBe null

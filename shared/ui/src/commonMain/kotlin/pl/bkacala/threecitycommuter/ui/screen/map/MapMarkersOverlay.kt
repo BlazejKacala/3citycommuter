@@ -54,7 +54,7 @@ internal data class StopMapMarker(
 
 internal fun List<TransitStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapMarker> {
     val stopsWithIndex = withIndex().toList()
-    val (skmStops, otherStops) = stopsWithIndex.partition { it.value.data.provider == TransitProvider.SKM }
+    val (skmStops, otherStops) = stopsWithIndex.partition { it.value.data.provider == TransitProvider.PLK }
     val groups = if (zoom >= STOPS_UNCLUSTERED_ZOOM) {
         stopsWithIndex.map { listOf(it) }
     } else {
