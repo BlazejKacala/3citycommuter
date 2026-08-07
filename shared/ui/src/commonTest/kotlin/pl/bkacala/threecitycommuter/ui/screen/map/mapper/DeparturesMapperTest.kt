@@ -37,7 +37,7 @@ class DeparturesMapperTest {
             selectedDepartureKey = null,
         )
 
-        assertEquals("pkm", model.departures.single().lineNumber)
+        assertEquals("PKM", model.departures.single().lineNumber)
     }
 
     private fun transitStopData(): TransitStopData =

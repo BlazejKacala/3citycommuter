@@ -119,5 +119,5 @@ object DeparturesMapper {
         }
 
     private val RailNetwork.displayName: String
-        get() = name.lowercase()
+        get() = name.uppercase()
 }
