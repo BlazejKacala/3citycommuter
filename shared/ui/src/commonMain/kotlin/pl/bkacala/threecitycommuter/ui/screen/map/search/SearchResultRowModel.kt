@@ -63,7 +63,7 @@ fun SearchResultRowModel.Widget(onClicked: (TransitStopKey) -> Unit) {
         Column {
             Text(text = station, style = MaterialTheme.typography.titleMedium)
             Text(
-        text = if (provider == TransitProvider.PLK) "$distance - rail" else distance,
+                text = distance,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
