@@ -119,7 +119,7 @@ class MapScreenViewModelTest {
 
             viewModel.uiState.value.selectedTransitStop?.data shouldBe selectedStop
             viewModel.uiState.value.departures shouldNotBe null
-            viewModel.uiState.value.departures?.header?.transitStopName shouldBe selectedStop.name
+            (viewModel.uiState.value.departures as UiState.Success).data.header.transitStopName shouldBe selectedStop.name
             viewModel.onAction(MapAction.ScreenPaused)
         }
 
@@ -197,7 +197,8 @@ class MapScreenViewModelTest {
         viewModel.onAction(MapAction.StopSelected(transitStopsFrom(viewModel).first().key))
         advanceTimeBy(250.milliseconds)
 
-        val departureKey = viewModel.uiState.value.departures?.departures?.first()?.departureKey ?: error("missing departure")
+        val departures = (viewModel.uiState.value.departures as UiState.Success).data
+        val departureKey = departures.departures.firstOrNull()?.departureKey ?: error("missing departure")
         viewModel.onAction(MapAction.DepartureSelected(departureKey))
         advanceTimeBy(250.milliseconds)
 

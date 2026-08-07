@@ -14,7 +14,7 @@ data class MapScreenUiState(
     val userLocation: UserLocation = UserLocation.default(),
     val selectedTransitStop: TransitStopMapItem? = null,
     val selectedDeparture: DepartureRowModel? = null,
-    val departures: DeparturesBottomSheetModel? = null,
+    val departures: UiState<DeparturesBottomSheetModel>? = null,
     val route: List<LatLng>? = null,
     val trackedVehicle: TrackedVehicle? = null,
     val isSearchActive: Boolean = false,

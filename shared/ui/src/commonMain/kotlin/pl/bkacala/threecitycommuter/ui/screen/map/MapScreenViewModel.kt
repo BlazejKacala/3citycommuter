@@ -23,6 +23,7 @@ import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
 import pl.bkacala.threecitycommuter.model.sphericalDistance
+import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.model.transit.supportsLiveVehicleTracking
 import pl.bkacala.threecitycommuter.repository.location.LocationRepository
@@ -165,7 +166,7 @@ class MapScreenViewModel(
             it.copy(
                 selectedTransitStop = selected,
                 selectedDeparture = null,
-                departures = null,
+                departures = UiState.Loading,
                 route = null,
                 trackedVehicle = null,
             )
@@ -207,6 +208,15 @@ class MapScreenViewModel(
     private fun updateDepartures(selected: TransitStopMapItem) {
         updateDeparturesJob = viewModelScope.launch {
             while (isActive) {
+                _uiState.update { state ->
+                    if (state.selectedTransitStop?.key == selected.key &&
+                        state.departures !is UiState.Success
+                    ) {
+                        state.copy(departures = UiState.Loading)
+                    } else {
+                        state
+                    }
+                }
                 getDeparturesUseCase.getDepartures(selected.key)
                     .take(1)
                     .catch { throwable ->
@@ -215,6 +225,13 @@ class MapScreenViewModel(
                             "Failed to load departures for provider=${selected.data.provider} sourceStopId=${selected.data.sourceStopId} stopName=${selected.data.name}",
                             throwable,
                         )
+                        _uiState.update { state ->
+                            if (state.selectedTransitStop?.key == selected.key) {
+                                state.copy(departures = UiState.Error(throwable))
+                            } else {
+                                state
+                            }
+                        }
                         emitError()
                     }
                     .collect { departures ->
@@ -223,16 +240,28 @@ class MapScreenViewModel(
                                 state
                             } else {
                                 state.copy(
-                                    departures = DeparturesMapper.mapToBottomSheetModel(
+                                    departures = UiState.Success(DeparturesMapper.mapToBottomSheetModel(
                                         transitStopData = selected.data,
-                                        departures = departures.distinctBy { departureIdentity(it.first) },
+                                        departures = departures
+                                            .distinctBy { departureIdentity(it.first) }
+                                            .sortedBy {
+                                                (it.first.estimatedTime ?: it.first.theoreticalTime)?.epochSeconds
+                                                    ?: Long.MAX_VALUE
+                                            }
+                                            .take(MAX_DEPARTURES_DISPLAYED),
                                         selectedDepartureKey = state.selectedDeparture?.departureKey,
-                                    ),
+                                    )),
                                 )
                             }
                         }
                     }
-                delay(DEPARTURES_REFRESH_INTERVAL)
+                delay(
+                    if (selected.data.provider == TransitProvider.SKM) {
+                        RAIL_DEPARTURES_REFRESH_INTERVAL
+                    } else {
+                        DEPARTURES_REFRESH_INTERVAL
+                    },
+                )
             }
         }
     }
@@ -240,18 +269,23 @@ class MapScreenViewModel(
     private fun onSelectDeparture(departureKey: String) {
         traceVehicleJob?.cancel()
         _uiState.update { state ->
-            val selectedDeparture = state.departures?.departures?.find {
+            val departures = (state.departures as? UiState.Success)?.data
+            val selectedDeparture = departures?.departures?.find {
                 it.departureKey == departureKey
             }
             state.copy(
                 selectedDeparture = selectedDeparture,
                 trackedVehicle = null,
                 route = null,
-                departures = state.departures?.copy(
-                    departures = state.departures.departures.map {
-                        it.copy(isSelected = it.departureKey == departureKey)
-                    },
-                ),
+                departures = departures?.let { model ->
+                    UiState.Success(
+                        model.copy(
+                            departures = model.departures.map {
+                                it.copy(isSelected = it.departureKey == departureKey)
+                            },
+                        ),
+                    )
+                },
             )
         }
 
@@ -418,7 +452,9 @@ class MapScreenViewModel(
 private const val LOG_TAG = "MapScreenViewModel"
 private val USER_LOCATION_REFRESH_INTERVAL = 10.seconds
 private val DEPARTURES_REFRESH_INTERVAL = 30.seconds
+private val RAIL_DEPARTURES_REFRESH_INTERVAL = 60.seconds
 private val VEHICLE_REFRESH_INTERVAL = 10.seconds
+private const val MAX_DEPARTURES_DISPLAYED = 15
 
 private const val GENERIC_ERROR_MESSAGE = "Nie udało się wczytać danych"
 private const val INVALID_VEHICLE_ID_ERROR_MESSAGE = "Nieprawidłowy identyfikator pojazdu"
