@@ -1,11 +1,11 @@
 package pl.bkacala.threecitycommuter.model.plk
 
-import kotlinx.serialization.Serializable
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class PlkOperationsResponse(
-    val generatedAt: Instant,
+    val generatedAt: Instant? = null,
     val trains: List<PlkTrainOperationDto> = emptyList(),
     val stations: Map<String, String> = emptyMap(),
 )

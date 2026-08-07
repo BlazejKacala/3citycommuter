@@ -40,9 +40,10 @@ import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.viewmodel.koinViewModel
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.ui.common.UiState
-import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheet
 import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesBottomSheetModel
+import pl.bkacala.threecitycommuter.ui.screen.map.component.DeparturesHeaderModel
+import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
 import pl.bkacala.threecitycommuter.ui.screen.map.search.BusSearchBar
 
@@ -108,7 +109,11 @@ fun MapScreen(
             )
         }
 
-        DeparturesSheet(state.departures, viewModel) {
+        DeparturesSheet(
+            departuresState = state.departures,
+            selectedStop = state.selectedTransitStop,
+            viewModel = viewModel,
+        ) {
             mapBottomPadding.value = it
         }
     }
@@ -194,14 +199,15 @@ private fun TraceLifecycleEvents(viewModel: MapScreenViewModel) {
 
 @Composable
 private fun BoxWithConstraintsScope.DeparturesSheet(
-    departuresModel: DeparturesBottomSheetModel?,
+    departuresState: UiState<DeparturesBottomSheetModel>?,
+    selectedStop: TransitStopMapItem?,
     viewModel: MapScreenViewModel,
     maxSizeListener: (maxSize: Dp) -> Unit,
 ) {
     val density = LocalDensity.current
 
     AnimatedVisibility(
-        visible = departuresModel != null,
+        visible = departuresState != null && selectedStop != null,
         enter = slideInVertically { fullHeight ->
             with(density) {
                 maxSizeListener(fullHeight.toDp())
@@ -212,9 +218,22 @@ private fun BoxWithConstraintsScope.DeparturesSheet(
             .align(Alignment.BottomCenter)
             .heightIn(min = 0.dp, max = maxHeight * 2 / 5),
     ) {
-        departuresModel?.let {
+        val isLoading = departuresState is UiState.Loading || departuresState is UiState.Error
+        val model = (departuresState as? UiState.Success)?.data ?: selectedStop?.let {
+            DeparturesBottomSheetModel(
+                provider = it.data.provider,
+                header = DeparturesHeaderModel(
+                    transitStopName = it.data.name,
+                    isForDemand = it.data.onDemand,
+                ),
+                departures = emptyList(),
+            )
+        }
+        model?.let {
             DeparturesBottomSheet(
-                model = departuresModel,
+                model = it,
+                isLoading = isLoading,
+                animationKey = selectedStop?.key?.toString() ?: it.header.transitStopName,
                 onDepartureSelected = { viewModel.onAction(MapAction.DepartureSelected(it)) },
             )
         }

@@ -3,8 +3,8 @@ package pl.bkacala.threecitycommuter.di
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
@@ -18,8 +18,8 @@ import pl.bkacala.threecitycommuter.client.GdyniaTransitDataSource
 import pl.bkacala.threecitycommuter.client.KtorGdanskApiClient
 import pl.bkacala.threecitycommuter.client.KtorPlkApiClient
 import pl.bkacala.threecitycommuter.client.PlkApiClient
-import pl.bkacala.threecitycommuter.client.SkmStaticFeed
-import pl.bkacala.threecitycommuter.client.SkmTransitDataSource
+import pl.bkacala.threecitycommuter.client.RailStaticCatalog
+import pl.bkacala.threecitycommuter.client.RailTransitDataSource
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.client.ZipEntryReader
 
@@ -47,7 +47,7 @@ val networkModule = module {
                             println("KTOR $message")
                         }
                     }
-                level = LogLevel.HEADERS
+                level = LogLevel.BODY
             }
         }
     }
@@ -60,9 +60,9 @@ val networkModule = module {
     single { GdyniaGtfsStore(get(), get(), get(), get(), get()) }
     single<GdyniaGtfsPreloader> { get<GdyniaGtfsStore>() }
     single<PlkApiClient> { KtorPlkApiClient(get(), get()) }
-    single { SkmStaticFeed(get()) }
+    single { RailStaticCatalog(get()) }
     single { GdanskTransitDataSource(get(), get()) }
     single { GdyniaTransitDataSource(get(), get(), get()) }
-    single { SkmTransitDataSource(get(), get()) }
+    single { RailTransitDataSource(get(), get()) }
     single<TransitDataSource> { CombinedTransitDataSource(get(), get(), get(), get()) }
 }

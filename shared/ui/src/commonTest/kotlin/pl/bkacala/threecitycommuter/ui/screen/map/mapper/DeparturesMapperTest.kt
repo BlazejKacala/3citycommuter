@@ -30,14 +30,14 @@ class DeparturesMapperTest {
     fun `uses rail network name instead of line number for rail departures`() {
         val model = DeparturesMapper.mapToBottomSheetModel(
             transitStopData = transitStopData().copy(
-                stopKey = TransitStopKey(TransitProvider.SKM, 257540),
+                stopKey = TransitStopKey(TransitProvider.PLK, 257540),
                 railNetwork = RailNetwork.PKM,
             ),
             departures = listOf(departure(delayInSeconds = 0) to null),
             selectedDepartureKey = null,
         )
 
-        assertEquals("pkm", model.departures.single().lineNumber)
+        assertEquals("PKM", model.departures.single().lineNumber)
     }
 
     private fun transitStopData(): TransitStopData =

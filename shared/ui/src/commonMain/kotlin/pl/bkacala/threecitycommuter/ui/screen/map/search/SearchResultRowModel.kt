@@ -39,7 +39,7 @@ fun SearchResultRowModel.Widget(onClicked: (TransitStopKey) -> Unit) {
             .padding(horizontal = Padding.big, vertical = Padding.normal),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (provider == TransitProvider.SKM) {
+        if (provider == TransitProvider.PLK) {
             Icon(
                 imageVector = Icons.Filled.Train,
                 contentDescription = "Stacja kolejowa",
@@ -63,7 +63,7 @@ fun SearchResultRowModel.Widget(onClicked: (TransitStopKey) -> Unit) {
         Column {
             Text(text = station, style = MaterialTheme.typography.titleMedium)
             Text(
-                text = if (provider == TransitProvider.SKM) "$distance - SKM" else distance,
+                text = distance,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -119,7 +119,7 @@ class MapScreenViewModelTest {
 
             viewModel.uiState.value.selectedTransitStop?.data shouldBe selectedStop
             viewModel.uiState.value.departures shouldNotBe null
-            viewModel.uiState.value.departures?.header?.transitStopName shouldBe selectedStop.name
+            (viewModel.uiState.value.departures as UiState.Success).data.header.transitStopName shouldBe selectedStop.name
             viewModel.onAction(MapAction.ScreenPaused)
         }
 
@@ -187,7 +187,7 @@ class MapScreenViewModelTest {
 
     @Test
     fun `GIVEN SKM stop and departure WHEN departure is selected THEN route loads without GPS tracking`() = runTest {
-        val stop = transitStopData(stopId = 101, name = "Sopot", provider = TransitProvider.SKM)
+        val stop = transitStopData(stopId = 101, name = "Sopot", provider = TransitProvider.PLK)
         val departure = departure(lineNumber = "S1", routeId = 9001, tripId = 9101, vehicleId = null)
         val viewModel = createViewModel(
             stopsRepository = FakeTransitStopsRepository(stops = listOf(stop), departures = listOf(departure)),
@@ -197,11 +197,12 @@ class MapScreenViewModelTest {
         viewModel.onAction(MapAction.StopSelected(transitStopsFrom(viewModel).first().key))
         advanceTimeBy(250.milliseconds)
 
-        val departureKey = viewModel.uiState.value.departures?.departures?.first()?.departureKey ?: error("missing departure")
+        val departures = (viewModel.uiState.value.departures as UiState.Success).data
+        val departureKey = departures.departures.firstOrNull()?.departureKey ?: error("missing departure")
         viewModel.onAction(MapAction.DepartureSelected(departureKey))
         advanceTimeBy(250.milliseconds)
 
-        viewModel.uiState.value.selectedTransitStop?.data?.provider shouldBe TransitProvider.SKM
+        viewModel.uiState.value.selectedTransitStop?.data?.provider shouldBe TransitProvider.PLK
         viewModel.uiState.value.selectedDeparture?.vehicleType shouldBe pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType.Train
         viewModel.uiState.value.selectedDeparture?.showGpsIndicator shouldBe false
         viewModel.uiState.value.trackedVehicle shouldBe null
@@ -341,7 +342,6 @@ class MapScreenViewModelTest {
             departuresError?.let { throw it }
             emit(departures)
         }
-
     }
 
     private inner class FakeLocationRepository(

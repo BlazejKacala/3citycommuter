@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class PlkScheduleResponse(
-    val generatedAt: Instant,
+    val generatedAt: Instant? = null,
     val routes: List<PlkRouteDto> = emptyList(),
     val dictionaries: PlkScheduleDictionaries? = null,
 )

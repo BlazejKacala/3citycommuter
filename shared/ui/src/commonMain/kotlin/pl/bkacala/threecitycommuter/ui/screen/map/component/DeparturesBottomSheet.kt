@@ -1,5 +1,9 @@
 package pl.bkacala.threecitycommuter.ui.screen.map.component
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +33,8 @@ data class DeparturesBottomSheetModel(
 @Composable
 fun DeparturesBottomSheet(
     model: DeparturesBottomSheetModel,
+    isLoading: Boolean = false,
+    animationKey: String = model.header.transitStopName,
     onDepartureSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -42,7 +48,7 @@ fun DeparturesBottomSheet(
             modifier = Modifier.verticalScroll(rememberScrollState()),
         ) {
             model.header.Widget(accentColor = accentColor)
-            if (model.provider == TransitProvider.SKM) {
+            if (model.provider == TransitProvider.PLK) {
                 Text(
                     text = "Pozycja pociagu nie jest publicznie dostepna. Pokazujemy trase i czasy odjazdow.",
                     style = MaterialTheme.typography.bodySmall,
@@ -50,18 +56,48 @@ fun DeparturesBottomSheet(
                     modifier = Modifier.padding(horizontal = Padding.big),
                 )
             }
-            model.departures.fastForEachIndexed { index, it ->
-                it.Widget(
-                    accentColor = accentColor,
-                    onSelected = onDepartureSelected,
-                )
-                if (index != model.departures.size - 1) {
-                    HorizontalDivider()
+            AnimatedContent(
+                targetState = DeparturesAnimationTarget(animationKey, isLoading, model),
+                contentKey = { target -> target.key to target.isLoading },
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                label = "departures-content",
+            ) { target ->
+                val targetModel = target.model
+                val targetAccentColor = stopMarkerColor(targetModel.provider)
+                if (target.isLoading) {
+                    Column {
+                        repeat(SKELETON_ROW_COUNT) { index ->
+                            DepartureSkeletonRow()
+                            if (index != SKELETON_ROW_COUNT - 1) {
+                                HorizontalDivider()
+                            }
+                        }
+                    }
+                } else {
+                    Column {
+                        targetModel.departures.fastForEachIndexed { index, it ->
+                            it.Widget(
+                                accentColor = targetAccentColor,
+                                onSelected = onDepartureSelected,
+                            )
+                            if (index != targetModel.departures.size - 1) {
+                                HorizontalDivider()
+                            }
+                        }
+                        if (targetModel.departures.isEmpty()) {
+                            DeparturesEmptyRow()
+                        }
+                    }
                 }
-            }
-            if (model.departures.isEmpty()) {
-                DeparturesEmptyRow()
             }
         }
     }
 }
+
+private const val SKELETON_ROW_COUNT = 6
+
+private data class DeparturesAnimationTarget(
+    val key: String,
+    val isLoading: Boolean,
+    val model: DeparturesBottomSheetModel,
+)

@@ -1,8 +1,8 @@
 package pl.bkacala.threecitycommuter.model.stops
 
+import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
-import pl.bkacala.threecitycommuter.model.rail.RailNetwork
 
 data class TransitStopData(
     val stopKey: TransitStopKey,

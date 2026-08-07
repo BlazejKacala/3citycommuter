@@ -65,7 +65,7 @@ object DeparturesMapper {
             isNear = minutesToArrival == 0,
             vehicleType = vehicleType(provider),
             departureTime = departureTime(minutesToArrival),
-                    lineNumber = railNetwork?.displayName ?: this.lineNumber,
+            lineNumber = railNetwork?.displayName ?: this.lineNumber,
             direction = this.headsign ?: "",
             disabledFriendly = vehicle?.wheelchairsRamp ?: false,
             bikesAllowed = vehicle?.bikeHolders == 1,
@@ -81,7 +81,7 @@ object DeparturesMapper {
 
     private fun Departure.vehicleType(provider: TransitProvider): VehicleType =
         when (provider) {
-            TransitProvider.SKM -> VehicleType.Train
+            TransitProvider.PLK -> VehicleType.Train
             TransitProvider.GDANSK, TransitProvider.GDYNIA -> if (this.routeId < 100) VehicleType.Tram else VehicleType.Bus
         }
 
@@ -119,5 +119,5 @@ object DeparturesMapper {
         }
 
     private val RailNetwork.displayName: String
-        get() = name.lowercase()
+        get() = name.uppercase()
 }

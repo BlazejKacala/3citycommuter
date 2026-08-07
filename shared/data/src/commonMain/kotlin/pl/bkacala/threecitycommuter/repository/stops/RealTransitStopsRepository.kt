@@ -7,13 +7,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.dao.TransitStopsDao
+import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.stops.TransitStopData
 import pl.bkacala.threecitycommuter.model.stops.toEntity
 import pl.bkacala.threecitycommuter.model.stops.toStopData
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
-import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.utils.isOlderThan
 
 private const val TRANSIT_STOPS_KEY = "transit_stops"
@@ -67,5 +67,4 @@ internal class RealTransitStopsRepository(
             emit(transitDataSource.getDepartures(stopKey))
         }.flowOn(Dispatchers.IO)
     }
-
 }
