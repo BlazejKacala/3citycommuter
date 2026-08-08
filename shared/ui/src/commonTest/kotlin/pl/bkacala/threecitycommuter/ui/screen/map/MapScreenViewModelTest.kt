@@ -240,9 +240,11 @@ class MapScreenViewModelTest {
         val departureKey = (viewModel.uiState.value.departures as UiState.Success)
             .data.departures.single().departureKey
         viewModel.onAction(MapAction.DepartureSelected(departureKey))
+        (viewModel.uiState.value.departures as UiState.Success).data.departures.single().isLoading shouldBe true
         advanceTimeBy(250.milliseconds)
 
         viewModel.uiState.value.routeStops.single().expectedTime shouldBe expectedTime
+        (viewModel.uiState.value.departures as UiState.Success).data.departures.single().isLoading shouldBe false
         viewModel.onAction(MapAction.ScreenPaused)
     }
 

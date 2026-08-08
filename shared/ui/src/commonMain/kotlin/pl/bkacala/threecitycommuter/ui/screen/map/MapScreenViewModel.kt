@@ -167,6 +167,7 @@ class MapScreenViewModel(
             it.copy(
                 selectedTransitStop = selected,
                 selectedDeparture = null,
+                routeLoadingDepartureKey = null,
                 departures = UiState.Loading,
                 route = null,
                 routeStops = emptyList(),
@@ -180,38 +181,59 @@ class MapScreenViewModel(
         viewModelScope.launch {
             _uiState.value.selectedDeparture?.let { departure ->
                 val provider = _uiState.value.selectedTransitStop?.data?.provider ?: return@launch
-                routesRepository.getRoute(
-                    provider = provider,
-                    routeId = departure.routeId,
-                    tripId = departure.tripId,
-                    departureTime = departure.scheduledTripStartTime
-                        ?: departure.theoreticalTime
-                        ?: departure.estimatedTime,
-                ).catch { throwable ->
-                    logError(
-                        LOG_TAG,
-                        "Failed to load route for provider=$provider routeId=${departure.routeId} tripId=${departure.tripId}",
-                        throwable,
-                    )
-                    emitError()
-                }
-                    .collectLatest { route ->
-                        _uiState.update { state ->
-                            if (state.selectedDeparture?.departureKey != departure.departureKey) {
-                                state
-                            } else {
-                                val selectedStopTime = departure.estimatedTime ?: departure.theoreticalTime
-                                state.copy(
-                                    route = route.shape.map { LatLng(it.latitude, it.longitude) },
-                                    routeStops = routeStopTimeCalculator.calculate(
-                                        route = route,
-                                        selectedStopKey = state.selectedTransitStop?.key,
-                                        selectedDepartureTime = selectedStopTime,
-                                    ),
-                                )
+                try {
+                    routesRepository.getRoute(
+                        provider = provider,
+                        routeId = departure.routeId,
+                        tripId = departure.tripId,
+                        departureTime = departure.scheduledTripStartTime
+                            ?: departure.theoreticalTime
+                            ?: departure.estimatedTime,
+                    ).catch { throwable ->
+                        logError(
+                            LOG_TAG,
+                            "Failed to load route for provider=$provider routeId=${departure.routeId} tripId=${departure.tripId}",
+                            throwable,
+                        )
+                        emitError()
+                    }
+                        .collectLatest { route ->
+                            _uiState.update { state ->
+                                if (state.selectedDeparture?.departureKey != departure.departureKey) {
+                                    state
+                                } else {
+                                    val selectedStopTime = departure.estimatedTime ?: departure.theoreticalTime
+                                    state.copy(
+                                        route = route.shape.map { LatLng(it.latitude, it.longitude) },
+                                        routeStops = routeStopTimeCalculator.calculate(
+                                            route = route,
+                                            selectedStopKey = state.selectedTransitStop?.key,
+                                            selectedDepartureTime = selectedStopTime,
+                                        ),
+                                    )
+                                }
                             }
                         }
+                } finally {
+                    _uiState.update { state ->
+                        if (state.routeLoadingDepartureKey == departure.departureKey) {
+                            state.copy(
+                                routeLoadingDepartureKey = null,
+                                departures = (state.departures as? UiState.Success)?.data?.let { model ->
+                                    UiState.Success(
+                                        model.copy(
+                                            departures = model.departures.map {
+                                                it.copy(isLoading = false)
+                                            },
+                                        ),
+                                    )
+                                } ?: state.departures,
+                            )
+                        } else {
+                            state
+                        }
                     }
+                }
             }
         }
     }
@@ -262,6 +284,7 @@ class MapScreenViewModel(
                                                 }
                                                 .take(MAX_DEPARTURES_DISPLAYED),
                                             selectedDepartureKey = state.selectedDeparture?.departureKey,
+                                            routeLoadingDepartureKey = state.routeLoadingDepartureKey,
                                         ),
                                     ),
                                 )
@@ -289,6 +312,9 @@ class MapScreenViewModel(
             }
             state.copy(
                 selectedDeparture = selectedDeparture.takeUnless { isDeselecting },
+                routeLoadingDepartureKey = selectedDeparture
+                    ?.departureKey
+                    ?.takeUnless { isDeselecting },
                 trackedVehicle = null,
                 route = null,
                 routeStops = emptyList(),
@@ -296,7 +322,10 @@ class MapScreenViewModel(
                     UiState.Success(
                         model.copy(
                             departures = model.departures.map {
-                                it.copy(isSelected = !isDeselecting && it.departureKey == departureKey)
+                                it.copy(
+                                    isSelected = !isDeselecting && it.departureKey == departureKey,
+                                    isLoading = !isDeselecting && it.departureKey == departureKey,
+                                )
                             },
                         ),
                     )
@@ -370,6 +399,7 @@ class MapScreenViewModel(
             it.copy(
                 selectedTransitStop = null,
                 selectedDeparture = null,
+                routeLoadingDepartureKey = null,
                 departures = null,
                 route = null,
                 routeStops = emptyList(),

@@ -29,6 +29,7 @@ object DeparturesMapper {
         transitStopData: TransitStopData,
         departures: List<Pair<Departure, Vehicle?>>,
         selectedDepartureKey: String?,
+        routeLoadingDepartureKey: String? = null,
     ): DeparturesBottomSheetModel {
         return DeparturesBottomSheetModel(
             provider = transitStopData.provider,
@@ -41,6 +42,7 @@ object DeparturesMapper {
                 departure.mapToUiRow(
                     vehicle = vehicle,
                     selectedDepartureKey = selectedDepartureKey,
+                    routeLoadingDepartureKey = routeLoadingDepartureKey,
                     supportsLiveTracking = transitStopData.provider.supportsLiveVehicleTracking,
                     provider = transitStopData.provider,
                     railNetwork = transitStopData.railNetwork,
@@ -60,6 +62,7 @@ object DeparturesMapper {
     private fun Departure.mapToUiRow(
         vehicle: Vehicle?,
         selectedDepartureKey: String?,
+        routeLoadingDepartureKey: String?,
         supportsLiveTracking: Boolean,
         provider: TransitProvider,
         railNetwork: RailNetwork?,
@@ -87,6 +90,7 @@ object DeparturesMapper {
             scheduledTripStartTime = scheduledTripStartTime,
             theoreticalTime = theoreticalTime,
             estimatedTime = estimatedTime,
+            isLoading = departureKey == routeLoadingDepartureKey,
         )
     }
 
