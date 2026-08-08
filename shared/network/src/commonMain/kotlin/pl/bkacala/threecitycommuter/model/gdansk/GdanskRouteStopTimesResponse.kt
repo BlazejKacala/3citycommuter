@@ -13,12 +13,20 @@ data class GdanskRouteStopTimesResponse(
 
 @Serializable
 data class GdanskRouteStopTimeResponse(
+    @SerialName("routeId")
+    val routeId: Int? = null,
     @SerialName("tripId")
     val tripId: Int,
+    @SerialName("variantId")
+    val variantId: Int? = null,
     @SerialName("stopId")
     val stopId: Int,
     @SerialName("stopSequence")
     val stopSequence: Int,
+    @SerialName("arrivalTime")
+    val arrivalTime: String? = null,
+    @SerialName("departureTime")
+    val departureTime: String? = null,
     @SerialName("passenger")
     val passenger: Boolean? = null,
     @SerialName("nonpassenger")

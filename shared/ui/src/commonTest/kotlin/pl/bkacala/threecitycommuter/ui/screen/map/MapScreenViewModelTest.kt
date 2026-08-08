@@ -210,6 +210,73 @@ class MapScreenViewModelTest {
         viewModel.onAction(MapAction.ScreenPaused)
     }
 
+    @Test
+    fun `GIVEN selected departure WHEN departure is selected THEN route stop timings are exposed`() = runTest {
+        val stop = transitStopData(stopId = 101, name = "Gdańsk Główny")
+        val scheduledTime = kotlinx.datetime.Instant.parse("2026-08-07T10:00:00Z")
+        val expectedTime = kotlinx.datetime.Instant.parse("2026-08-07T10:05:00Z")
+        val departure = departure(
+            vehicleId = null,
+            estimatedTime = expectedTime,
+            theoreticalTime = expectedTime,
+        )
+        val route = Route(
+            shape = listOf(
+                Route.GeoPoint(54.372158, 18.638306),
+                Route.GeoPoint(54.351959, 18.648064),
+            ),
+            stops = listOf(
+                Route.Stop(TransitStopKey(TransitProvider.GDANSK, stop.sourceStopId), sequence = 1, expectedTime = scheduledTime),
+            ),
+        )
+        val viewModel = createViewModel(
+            stopsRepository = FakeTransitStopsRepository(stops = listOf(stop), departures = listOf(departure)),
+            routesRepository = FakeRoutesRepository(route),
+        )
+
+        advanceTimeBy(150.milliseconds)
+        viewModel.onAction(MapAction.StopSelected(stop.stopKey))
+        advanceTimeBy(250.milliseconds)
+        val departureKey = (viewModel.uiState.value.departures as UiState.Success)
+            .data.departures.single().departureKey
+        viewModel.onAction(MapAction.DepartureSelected(departureKey))
+        advanceTimeBy(250.milliseconds)
+
+        viewModel.uiState.value.routeStops.single().expectedTime shouldBe expectedTime
+        viewModel.onAction(MapAction.ScreenPaused)
+    }
+
+    @Test
+    fun `GIVEN selected departure WHEN same departure is selected again THEN route filtering state is reset`() = runTest {
+        val stop = transitStopData(stopId = 101)
+        val viewModel = createViewModel(
+            stopsRepository = FakeTransitStopsRepository(
+                stops = listOf(stop),
+                departures = listOf(departure(vehicleId = null)),
+            ),
+            routesRepository = FakeRoutesRepository(
+                Route(
+                    shape = emptyList(),
+                    stops = listOf(Route.Stop(stop.stopKey, 1)),
+                ),
+            ),
+        )
+
+        advanceTimeBy(150.milliseconds)
+        viewModel.onAction(MapAction.StopSelected(stop.stopKey))
+        advanceTimeBy(250.milliseconds)
+        val departureKey = (viewModel.uiState.value.departures as UiState.Success)
+            .data.departures.single().departureKey
+        viewModel.onAction(MapAction.DepartureSelected(departureKey))
+        advanceTimeBy(250.milliseconds)
+        viewModel.onAction(MapAction.DepartureSelected(departureKey))
+
+        viewModel.uiState.value.selectedDeparture shouldBe null
+        viewModel.uiState.value.routeStops shouldHaveSize 0
+        viewModel.uiState.value.route shouldBe null
+        viewModel.onAction(MapAction.ScreenPaused)
+    }
+
     private fun createViewModel(
         stopsRepository: TransitStopsRepository = FakeTransitStopsRepository(),
         locationRepository: LocationRepository = FakeLocationRepository(UserLocation.default().copy(isFixed = false)),
@@ -303,18 +370,20 @@ class MapScreenViewModelTest {
         routeId: Int = 6,
         tripId: Int = 42,
         vehicleId: Long? = 1001,
+        estimatedTime: kotlinx.datetime.Instant = kotlinx.datetime.Clock.System.now(),
+        theoreticalTime: kotlinx.datetime.Instant = estimatedTime,
     ): Departure =
         Departure(
             id = "dep-$routeId-$tripId",
             delayInSeconds = 0,
-            estimatedTime = kotlinx.datetime.Clock.System.now(),
+            estimatedTime = estimatedTime,
             headsign = "Test direction",
             lineNumber = lineNumber,
             routeId = routeId,
             scheduledTripStartTime = null,
             tripId = tripId,
             status = "PLANOWO",
-            theoreticalTime = kotlinx.datetime.Clock.System.now(),
+            theoreticalTime = theoreticalTime,
             timestamp = kotlinx.datetime.Clock.System.now(),
             trip = tripId.toLong(),
             vehicleCode = if (vehicleId != null) 1 else null,

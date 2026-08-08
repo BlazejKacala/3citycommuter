@@ -200,12 +200,27 @@ class TransitDataSourceTest {
 
     @Test
     fun `Gdansk route shape includes ordered passenger stops for selected trip`() = runTest {
-        val dataSource = GdanskTransitDataSource(fakeGdanskApiClient(), testJson)
+        val dataSource = GdanskTransitDataSource(fakeGdanskApiClient(), testJson, GdanskRouteTimesResolver())
 
         val route = dataSource.getRouteShape(routeId = 6, tripId = 42)
 
         assertEquals(listOf(8227, 8228), route.stops.map { it.key.sourceStopId })
         assertEquals(listOf(0, 1), route.stops.map { it.sequence })
+        assertNotNull(route.stops[0].expectedTime)
+        assertNotNull(route.stops[1].expectedTime)
+        assertEquals(
+            10,
+            route.stops[0].expectedTime
+                ?.toLocalDateTime(TimeZone.of("Europe/Warsaw"))
+                ?.hour,
+        )
+        assertEquals(
+            "2026-08-07",
+            route.stops[0].expectedTime
+                ?.toLocalDateTime(TimeZone.of("Europe/Warsaw"))
+                ?.date
+                ?.toString(),
+        )
     }
 
     @Test
@@ -239,7 +254,7 @@ class TransitDataSourceTest {
 
     @Test
     fun `Gdansk and Gdynia providers expose a consistent domain model for UI fields`() = runTest {
-        val gdanskDataSource = GdanskTransitDataSource(fakeGdanskApiClient(), testJson)
+        val gdanskDataSource = GdanskTransitDataSource(fakeGdanskApiClient(), testJson, GdanskRouteTimesResolver())
         val gdyniaHttpClient = mockHttpClient(
             "http://api.zdiz.gdynia.pl/pt/stops" to MockResponse.Text(gdyniaStopsBody),
             "http://api.zdiz.gdynia.pl/pt/delays?stopId=1015" to MockResponse.Text(gdyniaDelaysBody),
@@ -470,6 +485,7 @@ class TransitDataSourceTest {
                             stopId = 8227,
                             stopSequence = 0,
                             passenger = true,
+                            departureTime = "2026-08-07T10:22:00",
                         ),
                         GdanskRouteStopTimeResponse(
                             tripId = 42,
@@ -482,6 +498,7 @@ class TransitDataSourceTest {
                             stopId = 8228,
                             stopSequence = 1,
                             passenger = true,
+                            departureTime = "2026-08-07T10:32:00",
                         ),
                         GdanskRouteStopTimeResponse(
                             tripId = 99,

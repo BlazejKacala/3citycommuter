@@ -14,8 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
@@ -29,6 +31,7 @@ actual fun PlatformMapView(
     selectedTransitStop: TransitStopMapItem?,
     trackedVehicle: TrackedVehicle?,
     route: List<LatLng>?,
+    routeStopTimes: Map<TransitStopKey, Instant?>?,
     userLocation: UserLocation?,
     onTransitStopSelected: (TransitStopMapItem) -> Unit,
     onMapClicked: () -> Unit,

@@ -1,5 +1,6 @@
 package pl.bkacala.threecitycommuter.client
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.route.Route
@@ -55,6 +56,13 @@ internal class CombinedTransitDataSource(
         routeId: Int,
         tripId: Int,
     ): Route? = dataSourceFor(provider).getRouteShape(routeId, tripId)
+
+    override suspend fun getRouteShape(
+        provider: TransitProvider,
+        routeId: Int,
+        tripId: Int,
+        departureTime: Instant?,
+    ): Route? = dataSourceFor(provider).getRouteShape(routeId, tripId, departureTime)
 
     override suspend fun getVehiclePosition(
         provider: TransitProvider,

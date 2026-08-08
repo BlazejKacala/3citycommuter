@@ -46,8 +46,16 @@ object DeparturesMapper {
                     railNetwork = transitStopData.railNetwork,
                 )
             },
+            disclaimer = transitStopData.provider.departuresDisclaimer(),
         )
     }
+
+    private fun TransitProvider.departuresDisclaimer(): String? =
+        when (this) {
+            TransitProvider.PLK -> "Pozycja pociągu nie jest publicznie dostępna. Pokazujemy trasę i czasy odjazdów."
+            TransitProvider.GDYNIA -> "Czasy odjazdów są rozkładowe i mogą różnić się od rzeczywistych."
+            TransitProvider.GDANSK -> null
+        }
 
     private fun Departure.mapToUiRow(
         vehicle: Vehicle?,
@@ -76,6 +84,9 @@ object DeparturesMapper {
             routeId = this.routeId,
             tripId = this.tripId,
             statusLabel = statusLabel(),
+            scheduledTripStartTime = scheduledTripStartTime,
+            theoreticalTime = theoreticalTime,
+            estimatedTime = estimatedTime,
         )
     }
 

@@ -48,6 +48,7 @@ class MapScreenViewModel(
     private val getDeparturesUseCase: GetDeparturesUseCase,
     private val routesRepository: RoutesRepository,
 ) : ViewModel() {
+    private val routeStopTimeCalculator = RouteStopTimeCalculator()
 
     private var loadTransitStopsJob: Job? = null
     private var updateDeparturesJob: Job? = null
@@ -168,6 +169,7 @@ class MapScreenViewModel(
                 selectedDeparture = null,
                 departures = UiState.Loading,
                 route = null,
+                routeStops = emptyList(),
                 trackedVehicle = null,
             )
         }
@@ -182,6 +184,9 @@ class MapScreenViewModel(
                     provider = provider,
                     routeId = departure.routeId,
                     tripId = departure.tripId,
+                    departureTime = departure.scheduledTripStartTime
+                        ?: departure.theoreticalTime
+                        ?: departure.estimatedTime,
                 ).catch { throwable ->
                     logError(
                         LOG_TAG,
@@ -195,8 +200,14 @@ class MapScreenViewModel(
                             if (state.selectedDeparture?.departureKey != departure.departureKey) {
                                 state
                             } else {
+                                val selectedStopTime = departure.estimatedTime ?: departure.theoreticalTime
                                 state.copy(
                                     route = route.shape.map { LatLng(it.latitude, it.longitude) },
+                                    routeStops = routeStopTimeCalculator.calculate(
+                                        route = route,
+                                        selectedStopKey = state.selectedTransitStop?.key,
+                                        selectedDepartureTime = selectedStopTime,
+                                    ),
                                 )
                             }
                         }
@@ -270,25 +281,31 @@ class MapScreenViewModel(
 
     private fun onSelectDeparture(departureKey: String) {
         traceVehicleJob?.cancel()
+        val isDeselecting = _uiState.value.selectedDeparture?.departureKey == departureKey
         _uiState.update { state ->
             val departures = (state.departures as? UiState.Success)?.data
             val selectedDeparture = departures?.departures?.find {
                 it.departureKey == departureKey
             }
             state.copy(
-                selectedDeparture = selectedDeparture,
+                selectedDeparture = selectedDeparture.takeUnless { isDeselecting },
                 trackedVehicle = null,
                 route = null,
+                routeStops = emptyList(),
                 departures = departures?.let { model ->
                     UiState.Success(
                         model.copy(
                             departures = model.departures.map {
-                                it.copy(isSelected = it.departureKey == departureKey)
+                                it.copy(isSelected = !isDeselecting && it.departureKey == departureKey)
                             },
                         ),
                     )
                 },
             )
+        }
+
+        if (isDeselecting) {
+            return
         }
 
         loadRoute()
@@ -297,7 +314,7 @@ class MapScreenViewModel(
             state.selectedDeparture != null &&
             state.selectedTransitStop?.data?.provider?.supportsLiveVehicleTracking == true
         ) {
-            state.selectedDeparture?.vehicleId?.let { trackVehicle(it) }
+            state.selectedDeparture.vehicleId?.let { trackVehicle(it) }
         }
     }
 
@@ -355,6 +372,7 @@ class MapScreenViewModel(
                 selectedDeparture = null,
                 departures = null,
                 route = null,
+                routeStops = emptyList(),
                 trackedVehicle = null,
             )
         }

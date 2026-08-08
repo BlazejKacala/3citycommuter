@@ -142,7 +142,20 @@ internal class RailTransitDataSource(
         val orderedStopIds = route.stations
             .sortedBy { it.orderNumber }
             .map { it.stationId }
-        return railStaticCatalog.routeFor(orderedStopIds)
+        val operatingDate = Clock.System.now().toLocalDateInSystemZone().toString()
+        val expectedTimes = route.stations.associate { station ->
+            station.stationId to (
+                station.departureTime?.toPlkRouteInstant(operatingDate, station.departureDay ?: 0)
+                    ?: station.arrivalTime?.toPlkRouteInstant(operatingDate, station.arrivalDay ?: 0)
+                )
+        }
+        return railStaticCatalog.routeFor(orderedStopIds).let { staticRoute ->
+            staticRoute.copy(
+                stops = staticRoute.stops.map { stop ->
+                    stop.copy(expectedTime = expectedTimes[stop.key.sourceStopId])
+                },
+            )
+        }
     }
 
     override suspend fun getVehiclePosition(vehicleId: Int): VehiclePosition? = null

@@ -81,6 +81,9 @@ fun MapScreen(
             onTransitStopSelected = { viewModel.onAction(MapAction.StopSelected(it.key)) },
             onMapClicked = { viewModel.onAction(MapAction.MapClicked) },
             route = state.route,
+            routeStopTimes = state.selectedDeparture?.let {
+                state.routeStops.associate { stop -> stop.key to stop.expectedTime }
+            },
             mapBottomPadding = if (state.departures == null) 0.dp else mapBottomPadding.value,
             mapStyle = mapStyle,
             stadiaToken = stadiaToken,

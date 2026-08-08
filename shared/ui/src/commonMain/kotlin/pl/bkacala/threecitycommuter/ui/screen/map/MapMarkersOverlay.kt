@@ -31,11 +31,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import org.maplibre.compose.camera.CameraState
 import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.sphericalDistance
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.component.VehicleType
@@ -52,37 +56,37 @@ internal data class StopMapMarker(
     val provider: TransitProvider?,
 )
 
-internal fun List<TransitStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapMarker> {
-    val stopsWithIndex = withIndex().toList()
-    val (skmStops, otherStops) = stopsWithIndex.partition { it.value.data.provider == TransitProvider.PLK }
-    val groups = if (zoom >= STOPS_UNCLUSTERED_ZOOM) {
-        stopsWithIndex.map { listOf(it) }
-    } else {
-        val longitudeCellSize = 360.0 / 2.0.pow(zoom) * CLUSTER_RADIUS_TILE_FRACTION
-        val latitudeCellSize = longitudeCellSize * cos(MAP_REFERENCE_LATITUDE * PI / 180.0)
-        otherStops.groupBy { indexedStop ->
-            Pair(
-                floor(indexedStop.value.position.longitude / longitudeCellSize).toLong(),
-                floor(indexedStop.value.position.latitude / latitudeCellSize).toLong(),
-            )
-        }.values + skmStops.map { listOf(it) }
-    }
-
-    return groups.map { group ->
-        if (group.size == 1) {
-            val stop = group.first().value
+internal fun List<TransitStopMapItem>.toStopMapMarkers(
+    zoom: Int,
+    cluster: Boolean = true,
+): List<StopMapMarker> {
+    if (!cluster || zoom >= STOPS_UNCLUSTERED_ZOOM) {
+        return map { stop ->
             StopMapMarker(
                 position = stop.position,
                 stop = stop,
                 count = 1,
                 provider = stop.data.provider,
             )
+        }
+    }
+
+    val stopsWithIndex = withIndex().toList()
+    val (skmStops, otherStops) = stopsWithIndex.partition { it.value.data.provider == TransitProvider.PLK }
+    val longitudeCellSize = 360.0 / 2.0.pow(zoom) * CLUSTER_RADIUS_TILE_FRACTION
+    val latitudeCellSize = longitudeCellSize * cos(MAP_REFERENCE_LATITUDE * PI / 180.0)
+    val groups = otherStops.groupBy { indexedStop ->
+        Pair(
+            floor(indexedStop.value.position.longitude / longitudeCellSize).toLong(),
+            floor(indexedStop.value.position.latitude / latitudeCellSize).toLong(),
+        )
+    }.values + skmStops.map { listOf(it) }
+
+    return groups.map { group ->
+        if (group.size == 1) {
+            val stop = group.first().value
+            StopMapMarker(stop.position, stop, 1, stop.data.provider)
         } else {
-            val dominantProvider = group
-                .groupingBy { it.value.data.provider }
-                .eachCount()
-                .maxByOrNull { it.value }
-                ?.key
             StopMapMarker(
                 position = LatLng(
                     latitude = group.sumOf { it.value.position.latitude } / group.size,
@@ -90,7 +94,7 @@ internal fun List<TransitStopMapItem>.toStopMapMarkers(zoom: Int): List<StopMapM
                 ),
                 stop = null,
                 count = group.size,
-                provider = dominantProvider,
+                provider = group.groupingBy { it.value.data.provider }.eachCount().maxByOrNull { it.value }?.key,
             )
         }
     }
@@ -126,6 +130,7 @@ internal fun MapMarkersOverlay(
     selectedTransitStop: TransitStopMapItem?,
     trackedVehicle: TrackedVehicle?,
     vehicleColor: Color,
+    routeStopTimes: Map<TransitStopKey, Instant?>?,
 ) {
     val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
     val tramPainter = rememberVectorPainter(Icons.Outlined.Tram)
@@ -133,11 +138,23 @@ internal fun MapMarkersOverlay(
     val textMeasurer = rememberTextMeasurer()
     val animatedVehiclePosition = remember { Animatable(Offset.Zero, OffsetVectorConverter) }
     var animatedVehicleNumber by remember { mutableStateOf<String?>(null) }
+    var currentTime by remember { mutableStateOf(Clock.System.now()) }
     val countTextStyle = remember {
         TextStyle(color = Color.White, fontSize = CLUSTER_COUNT_TEXT_SIZE, fontWeight = FontWeight.Bold)
     }
     val vehicleTextStyle = remember {
         TextStyle(color = Color.White, fontSize = VEHICLE_TEXT_SIZE, fontWeight = FontWeight.Bold)
+    }
+    val routeTimeTextStyle = remember {
+        TextStyle(color = Color.Black, fontSize = ROUTE_TIME_TEXT_SIZE, fontWeight = FontWeight.Bold)
+    }
+
+    LaunchedEffect(routeStopTimes) {
+        if (routeStopTimes == null) return@LaunchedEffect
+        while (true) {
+            currentTime = Clock.System.now()
+            delay(ROUTE_TIME_REFRESH_INTERVAL_MS)
+        }
     }
 
     LaunchedEffect(trackedVehicle?.number, trackedVehicle?.position) {
@@ -188,7 +205,7 @@ internal fun MapMarkersOverlay(
                     center = center,
                 )
             } else {
-                val isRailStation = marker.stop?.getStationType() == TransitStopMapItem.Type.Train
+                val isRailStation = marker.stop.getStationType() == TransitStopMapItem.Type.Train
                 val markerSize = if (isRailStation) RAIL_STOP_MARKER_SIZE else STOP_MARKER_SIZE
                 val outerSize = Size(markerSize.toPx(), markerSize.toPx())
                 val innerMarkerSize = markerSize - STOP_MARKER_BORDER
@@ -243,6 +260,38 @@ internal fun MapMarkersOverlay(
                         )
                     }
                 }
+                routeStopTimes?.let { times ->
+                    val label = formatRouteStopTime(times[marker.stop.key], currentTime)
+                    val text = textMeasurer.measure(label, routeTimeTextStyle)
+                    val horizontalPadding = ROUTE_TIME_HORIZONTAL_PADDING.toPx()
+                    val verticalPadding = ROUTE_TIME_VERTICAL_PADDING.toPx()
+                    val bubbleSize = Size(
+                        width = text.size.width + horizontalPadding * 2,
+                        height = text.size.height + verticalPadding * 2,
+                    )
+                    val bubbleTopLeft = Offset(
+                        x = center.x - bubbleSize.width / 2f,
+                        y = center.y -
+                            (
+                                if (marker.stop.getStationType() == TransitStopMapItem.Type.Train) {
+                                    RAIL_STOP_MARKER_SIZE
+                                } else {
+                                    STOP_MARKER_SIZE
+                                }
+                                ).toPx() / 2f -
+                            bubbleSize.height - ROUTE_TIME_GAP.toPx(),
+                    )
+                    drawRoundRect(
+                        color = Color.White,
+                        topLeft = bubbleTopLeft,
+                        size = bubbleSize,
+                        cornerRadius = CornerRadius(bubbleSize.height / 2f),
+                    )
+                    drawText(
+                        textLayoutResult = text,
+                        topLeft = bubbleTopLeft + Offset(horizontalPadding, verticalPadding),
+                    )
+                }
             }
         }
 
@@ -288,6 +337,30 @@ internal fun MapMarkersOverlay(
                             colorFilter = ColorFilter.tint(Color.White),
                         )
                     }
+                }
+                routeStopTimes?.let { times ->
+                    val label = formatRouteStopTime(times[stop.key], currentTime)
+                    val text = textMeasurer.measure(label, routeTimeTextStyle)
+                    val horizontalPadding = ROUTE_TIME_HORIZONTAL_PADDING.toPx()
+                    val verticalPadding = ROUTE_TIME_VERTICAL_PADDING.toPx()
+                    val bubbleSize = Size(
+                        width = text.size.width + horizontalPadding * 2,
+                        height = text.size.height + verticalPadding * 2,
+                    )
+                    val bubbleTopLeft = Offset(
+                        x = center.x - bubbleSize.width / 2f,
+                        y = center.y - markerSize.toPx() / 2f - bubbleSize.height - ROUTE_TIME_GAP.toPx(),
+                    )
+                    drawRoundRect(
+                        color = Color.White,
+                        topLeft = bubbleTopLeft,
+                        size = bubbleSize,
+                        cornerRadius = CornerRadius(bubbleSize.height / 2f),
+                    )
+                    drawText(
+                        textLayoutResult = text,
+                        topLeft = bubbleTopLeft + Offset(horizontalPadding, verticalPadding),
+                    )
                 }
             }
         }
@@ -402,6 +475,13 @@ private val VEHICLE_CONTENT_GAP = 4.dp
 private val VEHICLE_BORDER_WIDTH = 3.dp
 private val VEHICLE_TEXT_SIZE = 12.sp
 
+// Route stop time labels
+private val ROUTE_TIME_TEXT_SIZE = 10.sp
+private val ROUTE_TIME_HORIZONTAL_PADDING = 6.dp
+private val ROUTE_TIME_VERTICAL_PADDING = 3.dp
+private val ROUTE_TIME_GAP = 4.dp
+private const val ROUTE_TIME_REFRESH_INTERVAL_MS = 30_000L
+
 // Interaction
 private const val MARKER_CLICK_RADIUS_DP = 56f
 private const val MIN_MARKER_CLICK_RADIUS_METERS = 15.0
@@ -409,3 +489,11 @@ private const val MARKER_EDGE_MARGIN_PX = 64f
 
 // Animation
 private const val VEHICLE_POSITION_ANIMATION_DURATION_MS = 9_000
+
+internal fun formatRouteStopTime(expectedTime: Instant?, now: Instant): String {
+    if (expectedTime == null) return "brak danych"
+    val seconds = expectedTime.epochSeconds - now.epochSeconds
+    if (seconds <= 0) return "już był"
+    val minutes = ((seconds + 59) / 60).coerceAtLeast(1)
+    return "za $minutes min"
+}

@@ -1,5 +1,6 @@
 package pl.bkacala.threecitycommuter.model.route
 
+import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 
 data class Route(
@@ -14,5 +15,6 @@ data class Route(
     data class Stop(
         val key: TransitStopKey,
         val sequence: Int,
+        val expectedTime: Instant? = null,
     )
 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
@@ -29,6 +30,7 @@ import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.Position
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
+import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TrackedVehicle
 import pl.bkacala.threecitycommuter.ui.screen.map.component.TransitStopMapItem
 import pl.bkacala.threecitycommuter.ui.screen.map.model.MapStyle
@@ -46,6 +48,7 @@ actual fun PlatformMapView(
     selectedTransitStop: TransitStopMapItem?,
     trackedVehicle: TrackedVehicle?,
     route: List<LatLng>?,
+    routeStopTimes: Map<TransitStopKey, Instant?>?,
     userLocation: UserLocation?,
     onTransitStopSelected: (TransitStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
@@ -67,8 +70,10 @@ actual fun PlatformMapView(
     val tertiary = MaterialTheme.colorScheme.tertiary
     val coroutineScope = rememberCoroutineScope()
     val stopsZoom = cameraState.position.zoom.roundToInt()
-    val stopMarkers = remember(transitStops, stopsZoom) {
-        transitStops.toStopMapMarkers(stopsZoom)
+    val stopMarkers = remember(transitStops, stopsZoom, routeStopTimes) {
+        transitStops
+            .filter { routeStopTimes == null || it.key in routeStopTimes }
+            .toStopMapMarkers(stopsZoom, cluster = routeStopTimes == null)
     }
     val currentStopMarkers = rememberUpdatedState(stopMarkers)
     val currentOnTransitStopSelected = rememberUpdatedState(onTransitStopSelected)
@@ -147,6 +152,7 @@ actual fun PlatformMapView(
             selectedTransitStop = selectedTransitStop,
             trackedVehicle = trackedVehicle,
             vehicleColor = MapVehicleColor,
+            routeStopTimes = routeStopTimes,
         )
     }
 }

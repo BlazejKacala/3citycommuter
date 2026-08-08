@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.ui.theme.DelayEarlyBorderColor
 import pl.bkacala.threecitycommuter.ui.theme.DelayEarlyTextColor
 import pl.bkacala.threecitycommuter.ui.theme.DelayLateBorderColor
@@ -62,6 +63,9 @@ data class DepartureRowModel(
     val routeId: Int,
     val tripId: Int,
     val statusLabel: String?,
+    val scheduledTripStartTime: Instant? = null,
+    val theoreticalTime: Instant? = null,
+    val estimatedTime: Instant? = null,
 )
 
 @Composable
