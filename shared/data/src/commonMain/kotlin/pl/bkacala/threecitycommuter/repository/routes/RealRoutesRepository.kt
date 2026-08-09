@@ -5,6 +5,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.transit.TransitProvider
@@ -12,8 +13,20 @@ import pl.bkacala.threecitycommuter.model.transit.TransitProvider
 class RealRoutesRepository(private val transitDataSource: TransitDataSource) : RoutesRepository {
 
     override fun getRoute(provider: TransitProvider, routeId: Int, tripId: Int): Flow<Route> {
+        return getRoute(provider, routeId, tripId, null)
+    }
+
+    override fun getRoute(
+        provider: TransitProvider,
+        routeId: Int,
+        tripId: Int,
+        departureTime: Instant?,
+    ): Flow<Route> {
         return flow {
-            emit(transitDataSource.getRouteShape(provider, routeId, tripId) ?: Route(emptyList()))
+            emit(
+                transitDataSource.getRouteShape(provider, routeId, tripId, departureTime)
+                    ?: Route(emptyList()),
+            )
         }.flowOn(Dispatchers.IO)
     }
 }

@@ -29,6 +29,7 @@ object DeparturesMapper {
         transitStopData: TransitStopData,
         departures: List<Pair<Departure, Vehicle?>>,
         selectedDepartureKey: String?,
+        routeLoadingDepartureKey: String? = null,
     ): DeparturesBottomSheetModel {
         return DeparturesBottomSheetModel(
             provider = transitStopData.provider,
@@ -41,17 +42,27 @@ object DeparturesMapper {
                 departure.mapToUiRow(
                     vehicle = vehicle,
                     selectedDepartureKey = selectedDepartureKey,
+                    routeLoadingDepartureKey = routeLoadingDepartureKey,
                     supportsLiveTracking = transitStopData.provider.supportsLiveVehicleTracking,
                     provider = transitStopData.provider,
                     railNetwork = transitStopData.railNetwork,
                 )
             },
+            disclaimer = transitStopData.provider.departuresDisclaimer(),
         )
     }
+
+    private fun TransitProvider.departuresDisclaimer(): String? =
+        when (this) {
+            TransitProvider.PLK -> "Pozycja pociągu nie jest publicznie dostępna. Pokazujemy trasę i czasy odjazdów."
+            TransitProvider.GDYNIA -> "Czasy odjazdów są rozkładowe i mogą różnić się od rzeczywistych."
+            TransitProvider.GDANSK -> null
+        }
 
     private fun Departure.mapToUiRow(
         vehicle: Vehicle?,
         selectedDepartureKey: String?,
+        routeLoadingDepartureKey: String?,
         supportsLiveTracking: Boolean,
         provider: TransitProvider,
         railNetwork: RailNetwork?,
@@ -76,7 +87,18 @@ object DeparturesMapper {
             routeId = this.routeId,
             tripId = this.tripId,
             statusLabel = statusLabel(),
+            scheduledTripStartTime = scheduledTripStartTime,
+            theoreticalTime = theoreticalTime,
+            estimatedTime = estimatedTime,
+            delayInSeconds = this.delayInSeconds ?: estimatedDelayInSeconds(),
+            isLoading = departureKey == routeLoadingDepartureKey,
         )
+    }
+
+    private fun Departure.estimatedDelayInSeconds(): Int? {
+        val estimatedTime = estimatedTime ?: return null
+        val theoreticalTime = theoreticalTime ?: return null
+        return (estimatedTime.epochSeconds - theoreticalTime.epochSeconds).toInt()
     }
 
     private fun Departure.vehicleType(provider: TransitProvider): VehicleType =

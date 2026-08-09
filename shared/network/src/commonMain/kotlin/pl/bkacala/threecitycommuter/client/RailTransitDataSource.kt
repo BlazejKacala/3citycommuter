@@ -7,6 +7,7 @@ import kotlinx.datetime.Clock
 import pl.bkacala.threecitycommuter.logging.logError
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.plk.PlkOperationStationDto
+import pl.bkacala.threecitycommuter.model.plk.PlkOperationsResponse
 import pl.bkacala.threecitycommuter.model.plk.PlkRouteDto
 import pl.bkacala.threecitycommuter.model.plk.PlkStationOnRouteDto
 import pl.bkacala.threecitycommuter.model.plk.PlkTrainOperationDto
@@ -47,35 +48,33 @@ internal class RailTransitDataSource(
         val stationId = stopKey.sourceStopId.toString()
         val carrierCode = carrierCodeFor(stopKey.sourceStopId)
         val lineLabel = lineLabelFor(stopKey.sourceStopId)
-        val (schedules, operations) = supervisorScope {
-            val schedulesDeferred = async {
-                plkApiClient.getSchedules(
-                    dateFrom = today.toString(),
-                    dateTo = today.toString(),
-                    stations = stationId,
-                    carriersInclude = carrierCode,
-                    fullRoutes = true,
-                )
+        val schedules = plkApiClient.getSchedules(
+            dateFrom = today.toString(),
+            dateTo = today.toString(),
+            stations = stationId,
+            carriersInclude = carrierCode,
+            fullRoutes = true,
+        )
+        val candidateRoutes = schedules.routes
+            .asSequence()
+            .filter { it.carrierCode.equals(carrierCode, ignoreCase = true) }
+            .mapNotNull { route ->
+                val station = route.stations.firstOrNull { it.stationId == stopKey.sourceStopId }
+                    ?: return@mapNotNull null
+                val instant = station.departureTime?.toPlkRouteInstant(today.toString(), station.departureDay ?: 0)
+                    ?: station.arrivalTime?.toPlkRouteInstant(today.toString(), station.arrivalDay ?: 0)
+                route to (instant ?: now)
             }
-            val operationsDeferred = async {
-                plkApiClient.getOperations(
-                    stations = stationId,
-                    carriersInclude = carrierCode,
-                    fullRoutes = true,
-                )
-            }
-            val operations = try {
-                operationsDeferred.await()
-            } catch (throwable: Throwable) {
-                if (throwable is CancellationException) {
-                    throw throwable
-                }
-                logError(LOG_TAG, "Failed to load PLK operations; using scheduled departures", throwable)
-                null
-            }
-            schedulesDeferred.await() to operations
-        }
-        val operationsByKey = operations?.trains.orEmpty().associateBy(::routeKey)
+            .filter { (_, instant) -> instant >= now.minus(2.minutes) }
+            .sortedBy { (_, instant) -> instant }
+            .toList()
+        val operations = loadOperations(
+            stationId = stationId,
+            carrierCode = carrierCode,
+            directRoutes = candidateRoutes.take(DIRECT_OPERATION_COUNT).map { it.first },
+            today = today.toString(),
+        )
+        val operationsByKey = operations.trains.associateBy(::routeKey)
         val stationNames = resolveStationNames(schedules, operations)
 
         val scheduledDepartures = schedules.routes
@@ -104,8 +103,7 @@ internal class RailTransitDataSource(
             return scheduledDepartures
         }
 
-        return operations?.trains
-            .orEmpty()
+        return operations.trains
             .asSequence()
             .mapNotNull { train ->
                 val station = train.stations.firstOrNull { it.stationId == stopKey.sourceStopId }
@@ -142,7 +140,20 @@ internal class RailTransitDataSource(
         val orderedStopIds = route.stations
             .sortedBy { it.orderNumber }
             .map { it.stationId }
-        return railStaticCatalog.routeFor(orderedStopIds)
+        val operatingDate = Clock.System.now().toLocalDateInSystemZone().toString()
+        val expectedTimes = route.stations.associate { station ->
+            station.stationId to (
+                station.departureTime?.toPlkRouteInstant(operatingDate, station.departureDay ?: 0)
+                    ?: station.arrivalTime?.toPlkRouteInstant(operatingDate, station.arrivalDay ?: 0)
+                )
+        }
+        return railStaticCatalog.routeFor(orderedStopIds).let { staticRoute ->
+            staticRoute.copy(
+                stops = staticRoute.stops.map { stop ->
+                    stop.copy(expectedTime = expectedTimes[stop.key.sourceStopId])
+                },
+            )
+        }
     }
 
     override suspend fun getVehiclePosition(vehicleId: Int): VehiclePosition? = null
@@ -155,6 +166,47 @@ internal class RailTransitDataSource(
             catalogLoaded = true
         }
         return railStaticCatalog.stops
+    }
+
+    private suspend fun loadOperations(
+        stationId: String,
+        carrierCode: String,
+        directRoutes: List<PlkRouteDto>,
+        today: String,
+    ): PlkOperationsResponse = supervisorScope {
+        val shortened = async {
+            runCatching {
+                plkApiClient.getOperationsShortened(
+                    stations = stationId,
+                    carriersInclude = carrierCode,
+                    fullRoutes = false,
+                    withPlanned = true,
+                    pageSize = BULK_OPERATION_PAGE_SIZE,
+                )
+            }.getOrElse { throwable ->
+                if (throwable is CancellationException) throw throwable
+                logError(LOG_TAG, "Failed to load shortened PLK operations", throwable)
+                PlkOperationsResponse()
+            }
+        }
+        val direct = directRoutes.map { route ->
+            async {
+                runCatching {
+                    plkApiClient.getOperation(route.scheduleId, route.orderId, today)
+                }.getOrElse { throwable ->
+                    if (throwable is CancellationException) throw throwable
+                    logError(LOG_TAG, "Failed to load PLK operation ${routeKey(route)}", throwable)
+                    null
+                }
+            }
+        }
+        val bulk = shortened.await()
+        bulk.copy(
+            // Prefer the complete response for the two closest departures when the
+            // same train is also present in the shortened bulk response.
+            trains = (direct.mapNotNull { it.await() } + bulk.trains)
+                .distinctBy(::routeKey),
+        )
     }
 
     private fun resolveStationNames(
@@ -306,3 +358,5 @@ internal class RailTransitDataSource(
 }
 
 private const val LOG_TAG = "RailTransitDataSource"
+private const val DIRECT_OPERATION_COUNT = 2
+private const val BULK_OPERATION_PAGE_SIZE = 500

@@ -40,6 +40,19 @@ class DeparturesMapperTest {
         assertEquals("PKM", model.departures.single().lineNumber)
     }
 
+    @Test
+    fun `marks the departure whose route is loading`() {
+        val departure = departure(delayInSeconds = 0)
+        val model = DeparturesMapper.mapToBottomSheetModel(
+            transitStopData = transitStopData(),
+            departures = listOf(departure to null),
+            selectedDepartureKey = departureKey(departure),
+            routeLoadingDepartureKey = departureKey(departure),
+        )
+
+        assertEquals(true, model.departures.single().isLoading)
+    }
+
     private fun transitStopData(): TransitStopData =
         TransitStopData(
             stopKey = TransitStopKey(TransitProvider.GDANSK, 1234),
@@ -86,4 +99,15 @@ class DeparturesMapperTest {
             vehicleId = 1001L,
             vehicleService = "122",
         )
+
+    private fun departureKey(departure: Departure): String =
+        listOf(
+            departure.id,
+            departure.routeId.toString(),
+            departure.tripId.toString(),
+            departure.vehicleId?.toString().orEmpty(),
+            departure.theoreticalTime?.toString().orEmpty(),
+            departure.estimatedTime?.toString().orEmpty(),
+            departure.headsign.orEmpty(),
+        ).joinToString("|")
 }

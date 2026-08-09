@@ -28,6 +28,7 @@ data class DeparturesBottomSheetModel(
     val provider: TransitProvider,
     val header: DeparturesHeaderModel,
     val departures: List<DepartureRowModel>,
+    val disclaimer: String? = null,
 )
 
 @Composable
@@ -48,9 +49,9 @@ fun DeparturesBottomSheet(
             modifier = Modifier.verticalScroll(rememberScrollState()),
         ) {
             model.header.Widget(accentColor = accentColor)
-            if (model.provider == TransitProvider.PLK) {
+            model.disclaimer?.let { disclaimer ->
                 Text(
-                    text = "Pozycja pociagu nie jest publicznie dostepna. Pokazujemy trase i czasy odjazdow.",
+                    text = disclaimer,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = Padding.big),

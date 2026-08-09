@@ -1,13 +1,13 @@
 package pl.bkacala.threecitycommuter.client
 
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskDepartureResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteShapeResponse
-import pl.bkacala.threecitycommuter.model.gdansk.GdanskRouteStopTimeResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskStopsResponse
 import pl.bkacala.threecitycommuter.model.gdansk.GdanskVehiclePositionResponse
@@ -28,6 +28,7 @@ import pl.bkacala.threecitycommuter.utils.toddMMyyyyString
 internal class GdanskTransitDataSource(
     private val gdanskApiClient: GdanskApiClient,
     private val json: Json,
+    private val routeTimesResolver: GdanskRouteTimesResolver,
 ) : ProviderTransitDataSource {
     override val provider: TransitProvider = TransitProvider.GDANSK
 
@@ -57,24 +58,16 @@ internal class GdanskTransitDataSource(
         gdanskApiClient.getDepartures(stopKey.sourceStopId).departures.map { it.toDepartureData() }
 
     override suspend fun getRouteShape(routeId: Int, tripId: Int): Route {
+        return getRouteShape(routeId, tripId, null)
+    }
+
+    override suspend fun getRouteShape(routeId: Int, tripId: Int, departureTime: Instant?): Route {
         val dateString =
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toddMMyyyyString()
         val shape = gdanskApiClient.getRouteShape(dateString, routeId, tripId)
         val stopTimes = gdanskApiClient.getRouteStopTimes(dateString, routeId)
-
         return shape.mapToRoute(
-            stops = stopTimes.stopTimes
-                .asSequence()
-                .filter { it.tripId == tripId }
-                .filterNot { it.isNonPassengerStop() }
-                .sortedBy { it.stopSequence }
-                .map { stopTime ->
-                    Route.Stop(
-                        key = TransitStopKey(TransitProvider.GDANSK, stopTime.stopId),
-                        sequence = stopTime.stopSequence,
-                    )
-                }
-                .toList(),
+            stops = routeTimesResolver.resolve(stopTimes, tripId, departureTime),
         )
     }
 
@@ -151,9 +144,6 @@ private fun GdanskRouteShapeResponse.mapToRoute(stops: List<Route.Stop> = emptyL
         stops = stops,
     )
 }
-
-private fun GdanskRouteStopTimeResponse.isNonPassengerStop(): Boolean =
-    passenger == false || nonpassenger == 1 || virtual == 1
 
 private fun GdanskVehicleResponse.toVehicle(): Vehicle {
     return Vehicle(

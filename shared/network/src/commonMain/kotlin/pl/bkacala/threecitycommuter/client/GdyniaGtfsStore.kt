@@ -358,6 +358,7 @@ internal class GdyniaGtfsStore(
                 Route.Stop(
                     key = TransitStopKey(TransitProvider.GDYNIA, stopId),
                     sequence = stopSequence,
+                    expectedTime = departureTime.toGdyniaInstantOrNull(),
                 ),
             )
         }

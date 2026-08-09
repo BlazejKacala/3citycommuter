@@ -11,6 +11,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import pl.bkacala.threecitycommuter.client.CombinedTransitDataSource
 import pl.bkacala.threecitycommuter.client.GdanskApiClient
+import pl.bkacala.threecitycommuter.client.GdanskRouteTimesResolver
 import pl.bkacala.threecitycommuter.client.GdanskTransitDataSource
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsPreloader
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsStore
@@ -56,12 +57,13 @@ val networkModule = module {
         KtorGdanskApiClient(get(), get())
     }
 
+    single { GdanskRouteTimesResolver() }
     single { ZipEntryReader() }
     single { GdyniaGtfsStore(get(), get(), get(), get(), get()) }
     single<GdyniaGtfsPreloader> { get<GdyniaGtfsStore>() }
     single<PlkApiClient> { KtorPlkApiClient(get(), get()) }
     single { RailStaticCatalog(get()) }
-    single { GdanskTransitDataSource(get(), get()) }
+    single { GdanskTransitDataSource(get(), get(), get()) }
     single { GdyniaTransitDataSource(get(), get(), get()) }
     single { RailTransitDataSource(get(), get()) }
     single<TransitDataSource> { CombinedTransitDataSource(get(), get(), get(), get()) }

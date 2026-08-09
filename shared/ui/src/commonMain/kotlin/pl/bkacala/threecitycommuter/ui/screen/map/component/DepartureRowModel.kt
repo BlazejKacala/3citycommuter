@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.WheelchairPickup
 import androidx.compose.material.icons.sharp.DirectionsBusFilled
 import androidx.compose.material.icons.sharp.Tram
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.ui.theme.DelayEarlyBorderColor
 import pl.bkacala.threecitycommuter.ui.theme.DelayEarlyTextColor
 import pl.bkacala.threecitycommuter.ui.theme.DelayLateBorderColor
@@ -62,6 +64,11 @@ data class DepartureRowModel(
     val routeId: Int,
     val tripId: Int,
     val statusLabel: String?,
+    val scheduledTripStartTime: Instant? = null,
+    val theoreticalTime: Instant? = null,
+    val estimatedTime: Instant? = null,
+    val delayInSeconds: Int? = null,
+    val isLoading: Boolean = false,
 )
 
 @Composable
@@ -133,6 +140,14 @@ fun DepartureRowModel.Widget(
                 Spacer(modifier = Modifier.weight(1f))
                 DelayBadge(statusLabel)
             }
+        }
+        if (isLoading) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp),
+                color = accentColor,
+            )
         }
     }
 }

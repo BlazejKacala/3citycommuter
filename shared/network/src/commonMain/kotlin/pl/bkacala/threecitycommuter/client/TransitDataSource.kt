@@ -1,5 +1,6 @@
 package pl.bkacala.threecitycommuter.client
 
+import kotlinx.datetime.Instant
 import pl.bkacala.threecitycommuter.model.departures.Departure
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.stops.TransitStopData
@@ -22,6 +23,13 @@ interface TransitDataSource {
         routeId: Int,
         tripId: Int,
     ): Route?
+
+    suspend fun getRouteShape(
+        provider: pl.bkacala.threecitycommuter.model.transit.TransitProvider,
+        routeId: Int,
+        tripId: Int,
+        departureTime: Instant?,
+    ): Route? = getRouteShape(provider, routeId, tripId)
 
     suspend fun getVehiclePosition(
         provider: pl.bkacala.threecitycommuter.model.transit.TransitProvider,

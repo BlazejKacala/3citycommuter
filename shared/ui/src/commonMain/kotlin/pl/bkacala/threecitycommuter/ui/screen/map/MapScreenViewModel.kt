@@ -48,6 +48,7 @@ class MapScreenViewModel(
     private val getDeparturesUseCase: GetDeparturesUseCase,
     private val routesRepository: RoutesRepository,
 ) : ViewModel() {
+    private val routeStopTimeCalculator = RouteStopTimeCalculator()
 
     private var loadTransitStopsJob: Job? = null
     private var updateDeparturesJob: Job? = null
@@ -166,8 +167,11 @@ class MapScreenViewModel(
             it.copy(
                 selectedTransitStop = selected,
                 selectedDeparture = null,
+                routeLoadingDepartureKey = null,
                 departures = UiState.Loading,
                 route = null,
+                routeStops = emptyList(),
+                currentRouteStopKey = null,
                 trackedVehicle = null,
             )
         }
@@ -178,29 +182,64 @@ class MapScreenViewModel(
         viewModelScope.launch {
             _uiState.value.selectedDeparture?.let { departure ->
                 val provider = _uiState.value.selectedTransitStop?.data?.provider ?: return@launch
-                routesRepository.getRoute(
-                    provider = provider,
-                    routeId = departure.routeId,
-                    tripId = departure.tripId,
-                ).catch { throwable ->
-                    logError(
-                        LOG_TAG,
-                        "Failed to load route for provider=$provider routeId=${departure.routeId} tripId=${departure.tripId}",
-                        throwable,
-                    )
-                    emitError()
-                }
-                    .collectLatest { route ->
-                        _uiState.update { state ->
-                            if (state.selectedDeparture?.departureKey != departure.departureKey) {
-                                state
-                            } else {
-                                state.copy(
-                                    route = route.shape.map { LatLng(it.latitude, it.longitude) },
-                                )
+                try {
+                    routesRepository.getRoute(
+                        provider = provider,
+                        routeId = departure.routeId,
+                        tripId = departure.tripId,
+                        departureTime = departure.scheduledTripStartTime
+                            ?: departure.theoreticalTime
+                            ?: departure.estimatedTime,
+                    ).catch { throwable ->
+                        logError(
+                            LOG_TAG,
+                            "Failed to load route for provider=$provider routeId=${departure.routeId} tripId=${departure.tripId}",
+                            throwable,
+                        )
+                        emitError()
+                    }
+                        .collectLatest { route ->
+                            _uiState.update { state ->
+                                if (state.selectedDeparture?.departureKey != departure.departureKey) {
+                                    state
+                                } else {
+                                    val routeStops = routeStopTimeCalculator.calculate(
+                                        route = route,
+                                        selectedStopKey = state.selectedTransitStop?.key,
+                                        selectedDepartureTime = departure.theoreticalTime
+                                            ?: departure.estimatedTime,
+                                        delayInSeconds = departure.delayInSeconds,
+                                    )
+                                    val updatedState = state.copy(
+                                        route = route.shape.map { LatLng(it.latitude, it.longitude) },
+                                        routeStops = routeStops,
+                                    )
+                                    state.trackedVehicle?.position?.let {
+                                        updatedState.copy(currentRouteStopKey = findCurrentRouteStopKey(updatedState, it))
+                                    } ?: updatedState
+                                }
                             }
                         }
+                } finally {
+                    _uiState.update { state ->
+                        if (state.routeLoadingDepartureKey == departure.departureKey) {
+                            state.copy(
+                                routeLoadingDepartureKey = null,
+                                departures = (state.departures as? UiState.Success)?.data?.let { model ->
+                                    UiState.Success(
+                                        model.copy(
+                                            departures = model.departures.map {
+                                                it.copy(isLoading = false)
+                                            },
+                                        ),
+                                    )
+                                } ?: state.departures,
+                            )
+                        } else {
+                            state
+                        }
                     }
+                }
             }
         }
     }
@@ -251,6 +290,7 @@ class MapScreenViewModel(
                                                 }
                                                 .take(MAX_DEPARTURES_DISPLAYED),
                                             selectedDepartureKey = state.selectedDeparture?.departureKey,
+                                            routeLoadingDepartureKey = state.routeLoadingDepartureKey,
                                         ),
                                     ),
                                 )
@@ -270,25 +310,38 @@ class MapScreenViewModel(
 
     private fun onSelectDeparture(departureKey: String) {
         traceVehicleJob?.cancel()
+        val isDeselecting = _uiState.value.selectedDeparture?.departureKey == departureKey
         _uiState.update { state ->
             val departures = (state.departures as? UiState.Success)?.data
             val selectedDeparture = departures?.departures?.find {
                 it.departureKey == departureKey
             }
             state.copy(
-                selectedDeparture = selectedDeparture,
+                selectedDeparture = selectedDeparture.takeUnless { isDeselecting },
+                routeLoadingDepartureKey = selectedDeparture
+                    ?.departureKey
+                    ?.takeUnless { isDeselecting },
                 trackedVehicle = null,
                 route = null,
+                routeStops = emptyList(),
+                currentRouteStopKey = null,
                 departures = departures?.let { model ->
                     UiState.Success(
                         model.copy(
                             departures = model.departures.map {
-                                it.copy(isSelected = it.departureKey == departureKey)
+                                it.copy(
+                                    isSelected = !isDeselecting && it.departureKey == departureKey,
+                                    isLoading = !isDeselecting && it.departureKey == departureKey,
+                                )
                             },
                         ),
                     )
                 },
             )
+        }
+
+        if (isDeselecting) {
+            return
         }
 
         loadRoute()
@@ -297,7 +350,7 @@ class MapScreenViewModel(
             state.selectedDeparture != null &&
             state.selectedTransitStop?.data?.provider?.supportsLiveVehicleTracking == true
         ) {
-            state.selectedDeparture?.vehicleId?.let { trackVehicle(it) }
+            state.selectedDeparture.vehicleId?.let { trackVehicle(it) }
         }
     }
 
@@ -331,8 +384,13 @@ class MapScreenViewModel(
                                     if (departure?.vehicleId != vehicleId) {
                                         state
                                     } else {
+                                        val trackedVehicle = mapToTrackedVehicle(position, departure)
                                         state.copy(
-                                            trackedVehicle = mapToTrackedVehicle(position, departure),
+                                            trackedVehicle = trackedVehicle,
+                                            currentRouteStopKey = findCurrentRouteStopKey(
+                                                state,
+                                                LatLng(position.lat, position.lon),
+                                            ),
                                         )
                                     }
                                 }
@@ -346,6 +404,22 @@ class MapScreenViewModel(
         }
     }
 
+    private fun findCurrentRouteStopKey(
+        state: MapScreenUiState,
+        vehiclePosition: LatLng,
+    ): TransitStopKey? {
+        val transitStops = (state.transitStops as? UiState.Success)?.data.orEmpty()
+        return state.routeStops
+            .mapNotNull { stop ->
+                transitStops
+                    .firstOrNull { it.key == stop.key }
+                    ?.let { stop.key to vehiclePosition.sphericalDistance(it.position) }
+            }
+            .minByOrNull { it.second }
+            ?.takeIf { it.second <= CURRENT_STOP_RADIUS_METERS }
+            ?.first
+    }
+
     private fun clearSelection() {
         updateDeparturesJob?.cancel()
         traceVehicleJob?.cancel()
@@ -353,8 +427,11 @@ class MapScreenViewModel(
             it.copy(
                 selectedTransitStop = null,
                 selectedDeparture = null,
+                routeLoadingDepartureKey = null,
                 departures = null,
                 route = null,
+                routeStops = emptyList(),
+                currentRouteStopKey = null,
                 trackedVehicle = null,
             )
         }
@@ -462,3 +539,4 @@ private const val GENERIC_ERROR_MESSAGE = "Nie udało się wczytać danych"
 private const val INVALID_VEHICLE_ID_ERROR_MESSAGE = "Nieprawidłowy identyfikator pojazdu"
 private const val UNKNOWN_DISTANCE_LABEL = "Odległość od przystanka nieznana, brak Twojej lokalizacji"
 private const val DISTANCE_LABEL_PREFIX = "Przystanek odległy o"
+private const val CURRENT_STOP_RADIUS_METERS = 100.0
