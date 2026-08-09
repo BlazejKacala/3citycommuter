@@ -28,4 +28,16 @@ class MapRouteStopTimeTest {
     fun `missing expected time is explicit`() {
         assertEquals("brak danych", formatRouteStopTime(null, now))
     }
+
+    @Test
+    fun `route stop label puts stop name above time`() {
+        assertEquals(
+            "Gdańsk Główny\nza 3 min",
+            formatRouteStopLabel(
+                stopName = "Gdańsk Główny",
+                expectedTime = Instant.parse("2026-08-07T10:02:01Z"),
+                now = now,
+            ),
+        )
+    }
 }

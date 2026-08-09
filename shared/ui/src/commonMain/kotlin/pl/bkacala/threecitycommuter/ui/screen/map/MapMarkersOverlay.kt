@@ -29,6 +29,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -147,7 +148,12 @@ internal fun MapMarkersOverlay(
         TextStyle(color = Color.White, fontSize = VEHICLE_TEXT_SIZE, fontWeight = FontWeight.Bold)
     }
     val routeTimeTextStyle = remember {
-        TextStyle(color = Color.Black, fontSize = ROUTE_TIME_TEXT_SIZE, fontWeight = FontWeight.Bold)
+        TextStyle(
+            color = Color.Black,
+            fontSize = ROUTE_TIME_TEXT_SIZE,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        )
     }
 
     LaunchedEffect(routeStopTimes) {
@@ -262,7 +268,8 @@ internal fun MapMarkersOverlay(
                     }
                 }
                 routeStopTimes?.let { times ->
-                    val label = formatRouteStopTime(
+                    val label = formatRouteStopLabel(
+                        stopName = marker.stop.data.name,
                         expectedTime = times[marker.stop.key],
                         now = currentTime,
                         isCurrentStop = marker.stop.key == currentRouteStopKey,
@@ -353,7 +360,8 @@ internal fun MapMarkersOverlay(
                     }
                 }
                 routeStopTimes?.let { times ->
-                    val label = formatRouteStopTime(
+                    val label = formatRouteStopLabel(
+                        stopName = stop.data.name,
                         expectedTime = times[stop.key],
                         now = currentTime,
                         isCurrentStop = stop.key == currentRouteStopKey,
@@ -520,3 +528,10 @@ internal fun formatRouteStopTime(
     val minutes = ((seconds + 59) / 60).coerceAtLeast(1)
     return "za $minutes min"
 }
+
+internal fun formatRouteStopLabel(
+    stopName: String,
+    expectedTime: Instant?,
+    now: Instant,
+    isCurrentStop: Boolean = false,
+): String = "$stopName\n${formatRouteStopTime(expectedTime, now, isCurrentStop)}"
