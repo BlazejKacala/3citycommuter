@@ -171,6 +171,7 @@ class MapScreenViewModel(
                 departures = UiState.Loading,
                 route = null,
                 routeStops = emptyList(),
+                currentRouteStopKey = null,
                 trackedVehicle = null,
             )
         }
@@ -202,15 +203,20 @@ class MapScreenViewModel(
                                 if (state.selectedDeparture?.departureKey != departure.departureKey) {
                                     state
                                 } else {
-                                    val selectedStopTime = departure.estimatedTime ?: departure.theoreticalTime
-                                    state.copy(
-                                        route = route.shape.map { LatLng(it.latitude, it.longitude) },
-                                        routeStops = routeStopTimeCalculator.calculate(
-                                            route = route,
-                                            selectedStopKey = state.selectedTransitStop?.key,
-                                            selectedDepartureTime = selectedStopTime,
-                                        ),
+                                    val routeStops = routeStopTimeCalculator.calculate(
+                                        route = route,
+                                        selectedStopKey = state.selectedTransitStop?.key,
+                                        selectedDepartureTime = departure.theoreticalTime
+                                            ?: departure.estimatedTime,
+                                        delayInSeconds = departure.delayInSeconds,
                                     )
+                                    val updatedState = state.copy(
+                                        route = route.shape.map { LatLng(it.latitude, it.longitude) },
+                                        routeStops = routeStops,
+                                    )
+                                    state.trackedVehicle?.position?.let {
+                                        updatedState.copy(currentRouteStopKey = findCurrentRouteStopKey(updatedState, it))
+                                    } ?: updatedState
                                 }
                             }
                         }
@@ -318,6 +324,7 @@ class MapScreenViewModel(
                 trackedVehicle = null,
                 route = null,
                 routeStops = emptyList(),
+                currentRouteStopKey = null,
                 departures = departures?.let { model ->
                     UiState.Success(
                         model.copy(
@@ -377,8 +384,13 @@ class MapScreenViewModel(
                                     if (departure?.vehicleId != vehicleId) {
                                         state
                                     } else {
+                                        val trackedVehicle = mapToTrackedVehicle(position, departure)
                                         state.copy(
-                                            trackedVehicle = mapToTrackedVehicle(position, departure),
+                                            trackedVehicle = trackedVehicle,
+                                            currentRouteStopKey = findCurrentRouteStopKey(
+                                                state,
+                                                LatLng(position.lat, position.lon),
+                                            ),
                                         )
                                     }
                                 }
@@ -392,6 +404,22 @@ class MapScreenViewModel(
         }
     }
 
+    private fun findCurrentRouteStopKey(
+        state: MapScreenUiState,
+        vehiclePosition: LatLng,
+    ): TransitStopKey? {
+        val transitStops = (state.transitStops as? UiState.Success)?.data.orEmpty()
+        return state.routeStops
+            .mapNotNull { stop ->
+                transitStops
+                    .firstOrNull { it.key == stop.key }
+                    ?.let { stop.key to vehiclePosition.sphericalDistance(it.position) }
+            }
+            .minByOrNull { it.second }
+            ?.takeIf { it.second <= CURRENT_STOP_RADIUS_METERS }
+            ?.first
+    }
+
     private fun clearSelection() {
         updateDeparturesJob?.cancel()
         traceVehicleJob?.cancel()
@@ -403,6 +431,7 @@ class MapScreenViewModel(
                 departures = null,
                 route = null,
                 routeStops = emptyList(),
+                currentRouteStopKey = null,
                 trackedVehicle = null,
             )
         }
@@ -510,3 +539,4 @@ private const val GENERIC_ERROR_MESSAGE = "Nie udało się wczytać danych"
 private const val INVALID_VEHICLE_ID_ERROR_MESSAGE = "Nieprawidłowy identyfikator pojazdu"
 private const val UNKNOWN_DISTANCE_LABEL = "Odległość od przystanka nieznana, brak Twojej lokalizacji"
 private const val DISTANCE_LABEL_PREFIX = "Przystanek odległy o"
+private const val CURRENT_STOP_RADIUS_METERS = 100.0

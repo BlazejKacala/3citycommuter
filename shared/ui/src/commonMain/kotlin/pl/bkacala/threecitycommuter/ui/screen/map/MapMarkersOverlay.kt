@@ -131,6 +131,7 @@ internal fun MapMarkersOverlay(
     trackedVehicle: TrackedVehicle?,
     vehicleColor: Color,
     routeStopTimes: Map<TransitStopKey, Instant?>?,
+    currentRouteStopKey: TransitStopKey?,
 ) {
     val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
     val tramPainter = rememberVectorPainter(Icons.Outlined.Tram)
@@ -261,7 +262,11 @@ internal fun MapMarkersOverlay(
                     }
                 }
                 routeStopTimes?.let { times ->
-                    val label = formatRouteStopTime(times[marker.stop.key], currentTime)
+                    val label = formatRouteStopTime(
+                        expectedTime = times[marker.stop.key],
+                        now = currentTime,
+                        isCurrentStop = marker.stop.key == currentRouteStopKey,
+                    )
                     val text = textMeasurer.measure(label, routeTimeTextStyle)
                     val horizontalPadding = ROUTE_TIME_HORIZONTAL_PADDING.toPx()
                     val verticalPadding = ROUTE_TIME_VERTICAL_PADDING.toPx()
@@ -348,7 +353,11 @@ internal fun MapMarkersOverlay(
                     }
                 }
                 routeStopTimes?.let { times ->
-                    val label = formatRouteStopTime(times[stop.key], currentTime)
+                    val label = formatRouteStopTime(
+                        expectedTime = times[stop.key],
+                        now = currentTime,
+                        isCurrentStop = stop.key == currentRouteStopKey,
+                    )
                     val text = textMeasurer.measure(label, routeTimeTextStyle)
                     val horizontalPadding = ROUTE_TIME_HORIZONTAL_PADDING.toPx()
                     val verticalPadding = ROUTE_TIME_VERTICAL_PADDING.toPx()
@@ -496,10 +505,18 @@ private const val MARKER_EDGE_MARGIN_PX = 64f
 // Animation
 private const val VEHICLE_POSITION_ANIMATION_DURATION_MS = 9_000
 
-internal fun formatRouteStopTime(expectedTime: Instant?, now: Instant): String {
+internal fun formatRouteStopTime(
+    expectedTime: Instant?,
+    now: Instant,
+    isCurrentStop: Boolean = false,
+): String {
+    if (isCurrentStop) return "na przystanku"
     if (expectedTime == null) return "brak danych"
     val seconds = expectedTime.epochSeconds - now.epochSeconds
-    if (seconds <= 0) return "już był"
+    if (seconds <= 0) {
+        val minutes = ((-seconds + 59) / 60).coerceAtLeast(1)
+        return "$minutes min temu"
+    }
     val minutes = ((seconds + 59) / 60).coerceAtLeast(1)
     return "za $minutes min"
 }

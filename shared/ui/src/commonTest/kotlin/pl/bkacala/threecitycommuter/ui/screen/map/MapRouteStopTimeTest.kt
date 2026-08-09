@@ -17,9 +17,9 @@ class MapRouteStopTimeTest {
 
     @Test
     fun `current and past stops show already passed`() {
-        assertEquals("już był", formatRouteStopTime(now, now))
+        assertEquals("na przystanku", formatRouteStopTime(now, now, isCurrentStop = true))
         assertEquals(
-            "już był",
+            "1 min temu",
             formatRouteStopTime(Instant.parse("2026-08-07T09:59:59Z"), now),
         )
     }

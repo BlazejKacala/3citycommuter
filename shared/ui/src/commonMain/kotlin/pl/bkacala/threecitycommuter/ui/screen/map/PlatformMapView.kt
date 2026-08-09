@@ -21,6 +21,7 @@ expect fun PlatformMapView(
     trackedVehicle: TrackedVehicle?,
     route: List<LatLng>?,
     routeStopTimes: Map<TransitStopKey, Instant?>?,
+    currentRouteStopKey: TransitStopKey?,
     userLocation: UserLocation?,
     onTransitStopSelected: (TransitStopMapItem) -> Unit,
     onMapClicked: () -> Unit,

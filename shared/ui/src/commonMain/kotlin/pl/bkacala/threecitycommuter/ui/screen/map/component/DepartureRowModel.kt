@@ -67,6 +67,7 @@ data class DepartureRowModel(
     val scheduledTripStartTime: Instant? = null,
     val theoreticalTime: Instant? = null,
     val estimatedTime: Instant? = null,
+    val delayInSeconds: Int? = null,
     val isLoading: Boolean = false,
 )
 

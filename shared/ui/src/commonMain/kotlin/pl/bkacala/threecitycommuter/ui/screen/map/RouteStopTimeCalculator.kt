@@ -11,6 +11,7 @@ internal class RouteStopTimeCalculator {
         route: Route,
         selectedStopKey: TransitStopKey?,
         selectedDepartureTime: Instant?,
+        delayInSeconds: Int? = null,
     ): List<Route.Stop> {
         val routeSelectedStopTime = route.stops
             .firstOrNull { it.key == selectedStopKey }
@@ -21,13 +22,13 @@ internal class RouteStopTimeCalculator {
             selectedDepartureTime.epochSeconds - routeSelectedStopTime.epochSeconds
         } else {
             0L
-        }
+        } + (delayInSeconds ?: 0)
 
         return route.stops.map { stop ->
             val correctedTime = stop.expectedTime?.plus(routeTimeCorrectionSeconds.seconds)
             stop.copy(
                 expectedTime = if (stop.key == selectedStopKey) {
-                    selectedDepartureTime ?: correctedTime
+                    selectedDepartureTime?.plus((delayInSeconds ?: 0).seconds) ?: correctedTime
                 } else {
                     correctedTime
                 },

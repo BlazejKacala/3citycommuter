@@ -90,8 +90,15 @@ object DeparturesMapper {
             scheduledTripStartTime = scheduledTripStartTime,
             theoreticalTime = theoreticalTime,
             estimatedTime = estimatedTime,
+            delayInSeconds = this.delayInSeconds ?: estimatedDelayInSeconds(),
             isLoading = departureKey == routeLoadingDepartureKey,
         )
+    }
+
+    private fun Departure.estimatedDelayInSeconds(): Int? {
+        val estimatedTime = estimatedTime ?: return null
+        val theoreticalTime = theoreticalTime ?: return null
+        return (estimatedTime.epochSeconds - theoreticalTime.epochSeconds).toInt()
     }
 
     private fun Departure.vehicleType(provider: TransitProvider): VehicleType =
