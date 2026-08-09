@@ -3,6 +3,7 @@ package pl.bkacala.threecitycommuter.di
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import pl.bkacala.threecitycommuter.ui.screen.map.MapScreenViewModel
+import pl.bkacala.threecitycommuter.ui.screen.schedule.ScheduleScreenViewModel
 
 val uiModule = module {
     viewModel {
@@ -15,4 +16,5 @@ val uiModule = module {
             routesRepository = get(),
         )
     }
+    viewModel { ScheduleScreenViewModel() }
 }

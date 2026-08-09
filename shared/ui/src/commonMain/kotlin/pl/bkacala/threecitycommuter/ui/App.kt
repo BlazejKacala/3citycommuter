@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import pl.bkacala.threecitycommuter.ui.nav.AppBottomBar
 import pl.bkacala.threecitycommuter.ui.nav.AppNavHost
 import pl.bkacala.threecitycommuter.ui.theme.AppTheme
 
@@ -21,6 +22,7 @@ fun App() {
     AppTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
+            bottomBar = { AppBottomBar(navController) },
             content = { paddingValues ->
                 Box(
                     modifier = Modifier

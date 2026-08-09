@@ -1,8 +1,8 @@
 package pl.bkacala.threecitycommuter.ui.nav
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountBox
-import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Map
+import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class TopLvlDestinations(
@@ -13,12 +13,12 @@ enum class TopLvlDestinations(
     Map(
         route = "Map",
         label = "Mapa",
-        icon = Icons.Rounded.Home,
+        icon = Icons.Rounded.Map,
     ),
     Schedule(
         route = "Schedule",
         label = "Rozkład jazdy",
-        icon = Icons.Rounded.AccountBox,
+        icon = Icons.Rounded.Schedule,
     ),
 }
 
@@ -26,5 +26,5 @@ enum class Destinations(
     val route: String,
 ) {
     Maps(route = "Maps"),
-    Lines(route = "Lines"),
+    ScheduleContent(route = "ScheduleContent"),
 }
