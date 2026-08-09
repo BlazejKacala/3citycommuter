@@ -77,6 +77,44 @@ class TransitDataSourceTest {
         assertFalse(requestedUrl.contains("fullRoutes=true"))
     }
 
+    @Test
+    fun `PLK departure requests avoid large optional payloads`() = runTest {
+        val requestedUrls = mutableListOf<String>()
+        val httpClient = HttpClient(
+            MockEngine { request ->
+                requestedUrls += request.url.toString()
+                respond(
+                    content = "{}",
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(HttpHeaders.ContentType, "application/json"),
+                )
+            },
+        ) {
+            install(ContentNegotiation) {
+                json(testJson)
+            }
+        }
+        val apiClient = KtorPlkApiClient(httpClient, testJson)
+
+        apiClient.getSchedules(
+            dateFrom = "2026-08-07",
+            dateTo = "2026-08-07",
+            stations = "7617",
+            carriersInclude = "SKMT",
+            fullRoutes = true,
+        )
+        apiClient.getOperationsShortened(
+            stations = "7617",
+            carriersInclude = "SKMT",
+            fullRoutes = false,
+        )
+
+        assertTrue(requestedUrls[0].contains("dictionaries=false"))
+        assertTrue(requestedUrls[1].contains("/operations/shortened"))
+        assertTrue(requestedUrls[1].contains("fullRoutes=false"))
+        assertTrue(requestedUrls[1].contains("pageSize=500"))
+    }
+
     private fun testRailStationCatalog(): RailStationCatalog = object : RailStationCatalog {
         override suspend fun getActiveStations() = loadRailStationsSeed(testJson) +
             (101..105).map { id ->
