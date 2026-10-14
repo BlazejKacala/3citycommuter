@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -277,6 +278,41 @@ class MapScreenViewModelTest {
         viewModel.uiState.value.routeStops shouldHaveSize 0
         viewModel.uiState.value.route shouldBe null
         viewModel.onAction(MapAction.ScreenPaused)
+    }
+
+    @Test
+    fun `selecting another departure cancels the previous route request`() = runTest {
+        val requested = mutableListOf<Int>()
+        val cancelled = mutableListOf<Int>()
+        val routes = object : RoutesRepository {
+            override fun getRoute(provider: TransitProvider, routeId: Int, tripId: Int): Flow<Route> = flow {
+                requested += tripId
+                try {
+                    awaitCancellation()
+                } finally {
+                    cancelled += tripId
+                }
+            }
+        }
+        val viewModel = createViewModel(
+            stopsRepository = FakeTransitStopsRepository(
+                departures = listOf(departure(tripId = 1, vehicleId = null), departure(tripId = 2, vehicleId = null)),
+            ),
+            routesRepository = routes,
+        )
+        advanceTimeBy(150.milliseconds)
+        viewModel.onAction(MapAction.StopSelected(transitStopsFrom(viewModel).first().key))
+        advanceTimeBy(250.milliseconds)
+        val departures = (viewModel.uiState.value.departures as UiState.Success).data.departures
+        viewModel.onAction(MapAction.DepartureSelected(departures[0].departureKey))
+        advanceTimeBy(10.milliseconds)
+        viewModel.onAction(MapAction.DepartureSelected(departures[1].departureKey))
+        advanceTimeBy(10.milliseconds)
+        requested shouldBe listOf(1, 2)
+        cancelled shouldBe listOf(1)
+        viewModel.onAction(MapAction.MapClicked)
+        advanceTimeBy(10.milliseconds)
+        cancelled shouldBe listOf(1, 2)
     }
 
     private fun createViewModel(

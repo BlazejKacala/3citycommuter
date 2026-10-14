@@ -1,6 +1,9 @@
 package pl.bkacala.threecitycommuter.client
 
 internal interface GdyniaGtfsSnapshotStorage {
+    /** Reads only metadata, without loading trips or the ZIP into memory. */
+    suspend fun readDownloadedAtEpochMilliseconds(): Long?
+
     suspend fun readSnapshot(): GdyniaGtfsSnapshot?
 
     suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot): GdyniaGtfsSnapshot

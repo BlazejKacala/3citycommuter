@@ -149,12 +149,12 @@ Koin modules:
 
 ### Network Layer
 
-`KtorNetworkClient` implements the legacy Gdansk-specific `NetworkClient`.
+`KtorGdanskApiClient` implements the Gdansk-specific `GdanskApiClient`.
 
 Transport data is normalized through a provider layer:
 - `GdanskTransitDataSource`
 - `GdyniaTransitDataSource`
-- `SkmTransitDataSource`
+- `RailTransitDataSource` (SKM and PKM via PLK)
 - `CombinedTransitDataSource`
 
 `CombinedTransitDataSource` is the application-facing source. It merges Gdansk, Gdynia, and SKM data and routes later lookups by provider based on app-level stop keys.
@@ -171,16 +171,33 @@ Transport data is normalized through a provider layer:
 - Gdynia route geometry is parsed from GTFS:
   - `/pt/trips` provides `tripId -> shapeId`
   - `shapes.txt` from `gtfs.zip` provides `shapeId -> ordered coordinates`
-  - `GdyniaGtfsStore` caches the parsed route index in memory with a 1-day TTL
-  - Android preloads the Gdynia GTFS cache during startup in the same background phase that loads `relations.json`
+  - Android/JVM persist the trips payload, ZIP and download timestamp on disk; ZIP downloads and CSV reads are streamed
+  - Before Android startup preload/refresh, read only snapshot metadata; a snapshot younger than 1 day skips network download and startup parsing
+  - First departure lookup prefers the persisted snapshot and parses only stop_times, without building geometry or Route.Stop objects
+  - Geometry loading prefers the persisted snapshot over bundled shape indices; full geometry caching still needs a future memory bound
+  - Expired/missing snapshots may still trigger a full network import; the disk-backed indexed GTFS store remains planned
+  - Android bundles separate departure and shape indices as an offline fallback
 - Gdynia does not expose a public live GPS feed compatible with the Gdansk one:
   - route drawing works
   - live vehicle tracking is disabled in UI behavior
-- SKM uses the PLK API authenticated with `PLK_KEY` for departures and planned route metadata:
+- SKM and PKM use the PLK API authenticated with `PLK_KEY` for departures and planned route metadata:
   - local station geometry is still kept in-repo because PLK does not expose stop coordinates
   - SKM stops are intentionally not clustered on the map
   - SKM stops use a dedicated visual style distinct from bus and tram stops
 - Android allows cleartext HTTP specifically for `api.zdiz.gdynia.pl` through `composeApp/android/src/main/res/xml/network_security_config.xml`
+
+#### Data performance and cache contracts
+
+- The optimization audit and implementation status are in [docs/plan-optymalizacji-warstwy-danych.md](docs/plan-optymalizacji-warstwy-danych.md).
+- The shared Ktor client does not install body logging. Keep large payloads and API keys out of logs, including in release builds.
+- `RealTransitStopsRepository.getTransitStops()` emits Room/bundled data before network refresh, then emits changed persisted data. Collect the complete flow when refreshed results are needed; `first()/take(1)` cancels the refresh owned by that collection.
+- Stop catalog refresh is serialized. Failure preserves local results; cancellation propagates. Provider-independent refresh and atomic replacement are still planned.
+- The bundled Gdansk catalog contains one explicit service date (currently 2026-08-06, 2719 records), as an offline bootstrap only. Regenerate it from an official downloaded feed with `python script/generate_gdansk_stops_seed.py <stops.json> --date YYYY-MM-DD`. Do not select the seed by maximum lastUpdate or bundle the entire multi-day feed again.
+- `CachingPlkApiClient` caches only planned schedules in memory for 1 hour. Keys include both dates, station selection, carriers and fullRoute. LRU limits: 8 responses and 20,000 route-station records total. Large responses bypass the cache. Live operations remain uncached; version-aware/disk caching and reducing detailed operation calls are still planned.
+- Vehicle metadata is read from Room once per repository lifetime, then reused as a list and a numeric-code index. Successful refresh replaces both and updates the daily timestamp. Failures retain cached data and retry no sooner than 5 minutes later.
+- Gdansk vehicle polling waits 20 seconds after each request. Departures retain 30 seconds for city providers and 60 seconds for rail.
+- Map route requests are cancelled when selecting another departure/stop or clearing selection. Cancelled requests must not overwrite the newer loading state.
+- Every additional cache needs a freshness policy and an explicit size limit. Do not cache live PLK operations with the schedule TTL.
 
 #### Error logging
 
@@ -248,6 +265,11 @@ Important network/provider tests:
   - verifies Gdynia GTFS route parsing preserves point order
   - verifies Gdynia maps `routeId` to user-facing `lineNumber`
   - verifies Gdansk, Gdynia, and SKM providers populate a consistent shared domain model for stops and departures
+- `CachingPlkApiClientTest`: schedule reuse, expiration, key isolation, request coalescing and LRU eviction
+- `RealVehiclesRepositoryTest`: reuse of fleet/index, timestamp update and fallback/backoff
+- `RealTransitStopsRepositoryTest`: local emission before a suspended refresh and subsequent updated catalog
+- `TransitDataSourceTest`: fresh GTFS metadata skips startup parsing/download; persisted departures override the seed
+- `MapScreenViewModelTest`: switching departures cancels the preceding route request
 - `GdyniaRouteNetworkDataSerializationTest`
   - verifies `/pt/routes` payload deserialization
 

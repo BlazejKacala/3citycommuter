@@ -47,6 +47,56 @@ import kotlin.time.Duration.Companion.minutes
 class TransitDataSourceTest {
 
     @Test
+    fun `fresh Gdynia snapshot skips startup parsing and download and overrides the seed on demand`() = runTest {
+        var networkCalls = 0
+        val httpClient = HttpClient(MockEngine {
+            networkCalls += 1
+            error("No startup network request expected")
+        })
+        val storage = InMemoryGdyniaGtfsSnapshotStorage(
+            GdyniaGtfsSnapshot(gdyniaTripsBody, gdyniaGtfsZipBytes, downloadedAtEpochMilliseconds = Clock.System.now().toEpochMilliseconds()),
+        )
+        repeat(2) {
+            val store = GdyniaGtfsStore(
+                httpClient, testJson, ZipEntryReader(), storage,
+                InMemoryGdyniaGtfsSeedSource(departureMatchIndex = gdyniaDepartureMatchIndexBody.replace("201", "999")),
+            )
+            val previousReads = storage.snapshotReads
+            store.preload()
+            store.refresh()
+            assertEquals(previousReads, storage.snapshotReads)
+            assertEquals(0, networkCalls)
+            assertEquals(201, store.resolveTripId(1015, "10:22", "Kacze Buki", 999))
+            assertEquals(previousReads + 1, storage.snapshotReads)
+        }
+        httpClient.close()
+    }
+
+    @Test
+    fun `expired Gdynia snapshot is refreshed only once`() = runTest {
+        var networkCalls = 0
+        val httpClient = HttpClient(MockEngine { request ->
+            networkCalls += 1
+            if (request.url.encodedPath.endsWith("trips")) {
+                respond(gdyniaTripsBody)
+            } else {
+                respond(gdyniaGtfsZipBytes)
+            }
+        })
+        val storage = InMemoryGdyniaGtfsSnapshotStorage(
+            GdyniaGtfsSnapshot(gdyniaTripsBody, gdyniaGtfsZipBytes, downloadedAtEpochMilliseconds = 1),
+        )
+        val store = GdyniaGtfsStore(httpClient, testJson, ZipEntryReader(), storage, InMemoryGdyniaGtfsSeedSource())
+        store.preload()
+        store.refresh()
+        store.refresh()
+        assertEquals(2, networkCalls)
+        assertEquals(201, store.resolveTripId(1015, "10:22", "Kacze Buki", 999))
+        httpClient.close()
+    }
+
+
+    @Test
     fun `PLK schedules request uses singular fullRoute parameter`() = runTest {
         var requestedUrl = ""
         val httpClient = HttpClient(
@@ -705,7 +755,14 @@ class TransitDataSourceTest {
 private class InMemoryGdyniaGtfsSnapshotStorage(
     var snapshot: GdyniaGtfsSnapshot? = null,
 ) : GdyniaGtfsSnapshotStorage {
-    override suspend fun readSnapshot(): GdyniaGtfsSnapshot? = snapshot
+    override suspend fun readDownloadedAtEpochMilliseconds(): Long? = snapshot?.downloadedAtEpochMilliseconds
+
+    var snapshotReads = 0
+
+    override suspend fun readSnapshot(): GdyniaGtfsSnapshot? {
+        snapshotReads += 1
+        return snapshot
+    }
 
     override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot): GdyniaGtfsSnapshot {
         this.snapshot = snapshot

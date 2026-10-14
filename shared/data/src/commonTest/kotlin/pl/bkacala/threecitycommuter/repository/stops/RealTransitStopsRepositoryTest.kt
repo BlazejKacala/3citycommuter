@@ -1,6 +1,7 @@
 package pl.bkacala.threecitycommuter.repository.stops
 
 import app.cash.turbine.test
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.runTest
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.dao.TransitStopsDao
@@ -37,6 +38,7 @@ class RealTransitStopsRepositoryTest {
         )
 
         repository.getTransitStops().test {
+            assertEquals(listOf(gdanskStop.stopKey), awaitItem().map { it.stopKey })
             val stops = awaitItem()
             assertEquals(listOf(gdanskStop.stopKey, gdyniaStop.stopKey), stops.map { it.stopKey })
             awaitComplete()
@@ -109,6 +111,30 @@ class RealTransitStopsRepositoryTest {
 
         repository.getTransitStops().test {
             assertEquals(listOf(storedStop.stopKey), awaitItem().map { it.stopKey })
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `emits local data before a suspended network refresh and then publishes new data`() = runTest {
+        val oldStop = createStop(101, TransitProvider.GDANSK, true, false)
+        val newStop = oldStop.copy(stopName = "Updated stop")
+        val releaseNetwork = CompletableDeferred<Unit>()
+        val source = object : TransitDataSource by FakeTransitDataSource(listOf(newStop)) {
+            override suspend fun getStops(): List<TransitStopData> {
+                releaseNetwork.await()
+                return listOf(newStop)
+            }
+        }
+        val repository = RealTransitStopsRepository(
+            source,
+            FakeTransitStopsDao(mutableListOf(oldStop.toEntity())),
+            FakeLastUpdateRepository(),
+        )
+        repository.getTransitStops().test {
+            assertEquals(listOf(oldStop), awaitItem())
+            releaseNetwork.complete(Unit)
+            assertEquals(listOf(newStop), awaitItem())
             awaitComplete()
         }
     }

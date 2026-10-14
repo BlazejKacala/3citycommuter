@@ -2,13 +2,11 @@ package pl.bkacala.threecitycommuter.di
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import pl.bkacala.threecitycommuter.client.CachingPlkApiClient
 import pl.bkacala.threecitycommuter.client.CombinedTransitDataSource
 import pl.bkacala.threecitycommuter.client.GdanskApiClient
 import pl.bkacala.threecitycommuter.client.GdanskRouteTimesResolver
@@ -41,15 +39,6 @@ val networkModule = module {
             install(ContentNegotiation) {
                 json(json)
             }
-            install(Logging) {
-                logger =
-                    object : Logger {
-                        override fun log(message: String) {
-                            println("KTOR $message")
-                        }
-                    }
-                level = LogLevel.BODY
-            }
         }
     }
 
@@ -61,7 +50,7 @@ val networkModule = module {
     single { ZipEntryReader() }
     single { GdyniaGtfsStore(get(), get(), get(), get(), get()) }
     single<GdyniaGtfsPreloader> { get<GdyniaGtfsStore>() }
-    single<PlkApiClient> { KtorPlkApiClient(get(), get()) }
+    single<PlkApiClient> { CachingPlkApiClient(KtorPlkApiClient(get(), get())) }
     single { RailStaticCatalog(get()) }
     single { GdanskTransitDataSource(get(), get(), get()) }
     single { GdyniaTransitDataSource(get(), get(), get()) }

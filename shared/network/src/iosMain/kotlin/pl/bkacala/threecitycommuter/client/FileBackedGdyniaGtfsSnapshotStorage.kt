@@ -22,6 +22,15 @@ internal class FileBackedGdyniaGtfsSnapshotStorage : GdyniaGtfsSnapshotStorage {
     private val gtfsFilePath = "$snapshotDirectoryPath/$GTFS_FILE_NAME"
     private val metadataFilePath = "$snapshotDirectoryPath/$METADATA_FILE_NAME"
 
+    override suspend fun readDownloadedAtEpochMilliseconds(): Long? {
+        if (!fileManager.fileExistsAtPath(tripsFilePath) || !fileManager.fileExistsAtPath(gtfsFilePath)) return null
+        return NSString.stringWithContentsOfFile(
+            path = metadataFilePath,
+            encoding = NSUTF8StringEncoding,
+            error = null,
+        )?.toString()?.trim()?.toLongOrNull()
+    }
+
     override suspend fun readSnapshot(): GdyniaGtfsSnapshot? {
         if (
             !fileManager.fileExistsAtPath(tripsFilePath) ||

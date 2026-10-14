@@ -51,6 +51,7 @@ class MapScreenViewModel(
     private val routeStopTimeCalculator = RouteStopTimeCalculator()
 
     private var loadTransitStopsJob: Job? = null
+    private var loadRouteJob: Job? = null
     private var updateDeparturesJob: Job? = null
     private var traceUserLocationJob: Job? = null
     private var traceVehicleJob: Job? = null
@@ -161,6 +162,7 @@ class MapScreenViewModel(
     }
 
     private fun onTransitStopSelected(selected: TransitStopMapItem) {
+        loadRouteJob?.cancel()
         updateDeparturesJob?.cancel()
         traceVehicleJob?.cancel()
         _uiState.update {
@@ -179,7 +181,8 @@ class MapScreenViewModel(
     }
 
     private fun loadRoute() {
-        viewModelScope.launch {
+        loadRouteJob?.cancel()
+        loadRouteJob = viewModelScope.launch {
             _uiState.value.selectedDeparture?.let { departure ->
                 val provider = _uiState.value.selectedTransitStop?.data?.provider ?: return@launch
                 try {
@@ -222,7 +225,7 @@ class MapScreenViewModel(
                         }
                 } finally {
                     _uiState.update { state ->
-                        if (state.routeLoadingDepartureKey == departure.departureKey) {
+                        if (isActive && state.routeLoadingDepartureKey == departure.departureKey) {
                             state.copy(
                                 routeLoadingDepartureKey = null,
                                 departures = (state.departures as? UiState.Success)?.data?.let { model ->
@@ -309,6 +312,7 @@ class MapScreenViewModel(
     }
 
     private fun onSelectDeparture(departureKey: String) {
+        loadRouteJob?.cancel()
         traceVehicleJob?.cancel()
         val isDeselecting = _uiState.value.selectedDeparture?.departureKey == departureKey
         _uiState.update { state ->
@@ -421,6 +425,7 @@ class MapScreenViewModel(
     }
 
     private fun clearSelection() {
+        loadRouteJob?.cancel()
         updateDeparturesJob?.cancel()
         traceVehicleJob?.cancel()
         _uiState.update {
@@ -532,7 +537,7 @@ private const val LOG_TAG = "MapScreenViewModel"
 private val USER_LOCATION_REFRESH_INTERVAL = 10.seconds
 private val DEPARTURES_REFRESH_INTERVAL = 30.seconds
 private val RAIL_DEPARTURES_REFRESH_INTERVAL = 60.seconds
-private val VEHICLE_REFRESH_INTERVAL = 10.seconds
+private val VEHICLE_REFRESH_INTERVAL = 20.seconds
 private const val MAX_DEPARTURES_DISPLAYED = 15
 
 private const val GENERIC_ERROR_MESSAGE = "Nie udało się wczytać danych"

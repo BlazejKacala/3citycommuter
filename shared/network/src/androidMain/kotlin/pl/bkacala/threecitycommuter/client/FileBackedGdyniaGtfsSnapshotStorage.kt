@@ -11,6 +11,12 @@ internal class FileBackedGdyniaGtfsSnapshotStorage(
     private val gtfsFile = File(snapshotDirectory, GTFS_FILE_NAME)
     private val metadataFile = File(snapshotDirectory, METADATA_FILE_NAME)
 
+    override suspend fun readDownloadedAtEpochMilliseconds(): Long? {
+        if (!tripsFile.isFile || !gtfsFile.isFile || !metadataFile.isFile) return null
+        if (tripsFile.length() == 0L || gtfsFile.length() == 0L) return null
+        return metadataFile.readText().trim().toLongOrNull()
+    }
+
     override suspend fun readSnapshot(): GdyniaGtfsSnapshot? {
         if (!tripsFile.exists() || !gtfsFile.exists() || !metadataFile.exists()) {
             return null

@@ -16,11 +16,11 @@ class GetDeparturesUseCase(
         val provider = stopKey.provider
         return transitStopsRepository
             .getDepartures(stopKey)
-            .combine(vehiclesRepository.getVehicles(provider)) { departures, vehicles ->
+            .combine(vehiclesRepository.getVehiclesByCode(provider)) { departures, vehicles ->
                 departures.map { departure ->
                     Pair(
                         departure,
-                        vehicles.firstOrNull { it.vehicleCode.toInt() == departure.vehicleCode },
+                        departure.vehicleCode?.let(vehicles::get),
                     )
                 }
             }

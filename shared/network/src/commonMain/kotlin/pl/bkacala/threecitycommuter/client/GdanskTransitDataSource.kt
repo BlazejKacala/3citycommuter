@@ -47,10 +47,8 @@ internal class GdanskTransitDataSource(
         val payload = json.decodeFromString<Map<String, GdanskStopsResponse>>(
             readBundledResourceText("gdansk_stops.json"),
         )
-        return payload.values
-            .maxByOrNull { it.lastUpdate }
-            ?.stops
-            .orEmpty()
+        // The seed generator selects one explicit service date, not a publication timestamp.
+        return payload.values.single().stops
             .map { it.toTransitStopData(isForBuses = true, isForTrams = true) }
     }
 
