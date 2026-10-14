@@ -315,6 +315,37 @@ class MapScreenViewModelTest {
         cancelled shouldBe listOf(1, 2)
     }
 
+    @Test
+    fun refreshedDepartureUpdatesRouteTimesWithoutLosingSelection() = runTest {
+        val stop = transitStopData()
+        val scheduled = kotlinx.datetime.Instant.parse("2026-08-07T10:00:00Z")
+        val original = departure(vehicleId = null, theoreticalTime = scheduled, estimatedTime = scheduled)
+            .copy(delayInSeconds = 300, estimatedTime = scheduled.plus(300_000.milliseconds))
+        val repository = FakeTransitStopsRepository(stops = listOf(stop), departures = listOf(original))
+        val route = Route(emptyList(), listOf(Route.Stop(stop.stopKey, 1, scheduled)))
+        val viewModel = createViewModel(stopsRepository = repository, routesRepository = FakeRoutesRepository(route))
+        advanceTimeBy(150.milliseconds)
+        viewModel.onAction(MapAction.StopSelected(stop.stopKey))
+        advanceTimeBy(250.milliseconds)
+        val key = (viewModel.uiState.value.departures as UiState.Success).data.departures.single().departureKey
+        viewModel.onAction(MapAction.DepartureSelected(key))
+        advanceTimeBy(250.milliseconds)
+        viewModel.uiState.value.routeStops.single().expectedTime shouldBe original.estimatedTime
+
+        val refreshed = original.copy(delayInSeconds = 60, estimatedTime = scheduled.plus(60_000.milliseconds))
+        repository.departures = listOf(refreshed)
+        advanceTimeBy(31_000.milliseconds)
+        viewModel.uiState.value.selectedDeparture?.departureKey shouldBe key
+        viewModel.uiState.value.selectedDeparture?.estimatedTime shouldBe refreshed.estimatedTime
+        viewModel.uiState.value.routeStops.single().expectedTime shouldBe refreshed.estimatedTime
+        (viewModel.uiState.value.departures as UiState.Success).data.departures.single().isSelected shouldBe true
+
+        repository.departures = emptyList()
+        advanceTimeBy(31_000.milliseconds)
+        viewModel.uiState.value.selectedDeparture?.departureKey shouldBe key
+        viewModel.uiState.value.routeStops.single().expectedTime shouldBe refreshed.estimatedTime
+    }
+
     private fun createViewModel(
         stopsRepository: TransitStopsRepository = FakeTransitStopsRepository(),
         locationRepository: LocationRepository = FakeLocationRepository(UserLocation.default().copy(isFixed = false)),
@@ -431,7 +462,7 @@ class MapScreenViewModelTest {
 
     private inner class FakeTransitStopsRepository(
         private val stops: List<TransitStopData> = listOf(transitStopData()),
-        private val departures: List<Departure> = emptyList(),
+        var departures: List<Departure> = emptyList(),
         private val departuresError: Throwable? = null,
     ) : TransitStopsRepository {
 

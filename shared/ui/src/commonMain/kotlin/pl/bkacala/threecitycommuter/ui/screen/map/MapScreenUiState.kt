@@ -2,6 +2,7 @@ package pl.bkacala.threecitycommuter.ui.screen.map
 
 import pl.bkacala.threecitycommuter.model.LatLng
 import pl.bkacala.threecitycommuter.model.location.UserLocation
+import pl.bkacala.threecitycommuter.model.vehicles.VehiclePosition
 import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import pl.bkacala.threecitycommuter.ui.common.UiState
@@ -20,6 +21,9 @@ data class MapScreenUiState(
     val departures: UiState<DeparturesBottomSheetModel>? = null,
     val route: List<LatLng>? = null,
     val routeStops: List<Route.Stop> = emptyList(),
+    val routeTimetable: Route? = null,
+    val vehiclePosition: VehiclePosition? = null,
+    val routeProgress: RouteProgress = RouteProgress(),
     val currentRouteStopKey: TransitStopKey? = null,
     val trackedVehicle: TrackedVehicle? = null,
     val isSearchActive: Boolean = false,

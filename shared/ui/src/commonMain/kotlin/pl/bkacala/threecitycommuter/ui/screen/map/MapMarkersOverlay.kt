@@ -133,6 +133,7 @@ internal fun MapMarkersOverlay(
     vehicleColor: Color,
     routeStopTimes: Map<TransitStopKey, Instant?>?,
     currentRouteStopKey: TransitStopKey?,
+    passedRouteStopKeys: Set<TransitStopKey>,
 ) {
     val busPainter = rememberVectorPainter(Icons.Outlined.DirectionsBus)
     val tramPainter = rememberVectorPainter(Icons.Outlined.Tram)
@@ -273,6 +274,7 @@ internal fun MapMarkersOverlay(
                         expectedTime = times[marker.stop.key],
                         now = currentTime,
                         isCurrentStop = marker.stop.key == currentRouteStopKey,
+                        hasPassed = marker.stop.key in passedRouteStopKeys,
                     )
                     val text = textMeasurer.measure(label, routeTimeTextStyle)
                     val horizontalPadding = ROUTE_TIME_HORIZONTAL_PADDING.toPx()
@@ -365,6 +367,7 @@ internal fun MapMarkersOverlay(
                         expectedTime = times[stop.key],
                         now = currentTime,
                         isCurrentStop = stop.key == currentRouteStopKey,
+                        hasPassed = stop.key in passedRouteStopKeys,
                     )
                     val text = textMeasurer.measure(label, routeTimeTextStyle)
                     val horizontalPadding = ROUTE_TIME_HORIZONTAL_PADDING.toPx()
@@ -517,7 +520,9 @@ internal fun formatRouteStopTime(
     expectedTime: Instant?,
     now: Instant,
     isCurrentStop: Boolean = false,
+    hasPassed: Boolean = false,
 ): String {
+    if (hasPassed) return "odjechał"
     if (isCurrentStop) return "na przystanku"
     if (expectedTime == null) return "brak danych"
     val seconds = expectedTime.epochSeconds - now.epochSeconds
@@ -534,4 +539,5 @@ internal fun formatRouteStopLabel(
     expectedTime: Instant?,
     now: Instant,
     isCurrentStop: Boolean = false,
-): String = "$stopName\n${formatRouteStopTime(expectedTime, now, isCurrentStop)}"
+    hasPassed: Boolean = false,
+): String = "$stopName\n${formatRouteStopTime(expectedTime, now, isCurrentStop, hasPassed)}"

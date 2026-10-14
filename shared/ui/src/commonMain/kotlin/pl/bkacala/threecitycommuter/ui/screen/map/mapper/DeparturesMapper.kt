@@ -88,6 +88,7 @@ object DeparturesMapper {
             tripId = this.tripId,
             statusLabel = statusLabel(),
             scheduledTripStartTime = scheduledTripStartTime,
+            timestamp = timestamp,
             theoreticalTime = theoreticalTime,
             estimatedTime = estimatedTime,
             delayInSeconds = this.delayInSeconds ?: estimatedDelayInSeconds(),
@@ -127,7 +128,7 @@ object DeparturesMapper {
             tripId.toString(),
             vehicleId?.toString().orEmpty(),
             theoreticalTime?.toString().orEmpty(),
-            estimatedTime?.toString().orEmpty(),
+            (scheduledTripStartTime ?: theoreticalTime ?: estimatedTime)?.toString().orEmpty(),
             headsign.orEmpty(),
         ).joinToString("|")
 

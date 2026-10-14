@@ -107,7 +107,7 @@ class DeparturesMapperTest {
             departure.tripId.toString(),
             departure.vehicleId?.toString().orEmpty(),
             departure.theoreticalTime?.toString().orEmpty(),
-            departure.estimatedTime?.toString().orEmpty(),
+            (departure.scheduledTripStartTime ?: departure.theoreticalTime ?: departure.estimatedTime)?.toString().orEmpty(),
             departure.headsign.orEmpty(),
         ).joinToString("|")
 }

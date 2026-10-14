@@ -85,6 +85,7 @@ fun MapScreen(
                 state.routeStops.associate { stop -> stop.key to stop.expectedTime }
             },
             currentRouteStopKey = state.currentRouteStopKey,
+            passedRouteStopKeys = state.routeProgress.passedStopKeys,
             mapBottomPadding = if (state.departures == null) 0.dp else mapBottomPadding.value,
             mapStyle = mapStyle,
             stadiaToken = stadiaToken,

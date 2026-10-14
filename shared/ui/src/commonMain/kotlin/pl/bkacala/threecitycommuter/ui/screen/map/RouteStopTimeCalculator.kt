@@ -5,32 +5,36 @@ import pl.bkacala.threecitycommuter.model.route.Route
 import pl.bkacala.threecitycommuter.model.transit.TransitStopKey
 import kotlin.time.Duration.Companion.seconds
 
-/** Aligns provider timetable times with the departure selected by the user. */
+/** Always recalculates from the original timetable, never from corrected times. */
 internal class RouteStopTimeCalculator {
     fun calculate(
         route: Route,
         selectedStopKey: TransitStopKey?,
         selectedDepartureTime: Instant?,
         delayInSeconds: Int? = null,
+        estimatedTime: Instant? = null,
+        liveDelayInSeconds: Int? = null,
     ): List<Route.Stop> {
-        val routeSelectedStopTime = route.stops
-            .firstOrNull { it.key == selectedStopKey }
-            ?.expectedTime
-        val routeTimeCorrectionSeconds = if (selectedDepartureTime != null &&
-            routeSelectedStopTime != null
-        ) {
-            selectedDepartureTime.epochSeconds - routeSelectedStopTime.epochSeconds
+        val routeSelectedStopTime = route.stops.firstOrNull { it.key == selectedStopKey }?.expectedTime
+        val scheduledTime = selectedDepartureTime
+            ?: estimatedTime?.let { estimate -> delayInSeconds?.let { estimate.minus(it.seconds) } }
+            ?: routeSelectedStopTime
+        val expectedTime = if (liveDelayInSeconds != null && scheduledTime != null) {
+            scheduledTime.plus(liveDelayInSeconds.seconds)
         } else {
-            0L
-        } + (delayInSeconds ?: 0)
-
+            estimatedTime ?: selectedDepartureTime?.plus((delayInSeconds ?: 0).seconds)
+        }
+        val correction = if (expectedTime != null && routeSelectedStopTime != null) {
+            expectedTime - routeSelectedStopTime
+        } else {
+            (liveDelayInSeconds ?: delayInSeconds ?: 0).seconds
+        }
         return route.stops.map { stop ->
-            val correctedTime = stop.expectedTime?.plus(routeTimeCorrectionSeconds.seconds)
             stop.copy(
                 expectedTime = if (stop.key == selectedStopKey) {
-                    selectedDepartureTime?.plus((delayInSeconds ?: 0).seconds) ?: correctedTime
+                    expectedTime ?: stop.expectedTime?.plus(correction)
                 } else {
-                    correctedTime
+                    stop.expectedTime?.plus(correction)
                 },
             )
         }

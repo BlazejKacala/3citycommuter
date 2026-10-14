@@ -69,6 +69,7 @@ data class DepartureRowModel(
     val estimatedTime: Instant? = null,
     val delayInSeconds: Int? = null,
     val isLoading: Boolean = false,
+    val timestamp: Instant? = null,
 )
 
 @Composable

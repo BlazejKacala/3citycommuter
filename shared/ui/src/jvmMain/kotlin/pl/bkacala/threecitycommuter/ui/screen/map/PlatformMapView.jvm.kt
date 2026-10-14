@@ -50,6 +50,7 @@ actual fun PlatformMapView(
     route: List<LatLng>?,
     routeStopTimes: Map<TransitStopKey, Instant?>?,
     currentRouteStopKey: TransitStopKey?,
+    passedRouteStopKeys: Set<TransitStopKey>,
     userLocation: UserLocation?,
     onTransitStopSelected: (TransitStopMapItem) -> Unit,
     onMapClicked: () -> Unit,
@@ -155,6 +156,7 @@ actual fun PlatformMapView(
             vehicleColor = MapVehicleColor,
             routeStopTimes = routeStopTimes,
             currentRouteStopKey = currentRouteStopKey,
+            passedRouteStopKeys = passedRouteStopKeys,
         )
     }
 }

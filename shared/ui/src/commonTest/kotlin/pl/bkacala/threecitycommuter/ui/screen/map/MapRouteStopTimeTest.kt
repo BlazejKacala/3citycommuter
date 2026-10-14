@@ -40,4 +40,13 @@ class MapRouteStopTimeTest {
             ),
         )
     }
+    @Test
+    fun passedStopNeverDisplaysFutureEstimate() {
+        assertEquals(
+            "odjechał",
+            formatRouteStopTime(Instant.parse("2026-08-07T10:03:00Z"), now, hasPassed = true),
+        )
+        assertEquals("odjechał", formatRouteStopTime(null, now, hasPassed = true))
+    }
+
 }
