@@ -34,8 +34,10 @@ internal class CachingPlkApiClient(
         val stationCount = response.routes.sumOf { it.stations.size }
         if (stationCount <= MAX_CACHED_STATIONS) {
             while (schedules.isNotEmpty() &&
-                (schedules.size >= MAX_CACHED_SCHEDULES ||
-                    schedules.values.sumOf { it.stationCount } + stationCount > MAX_CACHED_STATIONS)
+                (
+                    schedules.size >= MAX_CACHED_SCHEDULES ||
+                        schedules.values.sumOf { it.stationCount } + stationCount > MAX_CACHED_STATIONS
+                    )
             ) {
                 schedules.remove(schedules.keys.first())
             }

@@ -49,16 +49,21 @@ class TransitDataSourceTest {
     @Test
     fun `fresh Gdynia snapshot skips startup parsing and download and overrides the seed on demand`() = runTest {
         var networkCalls = 0
-        val httpClient = HttpClient(MockEngine {
-            networkCalls += 1
-            error("No startup network request expected")
-        })
+        val httpClient = HttpClient(
+            MockEngine {
+                networkCalls += 1
+                error("No startup network request expected")
+            },
+        )
         val storage = InMemoryGdyniaGtfsSnapshotStorage(
             GdyniaGtfsSnapshot(gdyniaTripsBody, gdyniaGtfsZipBytes, downloadedAtEpochMilliseconds = Clock.System.now().toEpochMilliseconds()),
         )
         repeat(2) {
             val store = GdyniaGtfsStore(
-                httpClient, testJson, ZipEntryReader(), storage,
+                httpClient,
+                testJson,
+                ZipEntryReader(),
+                storage,
                 InMemoryGdyniaGtfsSeedSource(departureMatchIndex = gdyniaDepartureMatchIndexBody.replace("201", "999")),
             )
             val previousReads = storage.snapshotReads
@@ -75,14 +80,16 @@ class TransitDataSourceTest {
     @Test
     fun `expired Gdynia snapshot is refreshed only once`() = runTest {
         var networkCalls = 0
-        val httpClient = HttpClient(MockEngine { request ->
-            networkCalls += 1
-            if (request.url.encodedPath.endsWith("trips")) {
-                respond(gdyniaTripsBody)
-            } else {
-                respond(gdyniaGtfsZipBytes)
-            }
-        })
+        val httpClient = HttpClient(
+            MockEngine { request ->
+                networkCalls += 1
+                if (request.url.encodedPath.endsWith("trips")) {
+                    respond(gdyniaTripsBody)
+                } else {
+                    respond(gdyniaGtfsZipBytes)
+                }
+            },
+        )
         val storage = InMemoryGdyniaGtfsSnapshotStorage(
             GdyniaGtfsSnapshot(gdyniaTripsBody, gdyniaGtfsZipBytes, downloadedAtEpochMilliseconds = 1),
         )
@@ -94,7 +101,6 @@ class TransitDataSourceTest {
         assertEquals(201, store.resolveTripId(1015, "10:22", "Kacze Buki", 999))
         httpClient.close()
     }
-
 
     @Test
     fun `PLK schedules request uses singular fullRoute parameter`() = runTest {
@@ -752,10 +758,15 @@ class TransitDataSourceTest {
     }
 }
 
-private class InMemoryGdyniaGtfsSnapshotStorage(
+internal class InMemoryGdyniaGtfsSnapshotStorage(
     var snapshot: GdyniaGtfsSnapshot? = null,
 ) : GdyniaGtfsSnapshotStorage {
-    override suspend fun readDownloadedAtEpochMilliseconds(): Long? = snapshot?.downloadedAtEpochMilliseconds
+    var metadataReads = 0
+
+    override suspend fun readDownloadedAtEpochMilliseconds(): Long? {
+        metadataReads++
+        return snapshot?.downloadedAtEpochMilliseconds
+    }
 
     var snapshotReads = 0
 
@@ -764,28 +775,25 @@ private class InMemoryGdyniaGtfsSnapshotStorage(
         return snapshot
     }
 
-    override suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot): GdyniaGtfsSnapshot {
-        this.snapshot = snapshot
-        return snapshot
-    }
-
     override suspend fun writeDownloadedSnapshot(
         tripsBody: String,
         downloadedAtEpochMilliseconds: Long?,
         downloadGtfsZipToPath: suspend (String) -> Unit,
         downloadGtfsZipToBytes: suspend () -> ByteArray,
+        validate: suspend (GdyniaGtfsSnapshot) -> Unit,
     ): GdyniaGtfsSnapshot {
         val snapshot = GdyniaGtfsSnapshot(
             tripsBody = tripsBody,
             gtfsZip = downloadGtfsZipToBytes(),
             downloadedAtEpochMilliseconds = downloadedAtEpochMilliseconds,
         )
+        validate(snapshot)
         this.snapshot = snapshot
         return snapshot
     }
 }
 
-private class InMemoryGdyniaGtfsSeedSource(
+internal class InMemoryGdyniaGtfsSeedSource(
     private val departureMatchIndex: String? = null,
     private val shapeIndex: String? = null,
 ) : GdyniaGtfsSeedSource {
@@ -799,13 +807,13 @@ private sealed interface MockResponse {
     data class Bytes(val value: ByteArray) : MockResponse
 }
 
-private val testJson = Json {
+internal val testJson = Json {
     prettyPrint = true
     isLenient = true
     ignoreUnknownKeys = true
 }
 
-private val gdyniaTripsBody = """
+internal val gdyniaTripsBody = """
     [
       { "routeId": 10181, "tripId": 201, "shapeId": 1 }
     ]
@@ -859,7 +867,7 @@ private val gdyniaStopsBody = """
     ]
 """.trimIndent()
 
-private val gdyniaDepartureMatchIndexBody = """
+internal val gdyniaDepartureMatchIndexBody = """
     {
       "generatedAtUtc":"2026-07-27T10:00:00Z",
       "sourceGtfs":"test",
@@ -874,7 +882,7 @@ private val gdyniaDepartureMatchIndexBody = """
     }
 """.trimIndent()
 
-private val gdyniaShapeIndexBody = """
+internal val gdyniaShapeIndexBody = """
     {
       "generatedAtUtc":"2026-07-27T10:00:00Z",
       "sourceTrips":"test",
@@ -894,7 +902,7 @@ private val gdyniaShapeIndexBody = """
     }
 """.trimIndent()
 
-private val gdyniaGtfsZipBytes = byteArrayOf(
+internal val gdyniaGtfsZipBytes = byteArrayOf(
     80, 75, 3, 4, 20, 0, 0, 0, 8, 0, 39, 155.toByte(), 251.toByte(), 92, 31, 66, 58, 142.toByte(),
     52, 0, 0, 0, 80, 0, 0, 0, 10, 0, 0, 0, 115, 104, 97, 112, 101, 115, 46, 116, 120, 116,
     43, 206.toByte(), 72, 44, 72, 141.toByte(), 207.toByte(), 76, 209.toByte(), 41, 6, 51, 10, 74,

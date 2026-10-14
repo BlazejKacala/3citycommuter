@@ -197,6 +197,8 @@ Transport data is normalized through a provider layer:
 - Vehicle metadata is read from Room once per repository lifetime, then reused as a list and a numeric-code index. Successful refresh replaces both and updates the daily timestamp. Failures retain cached data and retry no sooner than 5 minutes later.
 - Gdansk vehicle polling waits 20 seconds after each request. Departures retain 30 seconds for city providers and 60 seconds for rail.
 - Map route requests are cancelled when selecting another departure/stop or clearing selection. Cancelled requests must not overwrite the newer loading state.
+- Gdynia GTFS imports share one coordinator. Publish a new disk generation only after parsing and validation, then atomically switch its manifest; never overwrite the active files during download. Android/JVM share the implementation in `shared/network/src/androidJvmMain`. Preserve legacy snapshot reads.
+- Gdynia keeps at most two new-format disk generations (plus legacy files). Missing-trip LRU: 128 entries, 5-minute TTL, cleared on generation publication. Import failures back off for 5 minutes; cancellation propagates without backoff. Already cached departures and complete routes remain readable during refresh.
 - Every additional cache needs a freshness policy and an explicit size limit. Do not cache live PLK operations with the schedule TTL.
 
 #### Error logging

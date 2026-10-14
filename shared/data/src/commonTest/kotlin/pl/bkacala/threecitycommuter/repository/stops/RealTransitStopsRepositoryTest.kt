@@ -118,7 +118,7 @@ class RealTransitStopsRepositoryTest {
     @Test
     fun `emits local data before a suspended network refresh and then publishes new data`() = runTest {
         val oldStop = createStop(101, TransitProvider.GDANSK, true, false)
-        val newStop = oldStop.copy(stopName = "Updated stop")
+        val newStop = oldStop.copy(stopName = "Updated stop", name = "Updated stop")
         val releaseNetwork = CompletableDeferred<Unit>()
         val source = object : TransitDataSource by FakeTransitDataSource(listOf(newStop)) {
             override suspend fun getStops(): List<TransitStopData> {

@@ -51,6 +51,8 @@ kotlin {
     }
 
     sourceSets {
+        androidMain { kotlin.srcDir("src/androidJvmMain/kotlin") }
+        jvmMain { kotlin.srcDir("src/androidJvmMain/kotlin") }
         commonMain.dependencies {
             implementation(project(":shared:core"))
             implementation(libs.ktor.client.core)

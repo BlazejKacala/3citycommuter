@@ -6,13 +6,13 @@ internal interface GdyniaGtfsSnapshotStorage {
 
     suspend fun readSnapshot(): GdyniaGtfsSnapshot?
 
-    suspend fun writeSnapshot(snapshot: GdyniaGtfsSnapshot): GdyniaGtfsSnapshot
-
+    /** Stage privately, validate, then atomically publish. Failure must preserve the active snapshot. */
     suspend fun writeDownloadedSnapshot(
         tripsBody: String,
         downloadedAtEpochMilliseconds: Long?,
         downloadGtfsZipToPath: suspend (String) -> Unit,
         downloadGtfsZipToBytes: suspend () -> ByteArray,
+        validate: suspend (GdyniaGtfsSnapshot) -> Unit,
     ): GdyniaGtfsSnapshot
 }
 
