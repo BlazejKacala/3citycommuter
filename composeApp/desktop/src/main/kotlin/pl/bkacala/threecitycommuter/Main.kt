@@ -1,8 +1,12 @@
 package pl.bkacala.threecitycommuter
 
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.skia.Image
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import pl.bkacala.threecitycommuter.di.dataModule
@@ -31,9 +35,16 @@ fun main() {
     }
 
     application {
+        val appIcon = remember {
+            BitmapPainter(
+                checkNotNull(Thread.currentThread().contextClassLoader.getResourceAsStream("icon.png"))
+                    .use { Image.makeFromEncoded(it.readBytes()).toComposeImageBitmap() },
+            )
+        }
         Window(
             onCloseRequest = ::exitApplication,
             title = "Przystanek Tr\u00F3jmiasto",
+            icon = appIcon,
         ) {
             App()
         }

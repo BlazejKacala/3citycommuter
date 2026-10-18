@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="launcher_background">#1976D2</color>
+    <color name="splash_background">#F6F8FC</color>
+    <color name="splash_logo">#1976D2</color>
+    <color name="splash_wordmark">#101D33</color>
+    <bool name="splash_light_system_bars">true</bool>
+</resources>
