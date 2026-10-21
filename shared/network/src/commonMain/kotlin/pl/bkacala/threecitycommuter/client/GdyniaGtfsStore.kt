@@ -73,6 +73,20 @@ internal class GdyniaGtfsStore(
         cache.routeByShapeId[shapeId]?.copy(stops = cache.routeStopsByTripId[tripId].orEmpty())
     }
 
+    /**
+     * Returns the currently published GTFS generation for timetable parsing.
+     * Refresh/publication stays serialized with departures and shape loading.
+     * If refresh fails, the last published disk generation remains readable.
+     */
+    suspend fun getTimetableSnapshot(): GdyniaGtfsSnapshot? = withContext(dispatcher) {
+        cacheMutex.withLock {
+            if (!hasFreshSnapshot()) {
+                loadTimetableSnapshotOrNull()?.let(::applyPublishedTimetableSnapshot)
+            }
+            snapshotStorage.readSnapshot()
+        }
+    }
+
     private fun ShapeCache.hasCompleteTrip(tripId: Int): Boolean =
         shapeIdByTripId[tripId]?.let { it in routeByShapeId } == true &&
             !routeStopsByTripId[tripId].isNullOrEmpty()
@@ -174,6 +188,102 @@ internal class GdyniaGtfsStore(
             retryAfter = clock.now() + RETRY_DELAY
             logError(LOG_TAG, "Failed to import Gdynia GTFS; keeping previous generation", exception)
             null
+        }
+    }
+
+    /**
+     * Timetable details only need the published archive. Validate the feed without materializing
+     * route geometry or per-stop domain objects, which are loaded lazily by their consumers.
+     */
+    private suspend fun loadTimetableSnapshotOrNull(): GdyniaGtfsSnapshot? {
+        if (retryAfter?.let { clock.now() < it } == true) return null
+        return try {
+            val snapshot = downloadSnapshot(::validateTimetableSnapshot)
+            retryAfter = null
+            logInfo(LOG_TAG, "Published validated Gdynia GTFS timetable snapshot")
+            snapshot
+        } catch (exception: Exception) {
+            if (exception is CancellationException) throw exception
+            retryAfter = clock.now() + RETRY_DELAY
+            logError(LOG_TAG, "Failed to import Gdynia GTFS timetable; keeping previous generation", exception)
+            null
+        }
+    }
+
+    private fun applyPublishedTimetableSnapshot(snapshot: GdyniaGtfsSnapshot) {
+        // These caches belong to the preceding disk generation. Clear them so later route and
+        // departure reads rebuild from the newly published snapshot.
+        state = CacheState(downloadedAt = snapshot.downloadedAtEpochMilliseconds?.let(Instant::fromEpochMilliseconds))
+        persistedSnapshotRejected = false
+        missingTrips.clear()
+    }
+
+    private suspend fun validateTimetableSnapshot(snapshot: GdyniaGtfsSnapshot) {
+        val tripShapes = json.decodeFromString<List<GdyniaTripNetworkData>>(snapshot.tripsBody)
+            .associate { it.tripId to it.shapeId }
+        require(tripShapes.isNotEmpty()) { "Empty trips" }
+
+        val tripsWithStops = mutableSetOf<Int>()
+        var tripIdIndex = -1
+        var stopIdIndex = -1
+        var stopSequenceIndex = -1
+        var departureTimeIndex = -1
+        var stopTimesCount = 0
+        val hasStopTimes = readGtfsEntryLines(snapshot, STOP_TIMES_ENTRY_NAME) { rawLine ->
+            val line = rawLine.trim()
+            if (line.isEmpty()) return@readGtfsEntryLines
+            val columns = line.parseCsvLine()
+            if (tripIdIndex == -1) {
+                tripIdIndex = columns.indexOf("tripId").takeIf { it != -1 } ?: columns.indexOf("trip_id")
+                stopIdIndex = columns.indexOf("stopId").takeIf { it != -1 } ?: columns.indexOf("stop_id")
+                stopSequenceIndex = columns.indexOf("stopSequence").takeIf { it != -1 } ?: columns.indexOf("stop_sequence")
+                departureTimeIndex = columns.indexOf("departureTime").takeIf { it != -1 } ?: columns.indexOf("departure_time")
+                require(tripIdIndex != -1 && stopIdIndex != -1 && stopSequenceIndex != -1 && departureTimeIndex != -1) {
+                    "Invalid stop_times header, required columns are missing"
+                }
+                return@readGtfsEntryLines
+            }
+
+            val tripId = columns.getOrNull(tripIdIndex)?.toIntOrNull() ?: error("Invalid GTFS trip_id")
+            columns.getOrNull(stopIdIndex)?.toIntOrNull() ?: error("Invalid GTFS stop_id")
+            columns.getOrNull(stopSequenceIndex)?.toIntOrNull() ?: error("Invalid GTFS stop_sequence")
+            require(!columns.getOrNull(departureTimeIndex).isNullOrBlank()) { "Missing departure time" }
+            require(tripId in tripShapes) { "stop_times references an unknown trip" }
+            tripsWithStops += tripId
+            stopTimesCount++
+        }
+        require(hasStopTimes && tripIdIndex != -1) { "Missing or empty $STOP_TIMES_ENTRY_NAME" }
+        require(stopTimesCount > 0) { "Empty stop_times" }
+
+        val shapeIds = mutableSetOf<Int>()
+        var shapeIdIndex = -1
+        var latitudeIndex = -1
+        var longitudeIndex = -1
+        var shapeSequenceIndex = -1
+        val hasShapes = readGtfsEntryLines(snapshot, SHAPES_ENTRY_NAME) { rawLine ->
+            val line = rawLine.trim()
+            if (line.isEmpty()) return@readGtfsEntryLines
+            val columns = line.parseCsvLine()
+            if (shapeIdIndex == -1) {
+                shapeIdIndex = columns.indexOf("shape_id")
+                latitudeIndex = columns.indexOf("shape_pt_lat")
+                longitudeIndex = columns.indexOf("shape_pt_lon")
+                shapeSequenceIndex = columns.indexOf("shape_pt_sequence")
+                require(shapeIdIndex != -1 && latitudeIndex != -1 && longitudeIndex != -1 && shapeSequenceIndex != -1) {
+                    "Invalid shapes.txt header, required columns are missing"
+                }
+                return@readGtfsEntryLines
+            }
+
+            val shapeId = columns.getOrNull(shapeIdIndex)?.toIntOrNull() ?: error("Invalid GTFS shape_id")
+            columns.getOrNull(latitudeIndex)?.toDoubleOrNull() ?: error("Invalid GTFS shape latitude")
+            columns.getOrNull(longitudeIndex)?.toDoubleOrNull() ?: error("Invalid GTFS shape longitude")
+            columns.getOrNull(shapeSequenceIndex)?.toIntOrNull() ?: error("Invalid GTFS shape sequence")
+            shapeIds += shapeId
+        }
+        require(hasShapes && shapeIdIndex != -1 && shapeIds.isNotEmpty()) { "Missing or empty $SHAPES_ENTRY_NAME" }
+        require(tripShapes.all { (tripId, shapeId) -> shapeId in shapeIds && tripId in tripsWithStops }) {
+            "Incomplete GTFS generation: trips, shapes and stop_times disagree"
         }
     }
 

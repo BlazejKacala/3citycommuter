@@ -1,0 +1,32 @@
+model = "gpt-6-astra"
+model_reasoning_effort = "high"
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+default_subagent_model = "gpt-6-luna"
+default_subagent_reasoning_effort = "high"
+
+[agents.supervisor]
+description = "Project workflow lead for planning, safe delegation, and integration decisions."
+config_file = "./agents/supervisor.toml"
+
+[agents.api_analyst]
+description = "Read-only analyst for provider APIs, payloads, and network contracts."
+config_file = "./agents/api_analyst.toml"
+
+[agents.data_worker]
+description = "Implementation worker for bounded shared data and network tasks."
+config_file = "./agents/data_worker.toml"
+
+[agents.viewmodel_worker]
+description = "Implementation worker for bounded Compose UI and ViewModel tasks."
+config_file = "./agents/viewmodel_worker.toml"
+
+[agents.test_worker]
+description = "Worker for focused tests and test-support changes assigned by the supervisor."
+config_file = "./agents/test_worker.toml"
+
+[agents.reviewer]
+description = "Independent, read-only reviewer for correctness, regressions, architecture, and test gaps."
+config_file = "./agents/reviewer.toml"

@@ -9,6 +9,8 @@ import pl.bkacala.threecitycommuter.repository.rail.DatabaseRailStationCatalog
 import pl.bkacala.threecitycommuter.repository.rail.RailStationsSeedSeeder
 import pl.bkacala.threecitycommuter.repository.routes.RealRoutesRepository
 import pl.bkacala.threecitycommuter.repository.routes.RoutesRepository
+import pl.bkacala.threecitycommuter.repository.schedule.RealScheduleRepository
+import pl.bkacala.threecitycommuter.repository.schedule.ScheduleRepository
 import pl.bkacala.threecitycommuter.repository.stops.RealTransitStopsRepository
 import pl.bkacala.threecitycommuter.repository.stops.TransitStopsRepository
 import pl.bkacala.threecitycommuter.repository.update.LastUpdateRepository
@@ -25,6 +27,7 @@ val dataModule = module {
     single<TransitStopsRepository> { RealTransitStopsRepository(get<TransitDataSource>(), get(), get()) }
     single<VehiclesRepository> { RealVehiclesRepository(get(), get<TransitDataSource>(), get()) }
     single<RoutesRepository> { RealRoutesRepository(get()) }
+    single<ScheduleRepository> { RealScheduleRepository(get()) }
     single { RailStationsSeedSeeder(get(), get()) }
     single<RailStationCatalog> { DatabaseRailStationCatalog(get()) }
     single { GetDeparturesUseCase(get(), get()) }

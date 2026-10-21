@@ -27,4 +27,8 @@ enum class Destinations(
 ) {
     Maps(route = "Maps"),
     ScheduleContent(route = "ScheduleContent"),
+    ScheduleTimetable(route = "ScheduleTimetable"),
+    ScheduleTrip(route = "ScheduleTrip"),
+    ScheduleCollection(route = "ScheduleCollection"),
+    ScheduleNotices(route = "ScheduleNotices"),
 }

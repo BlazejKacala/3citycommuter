@@ -13,12 +13,15 @@ import pl.bkacala.threecitycommuter.client.GdanskRouteTimesResolver
 import pl.bkacala.threecitycommuter.client.GdanskTransitDataSource
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsPreloader
 import pl.bkacala.threecitycommuter.client.GdyniaGtfsStore
+import pl.bkacala.threecitycommuter.client.GdyniaTimetableSource
 import pl.bkacala.threecitycommuter.client.GdyniaTransitDataSource
 import pl.bkacala.threecitycommuter.client.KtorGdanskApiClient
 import pl.bkacala.threecitycommuter.client.KtorPlkApiClient
 import pl.bkacala.threecitycommuter.client.PlkApiClient
 import pl.bkacala.threecitycommuter.client.RailStaticCatalog
 import pl.bkacala.threecitycommuter.client.RailTransitDataSource
+import pl.bkacala.threecitycommuter.client.RealTimetableDataSource
+import pl.bkacala.threecitycommuter.client.TimetableDataSource
 import pl.bkacala.threecitycommuter.client.TransitDataSource
 import pl.bkacala.threecitycommuter.client.ZipEntryReader
 
@@ -52,8 +55,10 @@ val networkModule = module {
     single<GdyniaGtfsPreloader> { get<GdyniaGtfsStore>() }
     single<PlkApiClient> { CachingPlkApiClient(KtorPlkApiClient(get(), get())) }
     single { RailStaticCatalog(get()) }
+    single { GdyniaTimetableSource(get(), get(), get()) }
     single { GdanskTransitDataSource(get(), get(), get()) }
     single { GdyniaTransitDataSource(get(), get(), get()) }
     single { RailTransitDataSource(get(), get()) }
     single<TransitDataSource> { CombinedTransitDataSource(get(), get(), get(), get()) }
+    single<TimetableDataSource> { RealTimetableDataSource(get(), get(), get(), get(), get(), get()) }
 }

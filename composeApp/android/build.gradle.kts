@@ -7,6 +7,13 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
 }
 
+// Material's date picker and existing providers need both the new and the 0.6 time API at runtime.
+configurations.configureEach {
+    if (name.endsWith("RuntimeClasspath", ignoreCase = true)) {
+        resolutionStrategy.force("org.jetbrains.kotlinx:kotlinx-datetime:${libs.versions.kotlinxDatetimeCompat.get()}")
+    }
+}
+
 android {
     namespace = "pl.bkacala.threecitycommuter"
     compileSdk = 37

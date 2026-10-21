@@ -1,7 +1,7 @@
 package pl.bkacala.threecitycommuter.client
 
 import java.io.ByteArrayInputStream
-import java.io.FileInputStream
+import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 
 internal actual class ZipEntryReader {
@@ -13,11 +13,11 @@ internal actual class ZipEntryReader {
         )
 
     actual fun readEntryLines(zipFilePath: String, entryName: String, onLine: (String) -> Unit): Boolean =
-        readEntryLinesInternal(
-            openZip = { ZipInputStream(FileInputStream(zipFilePath)) },
-            entryName = entryName,
-            onLine = onLine,
-        )
+        ZipFile(zipFilePath).use { zip ->
+            val entry = zip.getEntry(entryName) ?: return false
+            zip.getInputStream(entry).bufferedReader().useLines { lines -> lines.forEach(onLine) }
+            true
+        }
 
     private fun readEntryLinesInternal(
         openZip: () -> ZipInputStream,

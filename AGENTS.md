@@ -365,3 +365,14 @@ Required GitHub secrets for signed CI builds:
 2. Spotless covers Kotlin, Gradle Kotlin DSL, Markdown, YAML, and `.gitignore`.
 3. Detekt reports are generated under module `build/reports/detekt/`.
 4. `gradlew` must remain executable in Git for Linux CI runners.
+
+## Codex multi-agent workflow
+
+- Project configuration and role instructions live in `.codex/config.toml` and `.codex/agents/`. See [docs/codex-multi-agent.md](docs/codex-multi-agent.md) for version checks and runtime limitations.
+- Prefer Astra for the supervisor, Luna for API/data/ViewModel/test workers, and Astra or Sol for independent review. Use only model identifiers available in the active client. Configuration changes do not switch a running session's model.
+- Run at most three subagents concurrently. The supervisor owns planning, contracts, integration and final validation. Delegate independent tasks only after fixing shared contracts and exclusive file ownership.
+- Read the actual code before choosing patterns. Extend existing Koin/Ktor/Flow/provider conventions; do not introduce a new architecture for a feature integration.
+- Preserve pre-existing worktree changes. A worker may modify only its assigned files. Contract, dependency and ownership changes return to the supervisor before editing.
+- Workers report changed files, behavior, checks run, unresolved issues and risks. The supervisor schedules Gradle checks to avoid concurrent writes to build outputs.
+- For timetable integration, follow [docs/feature-implementation-plan.md](docs/feature-implementation-plan.md) and verified provider details in [docs/feature-api-analysis.md](docs/feature-api-analysis.md). Never present demo records, synthetic direction reversals or fixed inter-stop intervals as real provider data.
+- Review cancellation, provider-qualified identity, service dates, unknown data and offline restoration before acceptance. Do not cache live data using planned-schedule TTLs.

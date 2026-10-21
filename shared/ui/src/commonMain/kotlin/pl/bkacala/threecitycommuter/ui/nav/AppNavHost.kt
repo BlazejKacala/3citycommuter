@@ -7,7 +7,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import pl.bkacala.threecitycommuter.ui.screen.map.MapScreen
-import pl.bkacala.threecitycommuter.ui.screen.schedule.ScheduleScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController, snackbarHostState: SnackbarHostState) {
@@ -20,13 +19,6 @@ fun AppNavHost(navController: NavHostController, snackbarHostState: SnackbarHost
                 MapScreen(snackbarHostState)
             }
         }
-        navigation(
-            route = TopLvlDestinations.Schedule.route,
-            startDestination = Destinations.ScheduleContent.route,
-        ) {
-            composable(Destinations.ScheduleContent.route) {
-                ScheduleScreen()
-            }
-        }
+        scheduleGraph(navController, snackbarHostState)
     }
 }

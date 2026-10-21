@@ -2,6 +2,7 @@ package pl.bkacala.threecitycommuter.client
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -38,15 +39,15 @@ internal class KtorPlkApiClient(
         carriersInclude: String,
         fullRoutes: Boolean,
     ): PlkScheduleResponse = httpClient.get("${PlkApiConfig.BASE_URL}/api/v1/schedules") {
+        expectSuccess = true
         header("X-API-Key", PlkApiConfig.API_KEY)
         parameter("dateFrom", dateFrom)
         parameter("dateTo", dateTo)
         parameter("stations", stations)
         parameter("carriersInclude", carriersInclude)
         parameter("fullRoute", fullRoutes)
-        // Station names come from the local rail catalog.  The PLK dictionary can be
-        // large and is not needed for departures.
-        parameter("dictionaries", false)
+        // Full routes can terminate outside the local Tri-City station catalog.
+        parameter("dictionaries", fullRoutes)
     }.body()
 
     override suspend fun getOperations(

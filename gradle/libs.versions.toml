@@ -28,6 +28,7 @@ ktor = "3.1.1"
 # Kotlinx
 kotlinxSerialization = "1.8.0"
 kotlinxDatetime = "0.6.2"
+kotlinxDatetimeCompat = "0.7.1-0.6.x-compat"
 kotlinxCoroutines = "1.10.1"
 
 # MapLibre

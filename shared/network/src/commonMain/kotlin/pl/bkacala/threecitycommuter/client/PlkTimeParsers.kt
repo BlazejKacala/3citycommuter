@@ -18,11 +18,13 @@ internal fun String.toPlkRouteInstant(
     val date = LocalDate.parse(operatingDate).plus(DatePeriod(days = dayOffset))
     val normalized = removePrefix("P")
     val parts = normalized.split(":")
-    val hours = parts.getOrNull(0)?.toIntOrNull() ?: 0
-    val minutes = parts.getOrNull(1)?.toIntOrNull() ?: 0
-    val seconds = parts.getOrNull(2)?.toIntOrNull() ?: 0
+    require(parts.size in 2..3) { "Invalid PLK route time" }
+    val hours = requireNotNull(parts[0].toIntOrNull()) { "Invalid PLK hour" }
+    val minutes = requireNotNull(parts[1].toIntOrNull()) { "Invalid PLK minute" }
+    val seconds = if (parts.size == 3) requireNotNull(parts[2].toIntOrNull()) { "Invalid PLK second" } else 0
+    require(hours >= 0 && minutes in 0..59 && seconds in 0..59) { "Invalid PLK route time" }
     val adjustedDate = date.plus(DatePeriod(days = hours / 24))
-    return adjustedDate.atTime(hours % 24, minutes, seconds).toInstant(TimeZone.currentSystemDefault())
+    return adjustedDate.atTime(hours % 24, minutes, seconds).toInstant(TimeZone.of("Europe/Warsaw"))
 }
 
 internal fun String.toPlkOperationInstant(): Instant {

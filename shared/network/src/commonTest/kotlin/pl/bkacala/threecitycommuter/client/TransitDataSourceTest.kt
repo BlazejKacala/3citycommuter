@@ -134,7 +134,7 @@ class TransitDataSourceTest {
     }
 
     @Test
-    fun `PLK departure requests avoid large optional payloads`() = runTest {
+    fun `PLK full schedules include station names while live departures stay shortened`() = runTest {
         val requestedUrls = mutableListOf<String>()
         val httpClient = HttpClient(
             MockEngine { request ->
@@ -165,7 +165,7 @@ class TransitDataSourceTest {
             fullRoutes = false,
         )
 
-        assertTrue(requestedUrls[0].contains("dictionaries=false"))
+        assertTrue(requestedUrls[0].contains("dictionaries=true"))
         assertTrue(requestedUrls[1].contains("/operations/shortened"))
         assertTrue(requestedUrls[1].contains("fullRoutes=false"))
         assertTrue(requestedUrls[1].contains("pageSize=500"))

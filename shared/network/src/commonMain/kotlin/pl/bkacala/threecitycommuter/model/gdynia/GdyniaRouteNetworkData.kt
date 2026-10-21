@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class GdyniaRouteNetworkData(
     val routeId: Int,
     val routeShortName: String? = null,
+    val routeLongName: String? = null,
 )

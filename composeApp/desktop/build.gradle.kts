@@ -18,6 +18,24 @@ dependencies {
 
     implementation(libs.koin.core)
     implementation(libs.kotlinx.coroutines.swing)
+
+    testImplementation(libs.androidx.navigation.compose)
+    testImplementation(libs.kotlinx.datetime)
+}
+
+// Material's date picker and existing providers need both the new and the 0.6 time API at runtime.
+configurations.configureEach {
+    if (name.endsWith("RuntimeClasspath", ignoreCase = true)) {
+        resolutionStrategy.force("org.jetbrains.kotlinx:kotlinx-datetime:${libs.versions.kotlinxDatetimeCompat.get()}")
+    }
+}
+
+tasks.register<JavaExec>("runSchedulePreview") {
+    group = "application"
+    description = "Runs the mock schedule screens without the database or network."
+    dependsOn(tasks.named("testClasses"))
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("pl.bkacala.threecitycommuter.SchedulePreviewKt")
 }
 
 compose.desktop {

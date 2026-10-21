@@ -36,6 +36,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.multiplatform.settings)
         }
         androidMain.dependencies {
             // MapLibre Compose - open-source fork of Mapbox GL
